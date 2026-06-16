@@ -40,3 +40,26 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   .selected-row{display:grid;grid-template-columns:1fr;align-items:stretch}
   .selected-actions{justify-content:space-between}
 }
+
+
+/* 0.7 ajustes de layout */
+.topbar{border-radius:0;padding-bottom:22px}
+.hero h1{letter-spacing:-.03em}
+.play-btn.subtle{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.28)}
+.rules-panel{display:grid;gap:12px}
+.rule-group{background:#f7fbf8;border:1px solid #dfece4;border-radius:20px;padding:14px}
+.rule-group h4{margin:0 0 10px;font-size:15px;color:var(--green-dark)}
+.rule-group[hidden]{display:none!important}
+.rounded-matches{display:grid;gap:10px;margin-top:12px}
+.round-block{background:#f8fbf9;border:1px solid #e3eee7;border-radius:16px;padding:10px;display:grid;gap:8px}
+.round-block>strong{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--green-dark)}
+.tournament-head{padding-top:18px}
+.tournament-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.tournament-actions .play-btn{white-space:nowrap}
+@media(min-width:720px){.tournament-actions{grid-template-columns:repeat(4,max-content)}}
+@media(max-width:720px){
+  .topbar{border-radius:0}
+  .tournament-screen{padding-top:6px}
+  .tournament-actions{grid-template-columns:1fr 1fr}
+  .play-btn{padding:11px 10px;font-size:14px}
+}

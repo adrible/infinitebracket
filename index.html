@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brocket V7</title>
+  <title>Brocket 0.7.1</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -20,7 +20,7 @@
         <button class="ghost" id="resetLocal">limpar</button>
       </div>
       <div class="hero">
-        <small id="pageSubtitle">V7</small>
+        <small id="pageSubtitle">0.7.1</small>
         <h1 id="pageTitle">Início</h1>
       </div>
     </header>
@@ -34,8 +34,8 @@
           <button class="quick-card" data-go="tournament"><span>🎮</span><strong>Torneio atual</strong><small>simular partida por partida</small></button>
         </div>
         <div class="panel green-panel">
-          <strong>V7 oficial</strong>
-          <p>Criação de torneio mais livre: escolha manual dos times, busca, filtros, quantidade por pacote, prévia de grupos/chaveamento e simulação partida por partida.</p>
+          <strong>Brocket 0.7.1</strong>
+          <p>Criação mais simples, regras que mudam conforme o modelo, rodadas separadas e simulação por jogo, rodada ou torneio inteiro.</p>
         </div>
         <div class="section-title"><h2>Campeonatos</h2><button class="link" data-go="competitions">ver todos</button></div>
         <div id="homeCompetitions" class="list"></div>
@@ -48,36 +48,58 @@
           <div class="form-grid">
             <label>Nome da edição<input id="editionName" value="Copa dos Amigos 2026" /></label>
             <label>Campeonato<select id="competitionSelect"></select></label>
-            <label>Formato<select id="formatSelect"><option value="playoffs">Playoffs / mata-mata</option><option value="groups">Fase de grupos + mata-mata</option><option value="clubWorldCup">Copa do Mundo de Clubes</option><option value="league">Liga / pontos corridos</option></select></label>
+            <label>Modelo do torneio<select id="formatSelect"><option value="playoffs">Mata-mata direto</option><option value="groups">Grupos + mata-mata</option><option value="clubWorldCup">Mundial de Clubes — grupos + mata-mata</option><option value="league">Liga / pontos corridos</option></select></label>
             <label>Quantidade de times<select id="teamCount"><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option><option selected>16</option><option>20</option><option>24</option><option>32</option></select></label>
           </div>
         </div>
 
         <div class="panel rules-panel">
-          <h3>Regras</h3>
-          <div class="form-grid">
-            <label>Chaveamento<select id="bracketShuffle"><option value="shuffle" selected>Embaralhar confrontos</option><option value="strength">Cabeças de chave por força</option></select></label>
-            <label>Grupos<select id="groupShuffle"><option value="shuffle" selected>Sortear grupos</option><option value="balanced">Equilibrar por força</option></select></label>
-            <label>Confrontos mata-mata<select id="knockoutLegs"><option value="single" selected>Jogo único</option><option value="two">Ida e volta</option></select></label>
-            <label>Final<select id="finalRule"><option value="single" selected>Final jogo único</option><option value="same">Mesma regra das fases</option></select></label>
-            <label>Chance de zebra<select id="upsetLevel"><option value="low">Baixa</option><option value="medium" selected>Média</option><option value="high">Alta</option><option value="chaos">Caótica</option></select></label>
-            <label>Realismo do placar<select id="scoreRealism"><option value="realistic" selected>Realista</option><option value="normal">Normal</option><option value="chaotic">Caótico</option></select></label>
-            <label id="leagueTurnsWrap">Liga<select id="leagueTurns"><option value="single" selected>Turno único</option><option value="double">Turno e returno</option></select></label>
-            <label id="groupSizeWrap">Tamanho dos grupos<select id="groupSize"><option value="4" selected>4 times por grupo</option></select></label>
-            <label id="groupTurnsWrap">Fase de grupos<select id="groupTurns"><option value="single" selected>1 rodada</option><option value="double">2 rodadas / ida e volta</option></select></label>
+          <div class="section-title tight"><h3>Regras do modelo</h3><small id="ruleHint">ajustadas pelo modelo</small></div>
+
+          <div class="rule-group" data-rule-for="all">
+            <h4>Realismo</h4>
+            <div class="form-grid">
+              <label>Chance de zebra<select id="upsetLevel"><option value="low">Baixa</option><option value="medium" selected>Média</option><option value="high">Alta</option><option value="chaos">Caótica</option></select></label>
+              <label>Realismo do placar<select id="scoreRealism"><option value="realistic" selected>Realista</option><option value="normal">Normal</option><option value="chaotic">Caótico</option></select></label>
+            </div>
           </div>
-          <div class="switches">
-            <label><input id="extraTime" type="checkbox" checked /> Prorrogação</label>
-            <label><input id="penalties" type="checkbox" checked /> Pênaltis</label>
-            <label><input id="awayGoals" type="checkbox" /> Gol fora</label>
+
+          <div class="rule-group" data-rule-for="playoffs groups clubWorldCup">
+            <h4>Mata-mata</h4>
+            <div class="form-grid">
+              <label>Chaveamento<select id="bracketShuffle"><option value="shuffle" selected>Sortear confrontos</option><option value="strength">Cabeças de chave por força</option></select></label>
+              <label>Confrontos<select id="knockoutLegs"><option value="single" selected>Jogo único</option><option value="two">Ida e volta</option></select></label>
+              <label>Final<select id="finalRule"><option value="single" selected>Final jogo único</option><option value="same">Mesma regra das fases</option></select></label>
+            </div>
+            <div class="switches">
+              <label><input id="extraTime" type="checkbox" checked /> Prorrogação</label>
+              <label><input id="penalties" type="checkbox" checked /> Pênaltis</label>
+              <label><input id="awayGoals" type="checkbox" /> Gol fora</label>
+            </div>
+          </div>
+
+          <div class="rule-group" data-rule-for="groups clubWorldCup">
+            <h4>Fase de grupos</h4>
+            <div class="form-grid">
+              <label>Grupos<select id="groupShuffle"><option value="shuffle" selected>Sortear grupos</option><option value="balanced">Equilibrar por força</option></select></label>
+              <label>Tamanho dos grupos<select id="groupSize"><option value="4" selected>4 times por grupo</option></select></label>
+              <label>Rodadas da fase de grupos<select id="groupTurns"><option value="single" selected>1 rodada</option><option value="double">2 rodadas / ida e volta</option></select></label>
+            </div>
+          </div>
+
+          <div class="rule-group" data-rule-for="league">
+            <h4>Liga / pontos corridos</h4>
+            <div class="form-grid">
+              <label>Turnos<select id="leagueTurns"><option value="single" selected>Turno único</option><option value="double">Turno e returno</option></select></label>
+            </div>
           </div>
         </div>
 
         <div class="panel">
-          <div class="section-title tight"><h3>Pacotes de times</h3><small id="poolCount">0 disponíveis</small></div>
+          <div class="section-title tight"><h3>Escolha dos times</h3><small id="poolCount">0 disponíveis</small></div><small id="poolCount">0 disponíveis</small></div>
           <div id="packList" class="pack-grid"></div>
 
-          <div class="section-title tight"><h3>Quantidade por pacote</h3><small>opcional</small></div>
+          <div class="section-title tight"><h3>Montagem rápida</h3><small>opcional</small></div>
           <div id="quotaList" class="quota-grid"></div>
           <div class="action-row">
             <button class="secondary" id="applyQuotas">Aplicar quantidades</button>
@@ -98,7 +120,7 @@
             <button class="secondary" id="selectVisible">Selecionar visíveis</button>
           </div>
 
-          <div class="section-title tight"><h3>Escolha manual</h3><small id="availableCount">0 filtrados</small></div>
+          <div class="section-title tight"><h3>Escolher manualmente</h3><small id="availableCount">0 filtrados</small></div>
           <div id="availableTeams" class="team-list available-list"></div>
 
           <div class="section-title tight"><h3>Selecionados</h3><small id="selectedCount">0/16</small></div>
