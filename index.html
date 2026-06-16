@@ -3,86 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brocket V5</title>
+  <title>Brocket V6</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="app">
     <header class="topbar">
       <div class="topbar__row">
-        <div class="brand"><span class="brand__logo">B</span><div><strong>Brocket</strong><small>torneios, fases e histórias</small></div></div>
-        <button class="ghost" id="resetDemo">limpar</button>
+        <div class="brand" data-go="home">
+          <span class="brand__logo">B</span>
+          <div>
+            <strong>Brocket</strong>
+            <small>torneios, edições e histórias</small>
+          </div>
+        </div>
+        <button class="ghost" id="resetLocal">limpar</button>
       </div>
-      <div class="hero"><small id="subtitle">V5</small><h1 id="title">Início</h1></div>
+      <div class="hero">
+        <small id="pageSubtitle">V6</small>
+        <h1 id="pageTitle">Início</h1>
+      </div>
     </header>
 
     <main class="content">
       <section id="home" class="screen active">
         <div class="quick-grid">
-          <button class="quick-card" data-go="create"><span>🏆</span><strong>Criar torneio</strong><small>playoffs ou grupos + mata-mata</small></button>
-          <button class="quick-card" data-go="competitions"><span>📁</span><strong>Campeonatos</strong><small>edições e estatísticas</small></button>
+          <button class="quick-card" data-go="create"><span>🏆</span><strong>Criar torneio</strong><small>mata-mata, grupos ou liga</small></button>
+          <button class="quick-card" data-go="competitions"><span>📁</span><strong>Campeonatos</strong><small>edições, estatísticas e configs</small></button>
           <button class="quick-card" data-go="teams"><span>👥</span><strong>Times</strong><small>pacotes e personalizados</small></button>
-          <button class="quick-card" data-go="rules"><span>⚙️</span><strong>Regras</strong><small>ida-volta, pênaltis e zebra</small></button>
+          <button class="quick-card" data-go="tournament"><span>🎮</span><strong>Torneio atual</strong><small>simular partida por partida</small></button>
         </div>
         <div class="panel green-panel">
-          <strong>Agora na V5</strong>
-          <p>V4 + estatísticas polidas, Hall da Fama, apagar campeonatos/edições e novo formato Liga / Pontos Corridos.</p>
+          <strong>V6 polida</strong>
+          <p>Visual voltou para a pegada da V3, com simulação partida por partida, estatísticas persistentes, shuffle nos grupos/chaveamento e configurações do campeonato em aba própria.</p>
         </div>
-        <div class="section-title"><h2>Últimos campeonatos</h2><button class="link" data-go="competitions">ver todos</button></div>
+        <div class="section-title"><h2>Campeonatos</h2><button class="link" data-go="competitions">ver todos</button></div>
         <div id="homeCompetitions" class="list"></div>
-      </section>
-
-      <section id="competitions" class="screen">
-        <div class="section-title"><h2>Campeonatos</h2><button class="link" id="newCompetition">+ novo</button></div>
-        <div class="panel mini" id="competitionForm" hidden>
-          <label>Nome do campeonato<input id="competitionName" placeholder="Ex: Copa da Galera" /></label>
-          <button class="primary" id="saveCompetition">Criar</button>
-        </div>
-        <div id="competitionList" class="list"></div>
-      </section>
-
-      <section id="competitionDetail" class="screen">
-        <div class="section-title"><h2 id="competitionTitle">Campeonato</h2><button class="link" data-go="competitions">voltar</button></div>
-        <div id="competitionStats" class="stats stat-hero"></div>
-        <div class="tabs stat-tabs">
-          <button class="tab active" data-tab="summary">Resumo</button>
-          <button class="tab" data-tab="titles">Títulos</button>
-          <button class="tab" data-tab="teamsStats">Times</button>
-          <button class="tab" data-tab="gamesStats">Jogos</button>
-          <button class="tab" data-tab="editions">Edições</button>
-        </div>
-        <div id="summaryTab" class="tab-page active"><div id="summaryList" class="stat-grid"></div></div>
-        <div id="titlesTab" class="tab-page"><div id="titlesList" class="stat-grid"></div></div>
-        <div id="teamsStatsTab" class="tab-page"><div id="teamsStatsList" class="list"></div></div>
-        <div id="gamesStatsTab" class="tab-page"><div id="gamesStatsList" class="stat-grid"></div></div>
-        <div id="editionsTab" class="tab-page"><div id="editionList" class="list"></div></div>
-        <div class="danger-zone">
-          <strong>Zona de perigo</strong>
-          <small>Apagar um campeonato remove todas as edições e estatísticas salvas nele.</small>
-          <button class="danger" id="deleteCompetitionBtn">Apagar campeonato</button>
-        </div>
-      </section>
-
-      <section id="teams" class="screen">
-        <div class="section-title"><h2>Times</h2><button class="link" data-go="create">usar no torneio</button></div>
-        <div class="panel">
-          <h3>Criar time personalizado</h3>
-          <div class="form-grid">
-            <label>Nome<input id="customName" placeholder="Ex: Atlético dos Amigos" /></label>
-            <label>Força<input id="customPower" type="number" min="1" max="100" value="70" /></label>
-          </div>
-          <button class="primary" id="addCustomTeam">Adicionar aos meus times</button>
-        </div>
-        <div class="section-title"><h2>Meus times criados</h2></div>
-        <div id="customTeamList" class="team-list"></div>
-      </section>
-
-      <section id="rules" class="screen">
-        <div class="section-title"><h2>Regras avançadas</h2><button class="link" data-go="create">editar no torneio</button></div>
-        <div class="panel">
-          <p><strong>Zebra média</strong> é o padrão normal. Baixa favorece muito favoritos; alta deixa mais clima de copa; caótica é modo diversão.</p>
-          <p>Em mata-mata com ida-volta, o app decide por agregado, depois gol fora se estiver ligado, depois prorrogação e pênaltis.</p>
-        </div>
       </section>
 
       <section id="create" class="screen">
@@ -90,36 +46,24 @@
 
         <div class="panel">
           <div class="form-grid">
-            <label>Nome da edição<input id="tournamentName" value="Copa dos Amigos 2026" /></label>
+            <label>Nome da edição<input id="editionName" value="Copa dos Amigos 2026" /></label>
             <label>Campeonato<select id="competitionSelect"></select></label>
             <label>Formato<select id="formatSelect"><option value="playoffs">Playoffs / mata-mata</option><option value="groups">Fase de grupos + mata-mata</option><option value="clubWorldCup">Copa do Mundo de Clubes</option><option value="league">Liga / pontos corridos</option></select></label>
-            <label>Quantidade de times<select id="teamCount"><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option><option selected>16</option><option>20</option><option>32</option></select></label>
+            <label>Quantidade de times<select id="teamCount"><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option><option selected>16</option><option>20</option><option>24</option><option>32</option></select></label>
           </div>
         </div>
 
-
-        <div class="panel" id="leagueSettings">
-          <h3>Liga / pontos corridos</h3>
+        <div class="panel rules-panel">
+          <h3>Regras</h3>
           <div class="form-grid">
-            <label>Tipo de temporada<select id="leagueTurns"><option value="single" selected>Turno único</option><option value="double">Turno e returno</option></select></label>
-            <label>Critério principal<select disabled><option>Pontos, saldo, gols feitos e vitórias</option></select></label>
-          </div>
-        </div>
-        <div class="panel" id="groupSettings">
-          <h3>Fase de grupos</h3>
-          <div class="form-grid">
-            <label>Tamanho dos grupos<select id="groupSize"><option value="4" selected>4 times por grupo</option></select></label>
-            <label>Classificados por grupo<select id="qualifiers"><option value="2" selected>2 passam</option></select></label>
-          </div>
-        </div>
-
-        <div class="panel">
-          <h3>Regras do mata-mata</h3>
-          <div class="form-grid">
-            <label>Confrontos<select id="knockoutLegs"><option value="single">Jogo único</option><option value="two">Ida e volta</option></select></label>
-            <label>Final<select id="finalRule"><option value="single">Final jogo único</option><option value="same">Mesma regra das fases</option></select></label>
+            <label>Chaveamento<select id="bracketShuffle"><option value="shuffle" selected>Embaralhar confrontos</option><option value="strength">Cabeças de chave por força</option></select></label>
+            <label>Grupos<select id="groupShuffle"><option value="shuffle" selected>Sortear grupos</option><option value="balanced">Equilibrar por força</option></select></label>
+            <label>Confrontos mata-mata<select id="knockoutLegs"><option value="single" selected>Jogo único</option><option value="two">Ida e volta</option></select></label>
+            <label>Final<select id="finalRule"><option value="single" selected>Final jogo único</option><option value="same">Mesma regra das fases</option></select></label>
             <label>Chance de zebra<select id="upsetLevel"><option value="low">Baixa</option><option value="medium" selected>Média</option><option value="high">Alta</option><option value="chaos">Caótica</option></select></label>
             <label>Realismo do placar<select id="scoreRealism"><option value="realistic" selected>Realista</option><option value="normal">Normal</option><option value="chaotic">Caótico</option></select></label>
+            <label id="leagueTurnsWrap">Liga<select id="leagueTurns"><option value="single" selected>Turno único</option><option value="double">Turno e returno</option></select></label>
+            <label id="groupSizeWrap">Grupos<select id="groupSize"><option value="4" selected>4 times por grupo</option></select></label>
           </div>
           <div class="switches">
             <label><input id="extraTime" type="checkbox" checked /> Prorrogação</label>
@@ -132,35 +76,89 @@
           <div class="section-title tight"><h3>Pacotes de times</h3><small id="poolCount">0 disponíveis</small></div>
           <div id="packList" class="pack-grid"></div>
           <div class="action-row">
-            <button class="secondary" id="selectStrongest">Mais fortes</button>
-            <button class="secondary" id="selectRandom">Sortear</button>
-            <button class="secondary" id="selectBalanced">Equilibrado</button>
-            <button class="secondary" id="clearSelection">Limpar</button>
+            <button class="secondary" id="pickStrongest">Mais fortes</button>
+            <button class="secondary" id="pickRandom">Sortear</button>
+            <button class="secondary" id="pickBalanced">Equilibrado</button>
+            <button class="secondary" id="clearTeams">Limpar</button>
           </div>
           <div class="section-title tight"><h3>Selecionados</h3><small id="selectedCount">0/16</small></div>
           <div id="selectedTeams" class="team-list compact"></div>
         </div>
 
-        <button class="big-action" id="generateTournament">Gerar e simular torneio</button>
+        <button class="big-action" id="generateTournament">Gerar torneio</button>
       </section>
 
       <section id="tournament" class="screen tournament-screen">
         <div class="tournament-head">
-          <div><small id="tournamentFormatLabel">Torneio</small><h2 id="tournamentTitle">Torneio</h2></div>
+          <div><small id="tournamentFormat">Torneio atual</small><h2 id="tournamentName">Nenhum torneio</h2></div>
           <button class="light-btn" data-go="create">novo</button>
         </div>
-        <div class="summary-bar" id="summaryBar"></div>
+        <div id="tournamentActions" class="tournament-actions"></div>
+        <div id="summaryBar" class="summary-bar"></div>
         <div id="leagueArea"></div>
         <div id="groupsArea"></div>
         <div id="knockoutTitle" class="section-title on-field"><h2>Mata-mata</h2></div>
-        <div class="bracket-scroll"><div id="bracketArea" class="bracket"></div></div>
+        <div class="bracket-scroll"><div id="bracketArea" class="visual-bracket"></div></div>
+      </section>
+
+      <section id="competitions" class="screen">
+        <div class="section-title"><h2>Campeonatos</h2><button class="link" id="toggleCompetitionForm">+ novo</button></div>
+        <div class="panel mini" id="competitionForm" hidden>
+          <label>Nome do campeonato<input id="newCompetitionName" placeholder="Ex: Copa da Galera" /></label>
+          <button class="primary" id="saveCompetition">Criar</button>
+        </div>
+        <div id="competitionList" class="list"></div>
+      </section>
+
+      <section id="competitionDetail" class="screen">
+        <div class="section-title"><h2 id="competitionTitle">Campeonato</h2><button class="link" data-go="competitions">voltar</button></div>
+        <div id="competitionHero" class="stats hero-stats"></div>
+        <div class="tabs">
+          <button class="tab active" data-tab="overview">Resumo</button>
+          <button class="tab" data-tab="rankings">Rankings</button>
+          <button class="tab" data-tab="teamsStats">Times</button>
+          <button class="tab" data-tab="records">Recordes</button>
+          <button class="tab" data-tab="editions">Edições</button>
+          <button class="tab" data-tab="settings">Config</button>
+        </div>
+        <div id="overviewTab" class="tab-page active"><div id="overviewStats" class="stat-grid"></div></div>
+        <div id="rankingsTab" class="tab-page"><div id="rankingStats" class="stat-grid"></div></div>
+        <div id="teamsStatsTab" class="tab-page"><div id="teamStatsList" class="list"></div></div>
+        <div id="recordsTab" class="tab-page"><div id="recordStats" class="stat-grid"></div></div>
+        <div id="editionsTab" class="tab-page"><div id="editionList" class="list"></div></div>
+        <div id="settingsTab" class="tab-page">
+          <div class="panel">
+            <h3>Configurações do campeonato</h3>
+            <label>Nome<input id="editCompetitionName" /></label>
+            <button class="primary" id="renameCompetition">Salvar nome</button>
+          </div>
+          <div class="danger-zone">
+            <strong>Zona de perigo</strong>
+            <small>Apagar remove todas as edições e estatísticas deste campeonato.</small>
+            <button class="danger" id="deleteCompetition">Apagar campeonato</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="teams" class="screen">
+        <div class="section-title"><h2>Times</h2><button class="link" data-go="create">usar</button></div>
+        <div class="panel">
+          <h3>Criar time personalizado</h3>
+          <div class="form-grid">
+            <label>Nome<input id="customTeamName" placeholder="Ex: Atlético dos Amigos" /></label>
+            <label>Força<input id="customTeamPower" type="number" min="1" max="100" value="70" /></label>
+          </div>
+          <button class="primary" id="addCustomTeam">Adicionar aos meus times</button>
+        </div>
+        <div class="section-title"><h2>Meus times criados</h2></div>
+        <div id="customTeamList" class="team-list"></div>
       </section>
     </main>
 
     <nav class="bottom-nav">
       <button class="nav-btn active" data-go="home">⌂<span>Início</span></button>
-      <button class="nav-btn" data-go="competitions">□<span>Campeonatos</span></button>
       <button class="nav-btn" data-go="create">＋<span>Criar</span></button>
+      <button class="nav-btn" data-go="competitions">▣<span>Campeonatos</span></button>
       <button class="nav-btn" data-go="teams">◉<span>Times</span></button>
     </nav>
   </div>
