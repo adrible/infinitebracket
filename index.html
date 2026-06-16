@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Torneio Arena</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand__logo">TA</div>
+        <div>
+          <strong>Torneio Arena</strong>
+          <span>Simulador de campeonatos</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav__item active" data-screen="home">Início</button>
+        <button class="nav__item" data-screen="create">Criar torneio</button>
+        <button class="nav__item" data-screen="participants">Participantes</button>
+        <button class="nav__item" data-screen="presets">Presets</button>
+        <button class="nav__item" data-screen="settings">Configurações</button>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Projeto MVP</p>
+          <h1 id="pageTitle">Início</h1>
+        </div>
+        <button class="btn btn--primary" data-screen-button="create">Novo torneio</button>
+      </header>
+
+      <section id="home" class="screen active">
+        <div class="hero-card">
+          <div>
+            <p class="eyebrow">Simulação realista</p>
+            <h2>Crie torneios com força dos times, zebras, prorrogação e pênaltis.</h2>
+            <p>
+              Comece por Playoffs e evolua depois para Liga, Libertadores, Copa do Mundo
+              e Champions nova.
+            </p>
+            <button class="btn btn--primary" data-screen-button="create">Começar agora</button>
+          </div>
+        </div>
+
+        <div class="grid grid--3">
+          <article class="card">
+            <h3>Formatos</h3>
+            <p>Playoffs, Liga, Grupos + Mata-mata, Copa do Mundo e Personalizado.</p>
+          </article>
+          <article class="card">
+            <h3>Força dos times</h3>
+            <p>Defina favoritos e azarões sem impedir zebras históricas.</p>
+          </article>
+          <article class="card">
+            <h3>Placares realistas</h3>
+            <p>Goleadas existem, jogos malucos são raros e pênaltis decidem mata-mata.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="create" class="screen">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Criar torneio</p>
+            <h2>Escolha o formato</h2>
+          </div>
+        </div>
+
+        <div class="format-grid">
+          <button class="format-card selected" data-format="playoffs">
+            <strong>Playoffs</strong>
+            <span>Mata-mata direto, sem grupos.</span>
+          </button>
+          <button class="format-card" data-format="league">
+            <strong>Liga</strong>
+            <span>Pontos corridos.</span>
+          </button>
+          <button class="format-card" data-format="groups32">
+            <strong>Grupos + Mata-mata 32</strong>
+            <span>Libertadores / Champions antiga.</span>
+          </button>
+          <button class="format-card" data-format="worldcup32">
+            <strong>Copa do Mundo 32</strong>
+            <span>8 grupos de 4 + oitavas.</span>
+          </button>
+          <button class="format-card" data-format="worldcup48">
+            <strong>Copa do Mundo 48</strong>
+            <span>12 grupos + melhores terceiros.</span>
+          </button>
+          <button class="format-card" data-format="custom">
+            <strong>Personalizado</strong>
+            <span>Monte suas próprias regras.</span>
+          </button>
+        </div>
+
+        <div class="panel">
+          <div class="form-grid">
+            <label>
+              Nome do torneio
+              <input id="tournamentName" type="text" value="Copa dos Amigos" />
+            </label>
+
+            <label>
+              Quantidade de times
+              <select id="teamCount">
+                <option value="4">4 times</option>
+                <option value="8" selected>8 times</option>
+                <option value="16">16 times</option>
+                <option value="32">32 times</option>
+              </select>
+            </label>
+
+            <label>
+              Chance de zebra
+              <select id="upsetLevel">
+                <option value="low">Baixa</option>
+                <option value="medium" selected>Média</option>
+                <option value="high">Alta</option>
+                <option value="chaos">Caótica</option>
+              </select>
+            </label>
+
+            <label>
+              Realismo do placar
+              <select id="scoreRealism">
+                <option value="realistic" selected>Realista</option>
+                <option value="normal">Normal</option>
+                <option value="chaotic">Caótico</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="rules-box">
+            <h3>Regras eliminatórias</h3>
+            <label class="check">
+              <input id="extraTime" type="checkbox" checked />
+              Prorrogação
+            </label>
+            <label class="check">
+              <input id="penalties" type="checkbox" checked />
+              Pênaltis
+            </label>
+            <label class="check">
+              <input id="awayGoals" type="checkbox" />
+              Gol fora
+            </label>
+          </div>
+
+          <button class="btn btn--primary" id="goParticipants">Continuar para participantes</button>
+        </div>
+      </section>
+
+      <section id="participants" class="screen">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Participantes</p>
+            <h2>Monte a lista de times</h2>
+          </div>
+          <button class="btn btn--ghost" id="loadSuggested">Carregar sugeridos</button>
+        </div>
+
+        <div class="panel">
+          <div class="add-team">
+            <input id="teamName" type="text" placeholder="Nome do time" />
+            <input id="teamPower" type="number" min="1" max="100" value="75" />
+            <button class="btn btn--primary" id="addTeam">Adicionar</button>
+          </div>
+
+          <div class="team-list" id="teamList"></div>
+
+          <div class="actions-row">
+            <button class="btn btn--ghost" id="clearTeams">Limpar</button>
+            <button class="btn btn--primary" id="generateBracket">Gerar Playoffs</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="presets" class="screen">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Presets</p>
+            <h2>Formatos planejados</h2>
+          </div>
+        </div>
+
+        <div class="grid grid--2">
+          <article class="card">
+            <h3>Playoffs</h3>
+            <p>Mata-mata direto com jogo único, ida e volta ou melhor de séries.</p>
+          </article>
+          <article class="card">
+            <h3>Libertadores</h3>
+            <p>32 times, 8 grupos, mata-mata ida e volta, pênaltis e gol fora opcional.</p>
+          </article>
+          <article class="card">
+            <h3>Copa do Mundo 48</h3>
+            <p>12 grupos de 4, dois classificados e 8 melhores terceiros.</p>
+          </article>
+          <article class="card">
+            <h3>Champions nova</h3>
+            <p>36 times, tabela única, top 8 direto e playoff do 9º ao 24º.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="settings" class="screen">
+        <div class="panel">
+          <h2>Configurações futuras</h2>
+          <p>Login, salvamento online, API de times, escudos, compartilhamento por link e histórico.</p>
+        </div>
+      </section>
+
+      <section id="tournament" class="screen">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Torneio</p>
+            <h2 id="tournamentTitle">Playoffs</h2>
+          </div>
+          <button class="btn btn--primary" id="simulateAll">Simular tudo</button>
+        </div>
+
+        <div class="bracket" id="bracket"></div>
+      </section>
+    </main>
+
+    <nav class="mobile-nav">
+      <button class="mobile-nav__item active" data-screen="home">Início</button>
+      <button class="mobile-nav__item" data-screen="create">Criar</button>
+      <button class="mobile-nav__item" data-screen="participants">Times</button>
+      <button class="mobile-nav__item" data-screen="presets">Presets</button>
+    </nav>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
