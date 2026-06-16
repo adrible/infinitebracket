@@ -41,7 +41,7 @@ function team(name,power,source=""){ return { id:slug(name), name, power, source
 function shuffle(a){ return a.map(x=>[Math.random(),x]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]); }
 function clamp(n,a,b){ return Math.max(a,Math.min(b,n)); }
 function label(v){ return {low:"baixa",medium:"média",high:"alta",chaos:"caótica"}[v] || v; }
-function formatLabel(f){ return {playoffs:"Mata-mata direto",groups:"Grupos + mata-mata",clubWorldCup:"Mundial de Clubes",league:"Liga / pontos corridos"}[f] || f; }
+function formatLabel(f){ return {playoffs:"Mata-mata direto",groups:"Grupos + mata-mata",clubWorldCup:"Grupos + mata-mata",league:"Liga / pontos corridos"}[f] || f; }
 function pool(){
   const map = new Map();
   selectedPacks.forEach(k => packs[k].teams.forEach(([name,power]) => map.set(slug(name), team(name,power,packs[k].name))));
@@ -54,7 +54,7 @@ function medal(i){ return i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`; }
 function go(screen){
   $$(".screen").forEach(s=>s.classList.toggle("active",s.id===screen));
   $$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.go===screen));
-  const titles = {home:["0.7.1","Início"],create:["Novo","Criar torneio"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"]};
+  const titles = {home:["0.7.3","Início"],create:["Novo","Criar torneio"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"]};
   $("#pageSubtitle").textContent = titles[screen]?.[0] || "Brocket";
   $("#pageTitle").textContent = titles[screen]?.[1] || "Brocket";
   renderAll();
@@ -286,7 +286,7 @@ function currentRoundMatches(t){
   if(t.currentStage==="groups"){
     const all=t.groups.flatMap(g=>g.matches.filter(m=>!m.played));
     if(!all.length) return [];
-    const rodada=(all[0].stage.match(/Rodada \d+/)||["Rodada"])[0];
+    const rodada=(all[0].stage.match(/Rodada \d+/)||["Rodada 1"])[0];
     return all.filter(m=>m.stage.includes(rodada));
   }
   if(t.currentStage==="knockout"){
@@ -298,25 +298,28 @@ function currentRoundMatches(t){
 function simulateRound(){
   const t=data.activeTournament; if(!t || t.status==="finished") return;
   const ids=currentRoundMatches(t).map(m=>m.id);
-  ids.forEach(id=>simulateMatch(id));
+  ids.forEach(id=>simulateMatch(id, {deferAdvance:true}));
+  advanceIfNeeded(t);
+  save(); renderTournament();
 }
 function simulateAll(){
   const t=data.activeTournament; if(!t || t.status==="finished") return;
   let guard=0;
   while(t.status!=="finished" && nextPlayable(t) && guard<1000){
-    simulateMatch(nextPlayable(t).id);
+    simulateMatch(nextPlayable(t).id, {deferAdvance:true});
+    advanceIfNeeded(t);
     guard++;
   }
   save(); renderTournament();
 }
-function simulateMatch(id){
+function simulateMatch(id, opts={}){
   const t=data.activeTournament; if(!t || t.status==="finished") return;
   const m=allTournamentMatches(t).find(x=>x.id===id); if(!m || m.played) return;
   const result = m.allowDraw ? playGroupOrLeague(m.home,m.away,t.cfg) : playKnockout(m.home,m.away,t.cfg, m.stage==="Final");
   Object.assign(m,result,{played:true});
   if(t.currentStage==="league") updateLeagueTable(t,m);
   if(t.currentStage==="groups") updateGroupTable(t,m);
-  advanceIfNeeded(t); save(); renderTournament();
+  if(!opts.deferAdvance) advanceIfNeeded(t); save(); if(!opts.deferAdvance) renderTournament();
 }
 function advanceIfNeeded(t){
   if(t.currentStage==="groups" && t.groups.every(g=>g.matches.every(m=>m.played))){
@@ -382,7 +385,17 @@ function applyStats(rows,m){ const h=rows.find(x=>x.id===m.home.id), a=rows.find
 
 function renderTournament(){
   const t=data.activeTournament;
-  if(!t){ $("#tournamentName").textContent="Nenhum torneio"; $("#tournamentFormat").textContent="Torneio atual"; $("#tournamentActions").innerHTML=""; $("#summaryBar").innerHTML=""; $("#leagueArea").innerHTML=`<div class="empty-field">Crie um torneio para começar.</div>`; $("#groupsArea").innerHTML=""; $("#bracketArea").innerHTML=""; $("#knockoutTitle").style.display="none"; return; }
+  if(!t){
+    $("#tournamentName").textContent="Nenhum torneio ativo";
+    $("#tournamentFormat").textContent="Torneio atual";
+    $("#tournamentActions").innerHTML="";
+    $("#summaryBar").innerHTML="";
+    $("#leagueArea").innerHTML=`<div class="empty-tournament"><h3>Nenhum torneio ativo</h3><p>Crie um torneio para começar a simular partida por partida, rodada por rodada ou tudo de uma vez.</p><button class="primary" data-go="create">Criar torneio</button></div>`;
+    $("#groupsArea").innerHTML="";
+    $("#bracketArea").innerHTML="";
+    $("#knockoutTitle").style.display="none";
+    return;
+  }
   $("#tournamentName").textContent=t.cfg.name; $("#tournamentFormat").textContent=formatLabel(t.cfg.format);
   const next=nextPlayable(t);
   $("#tournamentActions").innerHTML = t.status==="finished"

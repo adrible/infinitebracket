@@ -63,3 +63,22 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   .tournament-actions{grid-template-columns:1fr 1fr}
   .play-btn{padding:11px 10px;font-size:14px}
 }
+
+
+/* 0.7.3 correções de UX */
+.content{padding-bottom:170px}
+.screen{padding-bottom:42px}
+.bottom-nav{z-index:80}
+.tournament-screen{padding-bottom:190px}
+.empty-tournament{background:#fff;border:1px solid #e4eee8;border-radius:26px;padding:22px;text-align:center;box-shadow:var(--shadow);margin-top:14px;color:var(--text)}
+.empty-tournament h3{margin:0 0 8px;font-size:22px}
+.empty-tournament p{color:var(--muted);margin:0 0 14px}
+.advanced-picker{margin-top:12px;background:#f8fbf9;border:1px solid #dfece4;border-radius:20px;padding:12px}
+.quick-actions{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:720px){
+  .content{padding-bottom:185px}
+  .screen{padding-bottom:56px}
+  .tournament-screen{padding-bottom:210px}
+  .quick-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .bottom-nav{bottom:calc(18px + env(safe-area-inset-bottom))}
+}

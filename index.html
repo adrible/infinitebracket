@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brocket 0.7.1</title>
+  <title>Brocket 0.7.3</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -20,7 +20,7 @@
         <button class="ghost" id="resetLocal">limpar</button>
       </div>
       <div class="hero">
-        <small id="pageSubtitle">0.7.1</small>
+        <small id="pageSubtitle">0.7.3</small>
         <h1 id="pageTitle">Início</h1>
       </div>
     </header>
@@ -34,8 +34,8 @@
           <button class="quick-card" data-go="tournament"><span>🎮</span><strong>Torneio atual</strong><small>simular partida por partida</small></button>
         </div>
         <div class="panel green-panel">
-          <strong>Brocket 0.7.1</strong>
-          <p>Criação mais simples, regras que mudam conforme o modelo, rodadas separadas e simulação por jogo, rodada ou torneio inteiro.</p>
+          <strong>Brocket 0.7.3</strong>
+          <p>Correções de UX: criação mais limpa, hotbar sem cobrir conteúdo e simulação de rodada corrigida.</p>
         </div>
         <div class="section-title"><h2>Campeonatos</h2><button class="link" data-go="competitions">ver todos</button></div>
         <div id="homeCompetitions" class="list"></div>
@@ -48,7 +48,7 @@
           <div class="form-grid">
             <label>Nome da edição<input id="editionName" value="Copa dos Amigos 2026" /></label>
             <label>Campeonato<select id="competitionSelect"></select></label>
-            <label>Modelo do torneio<select id="formatSelect"><option value="playoffs">Mata-mata direto</option><option value="groups">Grupos + mata-mata</option><option value="clubWorldCup">Mundial de Clubes — grupos + mata-mata</option><option value="league">Liga / pontos corridos</option></select></label>
+            <label>Modelo do torneio<select id="formatSelect"><option value="playoffs">Mata-mata direto</option><option value="groups">Grupos + mata-mata</option><option value="league">Liga / pontos corridos</option></select></label>
             <label>Quantidade de times<select id="teamCount"><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option><option selected>16</option><option>20</option><option>24</option><option>32</option></select></label>
           </div>
         </div>
@@ -108,20 +108,29 @@
             <button class="secondary" id="clearTeams">Limpar</button>
           </div>
 
-          <div class="selector-tools">
-            <label>Buscar time<input id="teamSearch" placeholder="Digite para filtrar..." /></label>
-            <label>Filtro de força<select id="powerFilter"><option value="all">Todos</option><option value="elite">Elite 90+</option><option value="strong">Fortes 80-89</option><option value="medium">Médios 70-79</option><option value="low">Abaixo de 70</option></select></label>
-          </div>
-
-          <div class="action-row">
+          <div class="action-row quick-actions">
             <button class="secondary" id="pickStrongest">Mais fortes</button>
             <button class="secondary" id="pickRandom">Sortear</button>
             <button class="secondary" id="pickBalanced">Equilibrado</button>
-            <button class="secondary" id="selectVisible">Selecionar visíveis</button>
+            <button class="secondary" id="toggleAdvancedPicker">Personalizar</button>
           </div>
 
-          <div class="section-title tight"><h3>Escolher manualmente</h3><small id="availableCount">0 filtrados</small></div>
-          <div id="availableTeams" class="team-list available-list"></div>
+          <div id="advancedPicker" class="advanced-picker" hidden>
+            <div class="selector-tools">
+              <label>Buscar time<input id="teamSearch" placeholder="Digite para filtrar..." /></label>
+              <label>Filtro de força<select id="powerFilter"><option value="all">Todos</option><option value="elite">Elite 90+</option><option value="strong">Fortes 80-89</option><option value="medium">Médios 70-79</option><option value="low">Abaixo de 70</option></select></label>
+            </div>
+
+            <div class="action-row">
+              <button class="secondary" id="selectVisible">Selecionar visíveis</button>
+              <button class="secondary" id="fillMissingRandom">Completar sorteando</button>
+              <button class="secondary" id="fillMissingStrongest">Completar fortes</button>
+              <button class="secondary" id="clearTeams">Limpar</button>
+            </div>
+
+            <div class="section-title tight"><h3>Escolher manualmente</h3><small id="availableCount">0 filtrados</small></div>
+            <div id="availableTeams" class="team-list available-list"></div>
+          </div>
 
           <div class="section-title tight"><h3>Selecionados</h3><small id="selectedCount">0/16</small></div>
           <div id="selectedTeams" class="team-list compact"></div>
