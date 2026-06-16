@@ -1,32 +1,26 @@
-# Brocket V7
+# Brocket 0.7.1
 
-Versão oficial V7.
+Versão 0.7.1 do Brocket.
 
-## Principais mudanças
+## Ajustes principais
 
-- Visual mais próximo da V3.
-- Fase de grupos com opção de 1 ou 2 rodadas.
-- Tela de grupos mais limpa.
-- Classificados em negrito, sem emoji de check.
-- Simulação partida por partida.
-- Botão de apagar campeonato dentro de Config.
-- Estatísticas persistentes no navegador.
-- Shuffle nos grupos e no chaveamento.
-- Escolha de times muito mais livre:
-  - pacotes múltiplos;
-  - busca por nome;
-  - filtro por força;
-  - seleção manual individual;
-  - edição de força antes de gerar;
-  - quantidade por pacote;
-  - completar sorteando;
-  - completar com mais fortes;
-  - prévia dos grupos/chaveamento;
-  - sortear prévia novamente.
+- Troca do nome da versão para 0.7.
+- Modelos de torneio tratados como modelos, não como nome do campeonato.
+- Tela de criação reorganizada.
+- Seção de regras agora muda conforme o modelo escolhido.
+- Botão para simular próxima partida.
+- Botão para simular rodada.
+- Botão para simular tudo.
+- Jogos separados por rodada na fase de grupos.
+- Layout do topo ajustado para remover curva estranha.
+- Grupos com 1 ou 2 rodadas.
+- Classificados em negrito, sem emoji.
+- Escolha manual de times, busca, filtros e quantidade por pacote.
+- Prévia de grupos/chaveamento antes de gerar.
 
-## Como subir no GitHub Pages
+## Como subir
 
-Suba apenas estes arquivos na raiz do repositório:
+Suba somente estes arquivos na raiz do repositório:
 
 - index.html
 - style.css
