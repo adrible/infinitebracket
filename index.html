@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brocket V6</title>
+  <title>Brocket V7</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -20,7 +20,7 @@
         <button class="ghost" id="resetLocal">limpar</button>
       </div>
       <div class="hero">
-        <small id="pageSubtitle">V6</small>
+        <small id="pageSubtitle">V7</small>
         <h1 id="pageTitle">Início</h1>
       </div>
     </header>
@@ -34,8 +34,8 @@
           <button class="quick-card" data-go="tournament"><span>🎮</span><strong>Torneio atual</strong><small>simular partida por partida</small></button>
         </div>
         <div class="panel green-panel">
-          <strong>V6 polida</strong>
-          <p>Visual voltou para a pegada da V3, com simulação partida por partida, estatísticas persistentes, shuffle nos grupos/chaveamento e configurações do campeonato em aba própria.</p>
+          <strong>V7 oficial</strong>
+          <p>Criação de torneio mais livre: escolha manual dos times, busca, filtros, quantidade por pacote, prévia de grupos/chaveamento e simulação partida por partida.</p>
         </div>
         <div class="section-title"><h2>Campeonatos</h2><button class="link" data-go="competitions">ver todos</button></div>
         <div id="homeCompetitions" class="list"></div>
@@ -63,7 +63,8 @@
             <label>Chance de zebra<select id="upsetLevel"><option value="low">Baixa</option><option value="medium" selected>Média</option><option value="high">Alta</option><option value="chaos">Caótica</option></select></label>
             <label>Realismo do placar<select id="scoreRealism"><option value="realistic" selected>Realista</option><option value="normal">Normal</option><option value="chaotic">Caótico</option></select></label>
             <label id="leagueTurnsWrap">Liga<select id="leagueTurns"><option value="single" selected>Turno único</option><option value="double">Turno e returno</option></select></label>
-            <label id="groupSizeWrap">Grupos<select id="groupSize"><option value="4" selected>4 times por grupo</option></select></label>
+            <label id="groupSizeWrap">Tamanho dos grupos<select id="groupSize"><option value="4" selected>4 times por grupo</option></select></label>
+            <label id="groupTurnsWrap">Fase de grupos<select id="groupTurns"><option value="single" selected>1 rodada</option><option value="double">2 rodadas / ida e volta</option></select></label>
           </div>
           <div class="switches">
             <label><input id="extraTime" type="checkbox" checked /> Prorrogação</label>
@@ -75,17 +76,41 @@
         <div class="panel">
           <div class="section-title tight"><h3>Pacotes de times</h3><small id="poolCount">0 disponíveis</small></div>
           <div id="packList" class="pack-grid"></div>
+
+          <div class="section-title tight"><h3>Quantidade por pacote</h3><small>opcional</small></div>
+          <div id="quotaList" class="quota-grid"></div>
+          <div class="action-row">
+            <button class="secondary" id="applyQuotas">Aplicar quantidades</button>
+            <button class="secondary" id="fillMissingRandom">Completar sorteando</button>
+            <button class="secondary" id="fillMissingStrongest">Completar fortes</button>
+            <button class="secondary" id="clearTeams">Limpar</button>
+          </div>
+
+          <div class="selector-tools">
+            <label>Buscar time<input id="teamSearch" placeholder="Digite para filtrar..." /></label>
+            <label>Filtro de força<select id="powerFilter"><option value="all">Todos</option><option value="elite">Elite 90+</option><option value="strong">Fortes 80-89</option><option value="medium">Médios 70-79</option><option value="low">Abaixo de 70</option></select></label>
+          </div>
+
           <div class="action-row">
             <button class="secondary" id="pickStrongest">Mais fortes</button>
             <button class="secondary" id="pickRandom">Sortear</button>
             <button class="secondary" id="pickBalanced">Equilibrado</button>
-            <button class="secondary" id="clearTeams">Limpar</button>
+            <button class="secondary" id="selectVisible">Selecionar visíveis</button>
           </div>
+
+          <div class="section-title tight"><h3>Escolha manual</h3><small id="availableCount">0 filtrados</small></div>
+          <div id="availableTeams" class="team-list available-list"></div>
+
           <div class="section-title tight"><h3>Selecionados</h3><small id="selectedCount">0/16</small></div>
           <div id="selectedTeams" class="team-list compact"></div>
         </div>
 
-        <button class="big-action" id="generateTournament">Gerar torneio</button>
+        <div class="panel">
+          <div class="section-title tight"><h3>Prévia do sorteio</h3><button class="link" id="reshufflePreview">sortear de novo</button></div>
+          <div id="drawPreview" class="draw-preview"></div>
+        </div>
+
+        <button class="big-action" id="generateTournament">Gerar torneio com esta seleção</button>
       </section>
 
       <section id="tournament" class="screen tournament-screen">
