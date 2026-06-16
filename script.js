@@ -11,13 +11,14 @@ const packs = {
   selecoes:{ name:"Seleções mundiais", icon:"🏳️", teams:[["França",93],["Argentina",92],["Brasil",91],["Inglaterra",90],["Espanha",89],["Portugal",89],["Alemanha",88],["Holanda",87],["Itália",86],["Bélgica",85],["Uruguai",84],["Croácia",84],["Colômbia",82],["Marrocos",82],["Suíça",82],["Senegal",81],["Dinamarca",81],["Japão",80],["México",79],["Estados Unidos",79],["Coreia do Sul",79],["Egito",79],["Chile",78],["Austrália",77]]}
 };
 
-const starter = { competitions:[{ id:uid(), name:"Copa da Galera", editions:[
-  { id:uid(), name:"2024", format:"Playoffs", champion:"Real Madrid", runnerUp:"Benfica", date:"2024", teams:["Real Madrid","Benfica","Flamengo","Palmeiras"], matches:[mSaved("Real Madrid","Benfica",3,1,"Real Madrid","Benfica","Final","Jogo único")] },
-  { id:uid(), name:"2025", format:"Grupos + mata-mata", champion:"Flamengo", runnerUp:"Palmeiras", date:"2025", teams:["Flamengo","Palmeiras","Boca Juniors","River Plate"], matches:[mSaved("Flamengo","Palmeiras",2,2,"Flamengo","Palmeiras","Final","pênaltis 5-4",{a:5,b:4})] }
-]}], customTeams:[], activeTournament:null };
+const starter = { competitions:[], customTeams:[], activeTournament:null };
 
 let data = load();
-let currentCompetitionId = data.competitions[0]?.id;
+if(data.competitions?.length===1 && data.competitions[0]?.name==="Copa da Galera" && data.competitions[0]?.editions?.some(e=>e.name==="2024") && data.competitions[0]?.editions?.some(e=>e.name==="2025")){
+  data.competitions=[];
+  save();
+}
+let currentCompetitionId = data.competitions[0]?.id || null;
 let selectedPacks = new Set(["brasileiros","europeus"]);
 let selectedTeams = [];
 let teamSearch = "";
@@ -32,7 +33,7 @@ function load(){
     const raw = localStorage.getItem(STORAGE) || LEGACY_KEYS.map(k=>localStorage.getItem(k)).find(Boolean);
     if(!raw) return structuredClone(starter);
     const parsed = JSON.parse(raw);
-    return { ...structuredClone(starter), ...parsed, competitions: parsed.competitions?.length ? parsed.competitions : structuredClone(starter.competitions), customTeams: parsed.customTeams || [], activeTournament: parsed.activeTournament || null };
+    return { ...structuredClone(starter), ...parsed, competitions: Array.isArray(parsed.competitions) ? parsed.competitions : structuredClone(starter.competitions), customTeams: parsed.customTeams || [], activeTournament: parsed.activeTournament || null };
   }catch{ return structuredClone(starter); }
 }
 function save(){ localStorage.setItem(STORAGE, JSON.stringify(data)); }
@@ -54,7 +55,7 @@ function medal(i){ return i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`; }
 function go(screen){
   $$(".screen").forEach(s=>s.classList.toggle("active",s.id===screen));
   $$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.go===screen));
-  const titles = {home:["0.7.3","Início"],create:["Novo","Criar torneio"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"]};
+  const titles = {home:["0.7.4","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"]};
   $("#pageSubtitle").textContent = titles[screen]?.[0] || "Brocket";
   $("#pageTitle").textContent = titles[screen]?.[1] || "Brocket";
   renderAll();
@@ -63,6 +64,7 @@ function go(screen){
 document.addEventListener("click", e=>{
   const nav = e.target.closest("[data-go]"); if(nav){ go(nav.dataset.go); return; }
   const comp = e.target.closest("[data-comp]"); if(comp){ openCompetition(comp.dataset.comp); return; }
+  const quickComp = e.target.closest("#quickCreateCompetition"); if(quickComp){ $("#competitionForm").hidden=false; return; }
   const sim = e.target.closest("[data-sim]"); if(sim){ simulateMatch(sim.dataset.sim); return; }
   const delEdition = e.target.closest("[data-delete-edition]"); if(delEdition){ deleteEdition(delEdition.dataset.deleteEdition); return; }
   const delCustom = e.target.closest("[data-delete-custom]"); if(delCustom){ deleteCustomTeam(delCustom.dataset.deleteCustom); return; }
@@ -71,23 +73,31 @@ document.addEventListener("click", e=>{
 });
 
 function renderAll(){ renderCompetitions(); renderCompetitionSelect(); renderPacks(); renderSelected(); renderCustomTeams(); toggleRuleVisibility(); renderTournament(); }
-function renderCompetitionSelect(){ $("#competitionSelect").innerHTML = data.competitions.map(c=>`<option value="${c.id}" ${c.id===currentCompetitionId?"selected":""}>${c.name}</option>`).join(""); }
+function renderCompetitionSelect(){
+  const select=$("#competitionSelect"); if(!select) return;
+  if(!data.competitions.length){ select.innerHTML=`<option value="">Nenhum campeonato criado</option>`; currentCompetitionId=null; return; }
+  if(!currentCompetitionId || !data.competitions.some(c=>c.id===currentCompetitionId)) currentCompetitionId=data.competitions[0]?.id || null;
+  select.innerHTML = data.competitions.map(c=>`<option value="${c.id}" ${c.id===currentCompetitionId?"selected":""}>${c.name}</option>`).join("");
+}
 function renderCompetitions(){
   const html = data.competitions.map(c=>{ const s=statsFor(c); return `<button class="list-card" data-comp="${c.id}"><div><strong>${c.name}</strong><small>${c.editions.length} edições • maior campeão: ${s.topChampion}</small></div><span class="pill">abrir</span></button>`; }).join("");
-  $("#competitionList").innerHTML = html || `<div class="panel">Nenhum campeonato criado.</div>`;
-  $("#homeCompetitions").innerHTML = html || `<div class="panel">Nenhum campeonato criado.</div>`;
+  const emptyHome = `<div class="empty-card"><strong>Nenhum campeonato criado</strong><small>Crie um campeonato para guardar várias edições e estatísticas históricas.</small><button class="primary" data-go="competitions">Criar campeonato</button></div>`;
+  const emptyList = `<div class="empty-card"><strong>Nenhum campeonato criado</strong><small>Você também pode criar um torneio único sem salvar no histórico.</small><button class="primary" id="quickCreateCompetition">Criar campeonato</button></div>`;
+  $("#competitionList").innerHTML = html || emptyList;
+  $("#homeCompetitions").innerHTML = html || emptyHome;
 }
 function openCompetition(id){ currentCompetitionId=id; const c=data.competitions.find(x=>x.id===id); if(!c) return; $("#competitionTitle").textContent=c.name; $("#editCompetitionName").value=c.name; renderCompetitionDetail(c); go("competitionDetail"); }
 
 function renderPacks(){
   $("#packList").innerHTML = Object.entries(packs).map(([key,p])=>`<label class="pack"><input type="checkbox" data-pack="${key}" ${selectedPacks.has(key)?"checked":""}/><span>${p.icon}</span><div><strong>${p.name}</strong><small>${p.teams.length} times</small></div></label>`).join("");
-  $("#poolCount").textContent = `${pool().length} disponíveis`;
+  const pc=$("#poolCount"); if(pc) pc.textContent = `${pool().length} disponíveis`;
   renderQuotas();
   renderAvailableTeams();
   renderDrawPreview();
 }
 function renderQuotas(){
   const keys=[...selectedPacks];
+  if(!$("#quotaList")) return;
   $("#quotaList").innerHTML = keys.map(k=>`<label class="quota-box"><span>${packs[k].icon} ${packs[k].name}</span><input type="number" min="0" max="${packs[k].teams.length}" value="0" data-quota="${k}" /></label>`).join("") || `<div class="empty-inline">Marque pacotes para definir quantidades.</div>`;
 }
 function filteredPool(){
@@ -111,8 +121,8 @@ function addTeam(t){
 function removeTeam(id){ selectedTeams=selectedTeams.filter(t=>t.id!==id); previewOrder=null; }
 function renderAvailableTeams(){
   const list=filteredPool(), need=Number($("#teamCount").value);
-  $("#availableCount").textContent = `${list.length} filtrados`;
-  $("#availableTeams").innerHTML = list.map(t=>{
+  const ac=$("#availableCount"); if(ac) ac.textContent = `${list.length} filtrados`;
+  if($("#availableTeams")) $("#availableTeams").innerHTML = list.map(t=>{
     const checked=isSelected(t.id);
     return `<button class="team-pick ${checked?"chosen":""}" data-toggle-team="${t.id}">
       <span class="pick-dot">${checked?"✓":"+"}</span>
@@ -122,14 +132,21 @@ function renderAvailableTeams(){
 }
 function renderSelected(){
   const need = Number($("#teamCount").value);
-  $("#selectedCount").textContent = `${selectedTeams.length}/${need}`;
-  $("#selectedTeams").innerHTML = selectedTeams.map(t=>`<div class="team-row selected-row">
+  const countText = `${selectedTeams.length}/${need}`;
+  const sc=$("#selectedCount"); if(sc) sc.textContent = countText;
+  const mc=$("#manualSelectedCount"); if(mc) mc.textContent = countText;
+  const summary = selectedTeams.slice(0,6).map(t=>`<div class="team-row selected-row">
+    <div><strong>${t.name}</strong><small>${t.source || "personalizado"} • força ${t.power}</small></div>
+  </div>`).join("") + (selectedTeams.length>6 ? `<div class="team-row"><small>+ ${selectedTeams.length-6} times selecionados</small></div>` : "");
+  const full = selectedTeams.map(t=>`<div class="team-row selected-row">
     <div><strong>${t.name}</strong><small>${t.source || "personalizado"}</small></div>
     <div class="selected-actions">
       <label class="power-edit">Força <input type="number" min="1" max="100" value="${t.power}" data-power-team="${t.id}" /></label>
       <button class="mini-danger" data-remove-team="${t.id}">remover</button>
     </div>
   </div>`).join("") || `<div class="team-row"><small>Nenhum time selecionado.</small></div>`;
+  const st=$("#selectedTeams"); if(st) st.innerHTML = summary || `<div class="team-row"><small>Nenhum time selecionado.</small></div>`;
+  const mst=$("#manualSelectedTeams"); if(mst) mst.innerHTML = full;
   renderAvailableTeams();
   renderDrawPreview();
 }
@@ -185,9 +202,9 @@ function applyQuotas(){
   previewOrder=null; renderSelected();
 }
 
-function cfg(){ return { id:uid(), name:$("#editionName").value.trim()||"Torneio", competitionId:$("#competitionSelect").value, format:$("#formatSelect").value, teamCount:Number($("#teamCount").value), legs:$("#knockoutLegs").value, finalRule:$("#finalRule").value, upset:$("#upsetLevel").value, realism:$("#scoreRealism").value, extraTime:$("#extraTime").checked, penalties:$("#penalties").checked, awayGoals:$("#awayGoals").checked, leagueTurns:$("#leagueTurns").value, groupTurns:$("#groupTurns").value, groupSize:Number($("#groupSize").value), bracketShuffle:$("#bracketShuffle").value, groupShuffle:$("#groupShuffle").value }; }
+function cfg(){ return { id:uid(), name:$("#editionName").value.trim()||"Torneio", saveMode:document.querySelector('input[name="saveMode"]:checked')?.value || "single", competitionId:$("#competitionSelect")?.value || "", format:$("#formatSelect").value, teamCount:Number($("#teamCount").value), legs:$("#knockoutLegs").value, finalRule:$("#finalRule").value, upset:$("#upsetLevel").value, realism:$("#scoreRealism").value, extraTime:$("#extraTime").checked, penalties:$("#penalties").checked, awayGoals:$("#awayGoals").checked, leagueTurns:$("#leagueTurns").value, groupTurns:$("#groupTurns").value, groupSize:Number($("#groupSize").value), bracketShuffle:$("#bracketShuffle").value, groupShuffle:$("#groupShuffle").value }; }
 function generateTournament(){
-  const c=cfg(); if(selectedTeams.length<c.teamCount){ alert(`Selecione ${c.teamCount} times.`); return; }
+  const c=cfg(); if(c.saveMode==="history" && !c.competitionId){ alert("Crie ou selecione um campeonato para salvar no histórico."); return; } if(selectedTeams.length<c.teamCount){ alert(`Selecione ${c.teamCount} times.`); return; }
   let teams = getPreviewOrder(c).slice(0,c.teamCount).map(t=>({...t}));
   const t = { id:uid(), cfg:c, teams, status:"running", saved:false, champion:null, runnerUp:null, groups:[], knockout:[], league:null, currentStage:"", createdAt:new Date().toISOString() };
   if(c.format==="league") setupLeague(t);
@@ -431,7 +448,7 @@ function renderBracket(t){
 }
 
 function flattenMatches(t){ return allTournamentMatches(t).filter(m=>m.played).map(m=>({home:m.home.name,away:m.away.name,homeGoals:m.homeGoals,awayGoals:m.awayGoals,winner:m.winner?.name || (m.homeGoals===m.awayGoals?null:(m.homeGoals>m.awayGoals?m.home.name:m.away.name)),loser:m.loser?.name || null,stage:m.stage,meta:m.meta,pens:m.pens,played:true})); }
-function saveEdition(t){ const c=data.competitions.find(x=>x.id===t.cfg.competitionId) || data.competitions[0]; if(!c) return; c.editions.push({id:uid(), name:t.cfg.name, format:formatLabel(t.cfg.format), champion:t.champion, runnerUp:t.runnerUp, date:new Date().getFullYear().toString(), teams:t.teams.map(x=>x.name), matches:flattenMatches(t), leagueTable:t.league?.table?.map(x=>({team:x.name,pts:x.pts,w:x.w,d:x.d,l:x.l,gf:x.gf,ga:x.ga,gd:x.gd}))||null}); save(); }
+function saveEdition(t){ if(t.cfg.saveMode==="single") return; const c=data.competitions.find(x=>x.id===t.cfg.competitionId); if(!c) return; c.editions.push({id:uid(), name:t.cfg.name, format:formatLabel(t.cfg.format), champion:t.champion, runnerUp:t.runnerUp, date:new Date().getFullYear().toString(), teams:t.teams.map(x=>x.name), matches:flattenMatches(t), leagueTable:t.league?.table?.map(x=>({team:x.name,pts:x.pts,w:x.w,d:x.d,l:x.l,gf:x.gf,ga:x.ga,gd:x.gd}))||null}); save(); }
 
 function statsFor(c){
   const editions=c.editions||[], matches=editions.flatMap(e=>e.matches||[]), teams=[...new Set(editions.flatMap(e=>e.teams||[]))];
@@ -463,17 +480,19 @@ function deleteEdition(id){ const c=data.competitions.find(x=>x.id===currentComp
 function deleteCustomTeam(id){ if(confirm("Apagar este time criado?")){ data.customTeams=data.customTeams.filter(t=>t.id!==id); save(); renderAll(); } }
 
 $("#toggleCompetitionForm").onclick=()=>$("#competitionForm").hidden=!$("#competitionForm").hidden;
-$("#saveCompetition").onclick=()=>{ const name=$("#newCompetitionName").value.trim(); if(!name) return; const c={id:uid(),name,editions:[]}; data.competitions.push(c); currentCompetitionId=c.id; $("#newCompetitionName").value=""; $("#competitionForm").hidden=true; save(); renderAll(); };
+$("#saveCompetition").onclick=()=>{ const name=$("#newCompetitionName").value.trim(); if(!name) return; const c={id:uid(),name,editions:[]}; data.competitions.push(c); currentCompetitionId=c.id; renderCompetitionSelect(); $("#newCompetitionName").value=""; $("#competitionForm").hidden=true; save(); renderAll(); };
 $("#renameCompetition").onclick=()=>{ const c=data.competitions.find(x=>x.id===currentCompetitionId); if(!c) return; c.name=$("#editCompetitionName").value.trim()||c.name; save(); openCompetition(c.id); };
-$("#deleteCompetition").onclick=()=>{ const c=data.competitions.find(x=>x.id===currentCompetitionId); if(!c) return; if(confirm(`Apagar o campeonato "${c.name}" e todas as edições?`)){ data.competitions=data.competitions.filter(x=>x.id!==c.id); if(!data.competitions.length) data.competitions.push({id:uid(),name:"Novo Campeonato",editions:[]}); currentCompetitionId=data.competitions[0].id; save(); go("competitions"); } };
+$("#deleteCompetition").onclick=()=>{ const c=data.competitions.find(x=>x.id===currentCompetitionId); if(!c) return; if(confirm(`Apagar o campeonato "${c.name}" e todas as edições?`)){ data.competitions=data.competitions.filter(x=>x.id!==c.id); currentCompetitionId=data.competitions[0]?.id || null; save(); go("competitions"); } };
 $("#addCustomTeam").onclick=()=>{ const name=$("#customTeamName").value.trim(), power=clamp(Number($("#customTeamPower").value)||70,1,100); if(!name) return; data.customTeams.push(team(name,power,"Meu time")); $("#customTeamName").value=""; save(); renderAll(); };
-$("#pickStrongest").onclick=pickStrongest; $("#pickRandom").onclick=pickRandom; $("#pickBalanced").onclick=pickBalanced; $("#clearTeams").onclick=()=>{selectedTeams=[]; previewOrder=null; renderSelected();};
-$("#fillMissingRandom").onclick=()=>fillMissing("random"); $("#fillMissingStrongest").onclick=()=>fillMissing("strongest"); $("#selectVisible").onclick=selectVisibleTeams; $("#applyQuotas").onclick=applyQuotas; $("#reshufflePreview").onclick=reshufflePreview;
-$("#teamSearch").oninput=e=>{teamSearch=e.target.value; renderAvailableTeams();}; $("#powerFilter").onchange=e=>{powerFilter=e.target.value; renderAvailableTeams();};
-$("#generateTournament").onclick=generateTournament;
-$("#formatSelect").onchange=()=>{ previewOrder=null; toggleRuleVisibility(); renderDrawPreview(); }; $("#teamCount").onchange=()=>{ selectedTeams=selectedTeams.slice(0,Number($("#teamCount").value)); previewOrder=null; renderSelected(); };
-$("#competitionSelect").onchange=e=>currentCompetitionId=e.target.value;
-$("#resetLocal").onclick=()=>{ if(confirm("Limpar dados locais do Brocket neste navegador?")){ localStorage.removeItem(STORAGE); data=structuredClone(starter); currentCompetitionId=data.competitions[0].id; selectedTeams=[]; save(); renderAll(); go("home"); } };
+const bind=(sel,ev,fn)=>{ const el=$(sel); if(el) el[ev]=fn; };
+bind("#pickStrongest","onclick",pickStrongest); bind("#pickRandom","onclick",pickRandom); bind("#pickBalanced","onclick",pickBalanced);
+bind("#clearTeams","onclick",()=>{selectedTeams=[]; previewOrder=null; renderSelected();});
+bind("#fillMissingRandom","onclick",()=>fillMissing("random")); bind("#fillMissingStrongest","onclick",()=>fillMissing("strongest")); bind("#selectVisible","onclick",selectVisibleTeams); bind("#applyQuotas","onclick",applyQuotas); bind("#reshufflePreview","onclick",reshufflePreview);
+bind("#teamSearch","oninput",e=>{teamSearch=e.target.value; renderAvailableTeams();}); bind("#powerFilter","onchange",e=>{powerFilter=e.target.value; renderAvailableTeams();});
+bind("#generateTournament","onclick",generateTournament);
+bind("#formatSelect","onchange",()=>{ previewOrder=null; toggleRuleVisibility(); renderDrawPreview(); }); bind("#teamCount","onchange",()=>{ selectedTeams=selectedTeams.slice(0,Number($("#teamCount").value)); previewOrder=null; renderSelected(); });
+bind("#competitionSelect","onchange",e=>currentCompetitionId=e.target.value);
+$("#resetLocal").onclick=()=>{ if(confirm("Limpar dados locais do Brocket neste navegador?")){ localStorage.removeItem(STORAGE); data=structuredClone(starter); currentCompetitionId=data.competitions[0]?.id || null; selectedTeams=[]; save(); renderAll(); go("home"); } };
 document.addEventListener("change",e=>{
   const p=e.target.closest("[data-pack]"); if(p){ p.checked?selectedPacks.add(p.dataset.pack):selectedPacks.delete(p.dataset.pack); selectedTeams=[]; previewOrder=null; renderAll(); return; }
   const pow=e.target.closest("[data-power-team]"); if(pow){ const t=selectedTeams.find(x=>x.id===pow.dataset.powerTeam); if(t){ t.power=clamp(Number(pow.value)||70,1,100); previewOrder=null; renderSelected(); } return; }
@@ -481,5 +500,6 @@ document.addEventListener("change",e=>{
 });
 $$('.tab').forEach(t=>t.onclick=()=>{ $$('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); $$('.tab-page').forEach(p=>p.classList.remove('active')); $(`#${t.dataset.tab}Tab`)?.classList.add('active'); });
 
+$$('input[name="saveMode"]').forEach(r=>r.onchange=()=>{ const choice=$("#competitionChoice"); if(choice) choice.hidden = r.value!=="history" || !r.checked; });
+
 renderAll();
-if(!selectedTeams.length) pickBalanced();
