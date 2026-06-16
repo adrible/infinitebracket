@@ -1,392 +1,311 @@
-const $ = (sel) => document.querySelector(sel);
-const $$ = (sel) => Array.from(document.querySelectorAll(sel));
-const STORAGE = "brocket-v5";
-const LEGACY_STORAGE = "brocket-v4";
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
+const STORAGE = "brocket-v6-polida";
+const LEGACY_KEYS = ["brocket-v5", "brocket-v4", "brocket-v3"];
 
-const teamPacks = {
-  brasileiros: { name: "Clubes brasileiros", icon: "🇧🇷", teams: [
-    ["Flamengo",86],["Palmeiras",86],["Botafogo",84],["São Paulo",82],["Corinthians",80],["Fluminense",81],["Grêmio",80],["Internacional",80],["Atlético-MG",82],["Cruzeiro",78],["Vasco",77],["Santos",77],["Athletico-PR",79],["Bahia",78],["Fortaleza",78],["Ceará",74],["Sport",73],["Vitória",73],["Bragantino",78],["Cuiabá",72]
-  ]},
-  europeus: { name: "Clubes europeus", icon: "🇪🇺", teams: [
-    ["Real Madrid",94],["Manchester City",93],["Bayern München",91],["Liverpool",90],["Barcelona",89],["PSG",90],["Arsenal",88],["Inter de Milão",88],["Atlético de Madrid",87],["Borussia Dortmund",86],["Milan",85],["Juventus",84],["Chelsea",84],["Tottenham",82],["Manchester United",82],["Napoli",84],["Benfica",83],["Porto",82],["Sporting",82],["Ajax",79],["Roma",82],["Bayer Leverkusen",87],["RB Leipzig",83],["Sevilla",79]
-  ]},
-  sulamericanos: { name: "Sul-americanos", icon: "🌎", teams: [
-    ["River Plate",84],["Boca Juniors",82],["Racing",78],["Independiente",76],["Estudiantes",77],["San Lorenzo",75],["Peñarol",76],["Nacional-URU",76],["Colo-Colo",75],["Universidad de Chile",73],["Olimpia",75],["Cerro Porteño",74],["LDU",76],["Independiente del Valle",78],["Barcelona SC",74],["Atlético Nacional",76],["Millonarios",74],["Deportivo Cali",72]
-  ]},
-  globais: { name: "Clubes globais", icon: "🌍", teams: [
-    ["Al Ahly",79],["Zamalek",75],["Wydad Casablanca",76],["Mamelodi Sundowns",76],["Al Hilal",82],["Al Nassr",81],["Al Ittihad",79],["Urawa Red Diamonds",75],["Kawasaki Frontale",75],["Yokohama F. Marinos",74],["Ulsan HD",74],["Jeonbuk Hyundai",73],["Monterrey",78],["América-MEX",78],["Tigres",77],["LAFC",75],["Inter Miami",76],["Seattle Sounders",74]
-  ]},
-  selecoes: { name: "Seleções mundiais", icon: "🏳️", teams: [
-    ["França",93],["Argentina",92],["Brasil",91],["Inglaterra",90],["Espanha",89],["Portugal",89],["Alemanha",88],["Holanda",87],["Itália",86],["Bélgica",85],["Uruguai",84],["Croácia",84],["Marrocos",82],["Japão",80],["Estados Unidos",79],["México",79],["Colômbia",82],["Senegal",81],["Suíça",82],["Dinamarca",81],["Coreia do Sul",79],["Austrália",77],["Egito",79],["Chile",78]
-  ]}
+const packs = {
+  brasileiros:{ name:"Clubes brasileiros", icon:"🇧🇷", teams:[["Flamengo",86],["Palmeiras",86],["Botafogo",84],["Atlético-MG",82],["São Paulo",82],["Fluminense",81],["Corinthians",80],["Grêmio",80],["Internacional",80],["Athletico-PR",79],["Bahia",78],["Fortaleza",78],["Cruzeiro",78],["Vasco",77],["Santos",77],["Ceará",74],["Sport",73],["Vitória",73],["Bragantino",78],["Cuiabá",72]]},
+  europeus:{ name:"Clubes europeus", icon:"🇪🇺", teams:[["Real Madrid",94],["Manchester City",93],["Bayern München",91],["PSG",90],["Liverpool",90],["Barcelona",89],["Arsenal",88],["Inter de Milão",88],["Bayer Leverkusen",87],["Atlético de Madrid",87],["Borussia Dortmund",86],["Milan",85],["Juventus",84],["Napoli",84],["Chelsea",84],["RB Leipzig",83],["Benfica",83],["Sporting",82],["Porto",82],["Tottenham",82],["Manchester United",82],["Roma",82],["Ajax",79],["Sevilla",79]]},
+  sulamericanos:{ name:"Sul-americanos", icon:"🌎", teams:[["River Plate",84],["Boca Juniors",82],["Independiente del Valle",78],["Racing",78],["Estudiantes",77],["LDU",76],["Peñarol",76],["Nacional-URU",76],["Atlético Nacional",76],["Olimpia",75],["Colo-Colo",75],["San Lorenzo",75],["Cerro Porteño",74],["Barcelona SC",74],["Millonarios",74],["Universidad de Chile",73],["Deportivo Cali",72],["Independiente",76]]},
+  globais:{ name:"Clubes globais", icon:"🌍", teams:[["Al Hilal",82],["Al Nassr",81],["Al Ahly",79],["Al Ittihad",79],["Monterrey",78],["América-MEX",78],["Tigres",77],["Mamelodi Sundowns",76],["Wydad Casablanca",76],["Inter Miami",76],["LAFC",75],["Urawa Red Diamonds",75],["Kawasaki Frontale",75],["Zamalek",75],["Yokohama F. Marinos",74],["Ulsan HD",74],["Seattle Sounders",74],["Jeonbuk Hyundai",73]]},
+  selecoes:{ name:"Seleções mundiais", icon:"🏳️", teams:[["França",93],["Argentina",92],["Brasil",91],["Inglaterra",90],["Espanha",89],["Portugal",89],["Alemanha",88],["Holanda",87],["Itália",86],["Bélgica",85],["Uruguai",84],["Croácia",84],["Colômbia",82],["Marrocos",82],["Suíça",82],["Senegal",81],["Dinamarca",81],["Japão",80],["México",79],["Estados Unidos",79],["Coreia do Sul",79],["Egito",79],["Chile",78],["Austrália",77]]}
 };
 
-const defaultData = {
-  competitions: [
-    { id: crypto.randomUUID(), name: "Copa da Galera", editions: [
-      { name:"2024", champion:"Real Madrid", runnerUp:"Benfica", teams:["Real Madrid","Benfica","Flamengo","Palmeiras"], format:"Playoffs", date:"2024", matches:[{home:"Real Madrid",away:"Benfica",homeGoals:3,awayGoals:1,winner:"Real Madrid",loser:"Benfica",stage:"Final",meta:"Jogo único"}] },
-      { name:"2025", champion:"Flamengo", runnerUp:"Palmeiras", teams:["Flamengo","Palmeiras","Boca Juniors","River Plate"], format:"Grupos + mata-mata", date:"2025", matches:[{home:"Flamengo",away:"Palmeiras",homeGoals:2,awayGoals:2,winner:"Flamengo",loser:"Palmeiras",stage:"Final",meta:"pênaltis 5-4",pens:{a:5,b:4}}] }
-    ]}
-  ],
-  customTeams: []
-};
+const starter = { competitions:[{ id:uid(), name:"Copa da Galera", editions:[
+  { id:uid(), name:"2024", format:"Playoffs", champion:"Real Madrid", runnerUp:"Benfica", date:"2024", teams:["Real Madrid","Benfica","Flamengo","Palmeiras"], matches:[mSaved("Real Madrid","Benfica",3,1,"Real Madrid","Benfica","Final","Jogo único")] },
+  { id:uid(), name:"2025", format:"Grupos + mata-mata", champion:"Flamengo", runnerUp:"Palmeiras", date:"2025", teams:["Flamengo","Palmeiras","Boca Juniors","River Plate"], matches:[mSaved("Flamengo","Palmeiras",2,2,"Flamengo","Palmeiras","Final","pênaltis 5-4",{a:5,b:4})] }
+]}], customTeams:[], activeTournament:null };
 
 let data = load();
 let currentCompetitionId = data.competitions[0]?.id;
 let selectedPacks = new Set(["brasileiros","europeus"]);
 let selectedTeams = [];
-let currentTournament = null;
 
+function uid(){ return crypto?.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)+Date.now(); }
+function mSaved(home,away,hg,ag,winner,loser,stage,meta,pens=null){ return {home,away,homeGoals:hg,awayGoals:ag,winner,loser,stage,meta,pens,played:true}; }
 function load(){
-  try {
-    const v5 = localStorage.getItem(STORAGE);
-    const legacy = localStorage.getItem(LEGACY_STORAGE);
-    return JSON.parse(v5 || legacy) || structuredClone(defaultData);
-  } catch { return structuredClone(defaultData); }
+  try{
+    const raw = localStorage.getItem(STORAGE) || LEGACY_KEYS.map(k=>localStorage.getItem(k)).find(Boolean);
+    if(!raw) return structuredClone(starter);
+    const parsed = JSON.parse(raw);
+    return { ...structuredClone(starter), ...parsed, competitions: parsed.competitions?.length ? parsed.competitions : structuredClone(starter.competitions), customTeams: parsed.customTeams || [], activeTournament: parsed.activeTournament || null };
+  }catch{ return structuredClone(starter); }
 }
 function save(){ localStorage.setItem(STORAGE, JSON.stringify(data)); }
-function safeId(text){ return `${text}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
-function team(name,power,source=""){ return { id: safeId(name), name, power, source }; }
-function packTeams(key){ return teamPacks[key].teams.map(([name,power]) => team(name,power,teamPacks[key].name)); }
-function allPool(){
+function slug(s){ return `${s}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
+function team(name,power,source=""){ return { id:slug(name), name, power, source }; }
+function shuffle(a){ return a.map(x=>[Math.random(),x]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]); }
+function clamp(n,a,b){ return Math.max(a,Math.min(b,n)); }
+function label(v){ return {low:"baixa",medium:"média",high:"alta",chaos:"caótica"}[v] || v; }
+function formatLabel(f){ return {playoffs:"Playoffs / mata-mata",groups:"Fase de grupos + mata-mata",clubWorldCup:"Copa do Mundo de Clubes",league:"Liga / pontos corridos"}[f] || f; }
+function pool(){
   const map = new Map();
-  selectedPacks.forEach(k => packTeams(k).forEach(t => map.set(t.id,t)));
-  data.customTeams.forEach(t => map.set(t.id,t));
+  selectedPacks.forEach(k => packs[k].teams.forEach(([name,power]) => map.set(slug(name), team(name,power,packs[k].name))));
+  data.customTeams.forEach(t => map.set(t.id, t));
   return Array.from(map.values());
 }
-function shuffle(arr){ return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
-function clamp(n,a,b){ return Math.max(a,Math.min(b,n)); }
-function label(v){ return ({low:"baixa",medium:"média",high:"alta",chaos:"caótica"}[v]||v); }
-function tally(list){ return list.filter(Boolean).reduce((a,x)=>(a[x]=(a[x]||0)+1,a),{}); }
-function entriesRank(obj){ return Object.entries(obj).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0])); }
+function rankEntries(obj){ return Object.entries(obj).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0])); }
 function medal(i){ return i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`; }
 
 function go(screen){
   $$(".screen").forEach(s=>s.classList.toggle("active",s.id===screen));
   $$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.go===screen));
-  const titles = {home:["V5","Início"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],create:["Novo","Criar torneio"],teams:["Participantes","Times"],rules:["Configuração","Regras"],tournament:["Simulação","Torneio"]};
-  $("#subtitle").textContent = titles[screen]?.[0] || "Brocket";
-  $("#title").textContent = titles[screen]?.[1] || "Brocket";
+  const titles = {home:["V6","Início"],create:["Novo","Criar torneio"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"]};
+  $("#pageSubtitle").textContent = titles[screen]?.[0] || "Brocket";
+  $("#pageTitle").textContent = titles[screen]?.[1] || "Brocket";
   renderAll();
 }
 
-document.addEventListener("click", (e)=>{
-  const nav = e.target.closest("[data-go]");
-  if(nav) go(nav.dataset.go);
-  const compBtn = e.target.closest("[data-comp-id]");
-  if(compBtn) openCompetition(compBtn.dataset.compId);
-  const delEdition = e.target.closest("[data-delete-edition]");
-  if(delEdition) deleteEdition(delEdition.dataset.deleteEdition);
+document.addEventListener("click", e=>{
+  const nav = e.target.closest("[data-go]"); if(nav){ go(nav.dataset.go); return; }
+  const comp = e.target.closest("[data-comp]"); if(comp){ openCompetition(comp.dataset.comp); return; }
+  const sim = e.target.closest("[data-sim]"); if(sim){ simulateMatch(sim.dataset.sim); return; }
+  const delEdition = e.target.closest("[data-delete-edition]"); if(delEdition){ deleteEdition(delEdition.dataset.deleteEdition); return; }
+  const delCustom = e.target.closest("[data-delete-custom]"); if(delCustom){ deleteCustomTeam(delCustom.dataset.deleteCustom); return; }
 });
 
-function renderAll(){ renderCompetitions(); renderCompetitionSelect(); renderPacks(); renderSelectedTeams(); renderCustomTeams(); toggleSettings(); }
-function renderCompetitionSelect(){
-  const sel = $("#competitionSelect");
-  sel.innerHTML = data.competitions.map(c=>`<option value="${c.id}" ${c.id===currentCompetitionId?"selected":""}>${c.name}</option>`).join("");
-}
+function renderAll(){ renderCompetitions(); renderCompetitionSelect(); renderPacks(); renderSelected(); renderCustomTeams(); toggleRuleVisibility(); renderTournament(); }
+function renderCompetitionSelect(){ $("#competitionSelect").innerHTML = data.competitions.map(c=>`<option value="${c.id}" ${c.id===currentCompetitionId?"selected":""}>${c.name}</option>`).join(""); }
 function renderCompetitions(){
-  const html = data.competitions.map(c=>{
-    const latest = c.editions.at(-1);
-    return `<button class="list-card" data-comp-id="${c.id}"><div><strong>${c.name}</strong><small>${c.editions.length} edições${latest?` • último campeão: ${latest.champion}`:""}</small></div><span class="pill">abrir</span></button>`;
-  }).join("");
+  const html = data.competitions.map(c=>{ const s=statsFor(c); return `<button class="list-card" data-comp="${c.id}"><div><strong>${c.name}</strong><small>${c.editions.length} edições • maior campeão: ${s.topChampion}</small></div><span class="pill">abrir</span></button>`; }).join("");
   $("#competitionList").innerHTML = html || `<div class="panel">Nenhum campeonato criado.</div>`;
   $("#homeCompetitions").innerHTML = html || `<div class="panel">Nenhum campeonato criado.</div>`;
 }
-function openCompetition(id){ currentCompetitionId=id; const c=data.competitions.find(x=>x.id===id); if(!c) return; $("#competitionTitle").textContent=c.name; renderCompetitionDetail(c); go("competitionDetail"); }
-
-function buildCompetitionStats(c){
-  const editions = c.editions || [];
-  const allMatches = editions.flatMap(e => e.matches || []);
-  const allTeams = new Set(editions.flatMap(e=>e.teams||[]));
-  const champions = tally(editions.map(e=>e.champion));
-  const vices = tally(editions.map(e=>e.runnerUp));
-  const finals = tally(editions.flatMap(e=>[e.champion,e.runnerUp].filter(Boolean)));
-  const parts = tally(editions.flatMap(e=>e.teams||[]));
-  const teamStats = {};
-  function ensure(n){ if(!n) return null; return teamStats[n] ||= {team:n,titles:0,vices:0,finals:0,parts:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,played:0}; }
-  editions.forEach(e=>{
-    (e.teams||[]).forEach(n=>ensure(n).parts++);
-    if(e.champion) ensure(e.champion).titles++;
-    if(e.runnerUp) ensure(e.runnerUp).vices++;
-    [e.champion,e.runnerUp].filter(Boolean).forEach(n=>ensure(n).finals++);
-  });
-  allMatches.forEach(m=>{
-    const h = typeof m.home === "string" ? m.home : m.home?.name;
-    const a = typeof m.away === "string" ? m.away : m.away?.name;
-    const hg = Number(m.homeGoals ?? 0), ag = Number(m.awayGoals ?? 0);
-    const hs=ensure(h), as=ensure(a); if(!hs || !as) return;
-    hs.gf+=hg; hs.ga+=ag; as.gf+=ag; as.ga+=hg; hs.played++; as.played++;
-    if(hg>ag){hs.w++; as.l++;} else if(hg<ag){as.w++; hs.l++;} else {hs.d++; as.d++;}
-  });
-  Object.values(teamStats).forEach(t=>t.gd=t.gf-t.ga);
-  const biggestWin = allMatches.map(m=>{
-    const h=typeof m.home==="string"?m.home:m.home?.name, a=typeof m.away==="string"?m.away:m.away?.name;
-    const hg=Number(m.homeGoals ?? 0), ag=Number(m.awayGoals ?? 0); return {m,h,a,hg,ag,diff:Math.abs(hg-ag),total:hg+ag};
-  }).sort((x,y)=>y.diff-x.diff || y.total-x.total)[0];
-  const craziestFinal = allMatches.filter(x=>(x.stage||"").toLowerCase().includes("final")).map(m=>{
-    const h=typeof m.home==="string"?m.home:m.home?.name, a=typeof m.away==="string"?m.away:m.away?.name;
-    const hg=Number(m.homeGoals ?? 0), ag=Number(m.awayGoals ?? 0); return {m,h,a,hg,ag,total:hg+ag};
-  }).sort((x,y)=>y.total-x.total)[0];
-  const leader = obj => entriesRank(obj)[0]?.[0] || "—";
-  return {editions,allMatches,allTeams,champions,vices,finals,parts,teamStats,biggestWin,craziestFinal,leader};
-}
-function rankCard(title, obj, icon="🏆"){
-  const rows = entriesRank(obj).slice(0,5).map(([name,n],i)=>`<div class="rank-row"><span>${medal(i)} ${name}</span><strong>${n}</strong></div>`).join("") || `<small>Sem dados ainda.</small>`;
-  return `<div class="stat-card"><h3>${icon} ${title}</h3>${rows}</div>`;
-}
-function recordCard(title, value, sub="", icon="✨"){
-  return `<div class="stat-card featured"><small>${icon} ${title}</small><strong>${value || "—"}</strong>${sub?`<span>${sub}</span>`:""}</div>`;
-}
-function renderCompetitionDetail(c){
-  const s = buildCompetitionStats(c);
-  $("#competitionStats").innerHTML = `
-    <div class="stat"><small>Edições</small><strong>${s.editions.length}</strong></div>
-    <div class="stat"><small>Jogos salvos</small><strong>${s.allMatches.length}</strong></div>
-    <div class="stat"><small>Times diferentes</small><strong>${s.allTeams.size}</strong></div>
-    <div class="stat"><small>Maior campeão</small><strong>${s.leader(s.champions)}</strong></div>`;
-  $("#summaryList").innerHTML = `
-    ${recordCard("Maior campeão", s.leader(s.champions), `${s.champions[s.leader(s.champions)]||0} título(s)`, "🏆")}
-    ${recordCard("Rei dos vices", s.leader(s.vices), `${s.vices[s.leader(s.vices)]||0} vice(s)`, "🥈")}
-    ${recordCard("Mais finais", s.leader(s.finals), `${s.finals[s.leader(s.finals)]||0} final(is)`, "🔥")}
-    ${recordCard("Mais participações", s.leader(s.parts), `${s.parts[s.leader(s.parts)]||0} edição(ões)`, "👥")}`;
-  $("#titlesList").innerHTML = `${rankCard("Maiores campeões",s.champions,"🏆")}${rankCard("Maiores vices",s.vices,"🥈")}${rankCard("Mais finais",s.finals,"🔥")}${rankCard("Mais participações",s.parts,"👥")}`;
-  const teams = Object.values(s.teamStats).sort((a,b)=>b.titles-a.titles || b.w-a.w || b.gd-a.gd || b.gf-a.gf || a.team.localeCompare(b.team));
-  $("#teamsStatsList").innerHTML = teams.map((t,i)=>`<div class="list-card team-stat"><div><strong>${medal(i)} ${t.team}</strong><small>${t.titles} título(s) • ${t.vices} vice(s) • ${t.parts} participação(ões)</small><small>${t.played}J ${t.w}V ${t.d}E ${t.l}D • GP ${t.gf} • GC ${t.ga} • SG ${t.gd}</small></div><span class="pill">🏆 ${t.titles}</span></div>`).join("") || `<div class="panel">Sem estatísticas de times ainda.</div>`;
-  const big = s.biggestWin;
-  const final = s.craziestFinal;
-  $("#gamesStatsList").innerHTML = `
-    ${recordCard("Maior goleada", big?`${big.h} ${big.hg} x ${big.ag} ${big.a}`:"—", big?`Diferença de ${big.diff} gol(s)`:"", "⚽")}
-    ${recordCard("Final com mais gols", final?`${final.h} ${final.hg} x ${final.ag} ${final.a}`:"—", final?`${final.total} gol(s) na final`:"", "🔥")}
-    ${recordCard("Títulos nos pênaltis", String(s.allMatches.filter(m=>m.pens).length), "decisões registradas", "🎯")}
-    ${recordCard("Total de gols", String(s.allMatches.reduce((a,m)=>a+Number(m.homeGoals||0)+Number(m.awayGoals||0),0)), `${s.allMatches.length} jogo(s)`, "🥅")}`;
-  $("#editionList").innerHTML = c.editions.slice().reverse().map((e,idx)=>{ const realIndex = c.editions.length-1-idx; return `<div class="list-card"><div><strong>${e.name}</strong><small>${e.format||"Torneio"} • campeão: ${e.champion||"—"} • vice: ${e.runnerUp||"—"}</small><small>${(e.teams||[]).length} times • ${(e.matches||[]).length} jogos salvos</small></div><button class="danger mini-danger" data-delete-edition="${realIndex}">apagar</button></div>`; }).join("") || `<div class="panel">Sem edições ainda.</div>`;
-}
-function deleteEdition(index){
-  const c = data.competitions.find(x=>x.id===currentCompetitionId); if(!c) return;
-  const e = c.editions[Number(index)]; if(!e) return;
-  if(confirm(`Apagar a edição "${e.name}"?`)){ c.editions.splice(Number(index),1); save(); renderCompetitionDetail(c); renderCompetitions(); }
-}
-
-$("#deleteCompetitionBtn").onclick=()=>{
-  const c = data.competitions.find(x=>x.id===currentCompetitionId); if(!c) return;
-  if(data.competitions.length<=1) return alert("Crie outro campeonato antes de apagar o único existente.");
-  if(confirm(`Apagar o campeonato "${c.name}" e todas as edições dele?`)){
-    data.competitions = data.competitions.filter(x=>x.id!==c.id);
-    currentCompetitionId = data.competitions[0]?.id;
-    save(); renderAll(); go("competitions");
-  }
-};
-
-$("#newCompetition").onclick=()=>$("#competitionForm").hidden=!$("#competitionForm").hidden;
-$("#saveCompetition").onclick=()=>{ const name=$("#competitionName").value.trim(); if(!name) return; const c={id:crypto.randomUUID(),name,editions:[]}; data.competitions.push(c); currentCompetitionId=c.id; $("#competitionName").value=""; $("#competitionForm").hidden=true; save(); renderAll(); };
-$("#competitionSelect").onchange=e=>currentCompetitionId=e.target.value;
-$("#formatSelect").onchange=()=>{ applyFormatDefaults(); toggleSettings(); };
-function toggleSettings(){
-  const f=$("#formatSelect").value;
-  $("#groupSettings").style.display = (f==="groups" || f==="clubWorldCup") ? "block" : "none";
-  $("#leagueSettings").style.display = f==="league" ? "block" : "none";
-}
-function applyFormatDefaults(){
-  const f=$("#formatSelect").value;
-  if(f==="clubWorldCup") { $("#teamCount").value="32"; $("#knockoutLegs").value="single"; $("#finalRule").value="single"; }
-  if(f==="league" && !["4","6","8","10","12","16","20"].includes($("#teamCount").value)) $("#teamCount").value="20";
-  if((f==="playoffs" || f==="groups") && !["8","16","32"].includes($("#teamCount").value)) $("#teamCount").value="16";
-  renderSelectedTeams();
-}
+function openCompetition(id){ currentCompetitionId=id; const c=data.competitions.find(x=>x.id===id); if(!c) return; $("#competitionTitle").textContent=c.name; $("#editCompetitionName").value=c.name; renderCompetitionDetail(c); go("competitionDetail"); }
 
 function renderPacks(){
-  $("#packList").innerHTML = Object.entries(teamPacks).map(([key,p])=>`<label class="pack"><input type="checkbox" value="${key}" ${selectedPacks.has(key)?"checked":""}/><span><strong>${p.icon} ${p.name}</strong><small>${p.teams.length} times</small></span></label>`).join("");
-  $$(".pack input").forEach(cb=>cb.onchange=()=>{ cb.checked?selectedPacks.add(cb.value):selectedPacks.delete(cb.value); renderPacks(); renderSelectedTeams(); });
-  $("#poolCount").textContent = `${allPool().length} disponíveis`;
+  $("#packList").innerHTML = Object.entries(packs).map(([key,p])=>`<label class="pack"><input type="checkbox" data-pack="${key}" ${selectedPacks.has(key)?"checked":""}/><span>${p.icon}</span><div><strong>${p.name}</strong><small>${p.teams.length} times</small></div></label>`).join("");
+  $("#poolCount").textContent = `${pool().length} disponíveis`;
 }
-function renderSelectedTeams(){
-  const count = Number($("#teamCount").value || 16);
-  $("#selectedCount").textContent = `${selectedTeams.length}/${count}`;
-  $("#selectedTeams").innerHTML = selectedTeams.map(t=>`<div class="team-row"><div><strong>${t.name}</strong><small>${t.source||"Personalizado"}</small></div><span class="pill">${t.power}</span></div>`).join("") || `<div class="team-row"><small>Nenhum time selecionado.</small></div>`;
+function renderSelected(){
+  const need = Number($("#teamCount").value);
+  $("#selectedCount").textContent = `${selectedTeams.length}/${need}`;
+  $("#selectedTeams").innerHTML = selectedTeams.map(t=>`<div class="team-row"><div><strong>${t.name}</strong><small>${t.source || "personalizado"}</small></div><span class="chip">${t.power}</span></div>`).join("") || `<div class="team-row"><small>Nenhum time selecionado.</small></div>`;
 }
-$("#teamCount").onchange=()=>{ selectedTeams = selectedTeams.slice(0,Number($("#teamCount").value)); renderSelectedTeams(); };
-$("#selectStrongest").onclick=()=>{ selectedTeams=allPool().sort((a,b)=>b.power-a.power).slice(0,Number($("#teamCount").value)); renderSelectedTeams(); };
-$("#selectRandom").onclick=()=>{ selectedTeams=shuffle(allPool()).slice(0,Number($("#teamCount").value)); renderSelectedTeams(); };
-$("#selectBalanced").onclick=()=>{ selectedTeams=balancedPick(allPool(),Number($("#teamCount").value)); renderSelectedTeams(); };
-$("#clearSelection").onclick=()=>{ selectedTeams=[]; renderSelectedTeams(); };
-function balancedPick(pool,count){
-  const sorted = [...pool].sort((a,b)=>b.power-a.power);
-  const elite = sorted.filter(t=>t.power>=88), strong=sorted.filter(t=>t.power>=80&&t.power<88), mid=sorted.filter(t=>t.power>=72&&t.power<80), low=sorted.filter(t=>t.power<72);
-  let pick=[...shuffle(elite).slice(0,Math.ceil(count*.25)),...shuffle(strong).slice(0,Math.ceil(count*.4)),...shuffle(mid).slice(0,Math.ceil(count*.25)),...shuffle(low).slice(0,Math.max(1,Math.floor(count*.1)))];
-  const map=new Map(pick.map(t=>[t.id,t]));
-  shuffle(sorted).forEach(t=>{ if(map.size<count) map.set(t.id,t); });
-  return Array.from(map.values()).slice(0,count);
+function renderCustomTeams(){
+  $("#customTeamList").innerHTML = data.customTeams.map(t=>`<div class="team-row"><div><strong>${t.name}</strong><small>Time criado • força ${t.power}</small></div><button class="danger mini-danger" data-delete-custom="${t.id}">apagar</button></div>`).join("") || `<div class="team-row"><small>Nenhum time criado.</small></div>`;
+}
+function toggleRuleVisibility(){
+  const f=$("#formatSelect").value;
+  $("#leagueTurnsWrap").style.display = f==="league" ? "grid" : "none";
+  $("#groupSizeWrap").style.display = (f==="groups" || f==="clubWorldCup") ? "grid" : "none";
 }
 
-$("#addCustomTeam").onclick=()=>{
-  const name=$("#customName").value.trim(); const power=clamp(Number($("#customPower").value)||70,1,100); if(!name) return;
-  data.customTeams.push(team(name,power,"Meus times")); $("#customName").value=""; save(); renderAll();
-};
-function renderCustomTeams(){ $("#customTeamList").innerHTML = data.customTeams.map((t,i)=>`<div class="team-row"><div><strong>${t.name}</strong><small>Personalizado</small></div><span class="pill">${t.power}</span></div>`).join("") || `<div class="team-row"><small>Você ainda não criou times.</small></div>`; }
+function pickStrongest(){ selectedTeams = pool().sort((a,b)=>b.power-a.power).slice(0,Number($("#teamCount").value)); renderSelected(); }
+function pickRandom(){ selectedTeams = shuffle(pool()).slice(0,Number($("#teamCount").value)); renderSelected(); }
+function pickBalanced(){
+  const need=Number($("#teamCount").value), sorted=pool().sort((a,b)=>b.power-a.power);
+  const tiers=[sorted.slice(0,Math.ceil(sorted.length*.25)),sorted.slice(Math.ceil(sorted.length*.25),Math.ceil(sorted.length*.55)),sorted.slice(Math.ceil(sorted.length*.55),Math.ceil(sorted.length*.8)),sorted.slice(Math.ceil(sorted.length*.8))].map(shuffle);
+  const quota=[Math.ceil(need*.30),Math.ceil(need*.35),Math.ceil(need*.25),need];
+  const out=[]; tiers.forEach((tier,i)=>out.push(...tier.slice(0,quota[i])));
+  selectedTeams = shuffle([...new Map(out.map(t=>[t.id,t])).values()]).slice(0,need);
+  while(selectedTeams.length<need && sorted.length>selectedTeams.length){ const next=shuffle(sorted).find(t=>!selectedTeams.some(x=>x.id===t.id)); if(!next) break; selectedTeams.push(next); }
+  renderSelected();
+}
 
-function config(){ return { format:$("#formatSelect").value, name:$("#tournamentName").value.trim()||"Torneio", teamCount:Number($("#teamCount").value), groupSize:Number($("#groupSize").value), qualifiers:Number($("#qualifiers").value), leagueTurns:$("#leagueTurns")?.value||"single", legs:$("#knockoutLegs").value, finalRule:$("#finalRule").value, upset:$("#upsetLevel").value, realism:$("#scoreRealism").value, extraTime:$("#extraTime").checked, penalties:$("#penalties").checked, awayGoals:$("#awayGoals").checked }; }
-$("#generateTournament").onclick=()=>{
-  const cfg=config();
-  if((cfg.format==="groups" || cfg.format==="clubWorldCup") && cfg.teamCount % cfg.groupSize !== 0) return alert("Para grupos, a quantidade de times precisa fechar grupos de 4.");
-  if(selectedTeams.length<cfg.teamCount) selectedTeams=balancedPick(allPool(),cfg.teamCount);
-  if(selectedTeams.length<cfg.teamCount) return alert("Selecione mais times ou marque mais pacotes.");
-  const teams=shuffle(selectedTeams.slice(0,cfg.teamCount));
-  currentTournament = cfg.format==="playoffs" ? makePlayoffs(teams,cfg) : cfg.format==="league" ? makeLeague(teams,cfg) : makeGroupsTournament(teams,cfg);
-  saveEdition(currentTournament);
-  renderTournament(currentTournament);
-  go("tournament");
-};
-
-function makeLeague(teams,cfg){
-  const rows = teams.map(t=>({...t,pts:0,w:0,d:0,l:0,gf:0,ga:0,gd:0}));
-  const rounds = [];
-  const n = rows.length;
-  const arr = n % 2 ? [...rows, null] : [...rows];
-  const totalRounds = arr.length - 1;
-  const half = arr.length / 2;
-  let rotation = [...arr];
-  for(let r=0;r<totalRounds;r++){
+function cfg(){ return { id:uid(), name:$("#editionName").value.trim()||"Torneio", competitionId:$("#competitionSelect").value, format:$("#formatSelect").value, teamCount:Number($("#teamCount").value), legs:$("#knockoutLegs").value, finalRule:$("#finalRule").value, upset:$("#upsetLevel").value, realism:$("#scoreRealism").value, extraTime:$("#extraTime").checked, penalties:$("#penalties").checked, awayGoals:$("#awayGoals").checked, leagueTurns:$("#leagueTurns").value, groupSize:Number($("#groupSize").value), bracketShuffle:$("#bracketShuffle").value, groupShuffle:$("#groupShuffle").value }; }
+function generateTournament(){
+  const c=cfg(); if(selectedTeams.length<c.teamCount){ alert(`Selecione ${c.teamCount} times.`); return; }
+  let teams = selectedTeams.slice(0,c.teamCount).map(t=>({...t}));
+  const t = { id:uid(), cfg:c, teams, status:"running", saved:false, champion:null, runnerUp:null, groups:[], knockout:[], league:null, currentStage:"", createdAt:new Date().toISOString() };
+  if(c.format==="league") setupLeague(t);
+  else if(c.format==="playoffs") setupKnockout(t, orderForBracket(teams,c), "Mata-mata");
+  else setupGroups(t);
+  data.activeTournament=t; save(); renderTournament(); go("tournament");
+}
+function orderForBracket(teams,c){
+  if(c.bracketShuffle==="strength"){
+    const s=[...teams].sort((a,b)=>b.power-a.power), out=[]; while(s.length){ out.push(s.shift()); if(s.length) out.push(s.pop()); } return out;
+  }
+  return shuffle(teams);
+}
+function orderForGroups(teams,c){
+  if(c.groupShuffle==="balanced"){
+    const sorted=[...teams].sort((a,b)=>b.power-a.power), gs=Math.ceil(teams.length/c.groupSize), groups=Array.from({length:gs},()=>[]);
+    sorted.forEach((t,i)=>groups[i%gs].push(t)); return shuffle(groups.map(g=>shuffle(g))).flat();
+  }
+  return shuffle(teams);
+}
+function blankStats(t){ return {...t, pts:0,w:0,d:0,l:0,gf:0,ga:0,gd:0}; }
+function setupGroups(t){
+  const c=t.cfg, ordered=orderForGroups(t.teams,c), gs=c.groupSize;
+  for(let i=0;i<ordered.length;i+=gs){
+    const idx=i/gs, g={ name:String.fromCharCode(65+idx), teams:ordered.slice(i,i+gs).map(blankStats), matches:[], table:[] };
+    for(let a=0;a<g.teams.length;a++) for(let b=a+1;b<g.teams.length;b++) g.matches.push(newMatch(g.teams[a],g.teams[b],`Grupo ${g.name}`,true));
+    g.matches=shuffle(g.matches); g.table=[...g.teams]; t.groups.push(g);
+  }
+  t.currentStage="groups";
+}
+function setupKnockout(t, orderedTeams, title="Mata-mata"){
+  const size=orderedTeams.length, r={ name:roundName(size), matches:[] };
+  for(let i=0;i<orderedTeams.length;i+=2) r.matches.push(newMatch(orderedTeams[i],orderedTeams[i+1],r.name,false));
+  t.knockout=[r]; t.currentStage="knockout";
+}
+function setupLeague(t){
+  const teams=t.teams.map(blankStats), rounds=[], base=[...teams];
+  if(base.length%2) base.push(null);
+  const n=base.length;
+  for(let r=0;r<n-1;r++){
     const matches=[];
-    for(let i=0;i<half;i++){
-      const a=rotation[i], b=rotation[rotation.length-1-i];
-      if(a && b){ const home = r%2 ? b : a; const away = r%2 ? a : b; const m=playSingle(home,away,cfg,true); m.stage=`Rodada ${r+1}`; matches.push(m); applyTable(rows,m); }
-    }
-    rounds.push({name:`Rodada ${r+1}`,matches});
-    rotation = [rotation[0], rotation.at(-1), ...rotation.slice(1,-1)];
+    for(let i=0;i<n/2;i++){ const a=base[i], b=base[n-1-i]; if(a&&b) matches.push(newMatch(a,b,`Rodada ${r+1}`,true)); }
+    rounds.push({name:`Rodada ${r+1}`,matches:shuffle(matches)});
+    base.splice(1,0,base.pop());
   }
-  if(cfg.leagueTurns==="double"){
-    const first=[...rounds];
-    first.forEach((round,idx)=>{
-      const matches=round.matches.map(m=>{ const rev=playSingle(m.away,m.home,cfg,true); rev.stage=`Rodada ${idx+1+first.length}`; applyTable(rows,rev); return rev; });
-      rounds.push({name:`Rodada ${idx+1+first.length}`,matches});
-    });
+  if(t.cfg.leagueTurns==="double"){
+    const second=rounds.map((r,i)=>({name:`Rodada ${rounds.length+i+1}`,matches:r.matches.map(m=>newMatch(m.away,m.home,`Rodada ${rounds.length+i+1}`,true))}));
+    rounds.push(...second);
   }
-  rows.forEach(t=>t.gd=t.gf-t.ga);
-  const table=[...rows].sort((a,b)=> b.pts-a.pts || b.gd-a.gd || b.gf-a.gf || b.w-a.w || b.power-a.power || Math.random()-.5);
-  return {cfg,teams,league:{table,rounds},groups:[],knockout:[],champion:table[0].name,runnerUp:table[1]?.name||"—",formatLabel:"Liga / pontos corridos"};
+  t.league={teams,table:[...teams],rounds}; t.currentStage="league";
 }
-function makeGroupsTournament(teams,cfg){
-  const groupCount = teams.length / cfg.groupSize;
-  const groups = Array.from({length:groupCount},(_,i)=>({ name:String.fromCharCode(65+i), teams:[], matches:[] }));
-  teams.forEach((t,i)=>groups[i%groupCount].teams.push({...t,pts:0,w:0,d:0,l:0,gf:0,ga:0,gd:0}));
-  groups.forEach(g=>simulateGroup(g,cfg));
-  const qualified=[];
-  groups.forEach(g=>g.table.slice(0,cfg.qualifiers).forEach((row,pos)=>qualified.push({...row, group:g.name, groupPosition:pos+1})));
-  const ordered = pairQualified(qualified);
-  const knockout = simulateKnockout(ordered,cfg);
-  return { cfg, teams, groups, knockout, champion: knockout.at(-1).matches[0].winner.name, runnerUp: knockout.at(-1).matches[0].loser.name, formatLabel: cfg.format==="clubWorldCup"?"Copa do Mundo de Clubes":"Grupos + mata-mata" };
-}
-function simulateGroup(g,cfg){
-  for(let i=0;i<g.teams.length;i++) for(let j=i+1;j<g.teams.length;j++){
-    const m = playSingle(g.teams[i],g.teams[j],cfg,true); m.stage=`Grupo ${g.name}`;
-    g.matches.push(m); applyTable(g.teams,m);
-  }
-  g.teams.forEach(t=>t.gd=t.gf-t.ga);
-  g.table = [...g.teams].sort((a,b)=> b.pts-a.pts || b.gd-a.gd || b.gf-a.gf || b.power-a.power || Math.random()-.5);
-}
-function applyTable(rows,m){
-  const a=rows.find(x=>x.id===m.home.id), b=rows.find(x=>x.id===m.away.id);
-  a.gf+=m.homeGoals; a.ga+=m.awayGoals; b.gf+=m.awayGoals; b.ga+=m.homeGoals;
-  if(m.homeGoals>m.awayGoals){ a.pts+=3; a.w++; b.l++; }
-  else if(m.homeGoals<m.awayGoals){ b.pts+=3; b.w++; a.l++; }
-  else { a.pts++; b.pts++; a.d++; b.d++; }
-}
-function pairQualified(q){
-  const winners=q.filter(x=>x.groupPosition===1), runners=q.filter(x=>x.groupPosition===2).reverse();
-  const out=[]; for(let i=0;i<winners.length;i++){ out.push(winners[i], runners[i]); } return out;
-}
-function makePlayoffs(teams,cfg){
-  const knockout = simulateKnockout(teams,cfg);
-  return { cfg, teams, groups:[], knockout, champion: knockout.at(-1).matches[0].winner.name, runnerUp: knockout.at(-1).matches[0].loser.name, formatLabel:"Playoffs / mata-mata" };
-}
-function simulateKnockout(teams,cfg){
-  let current=[...teams], rounds=[];
-  while(current.length>1){
-    const size=current.length; const isFinal=size===2; const matches=[]; const winners=[];
-    for(let i=0;i<current.length;i+=2){ const m=playKnockout(current[i],current[i+1],cfg,isFinal); m.stage=roundName(size); matches.push(m); winners.push(m.winner); }
-    rounds.push({ name:roundName(size), matches }); current=winners;
-  }
-  return rounds;
-}
+function newMatch(home,away,stage,allowDraw){ return { id:uid(), home, away, stage, allowDraw, played:false, homeGoals:null, awayGoals:null, winner:null, loser:null, meta:"" }; }
 function roundName(size){ return size===2?"Final":size===4?"Semifinal":size===8?"Quartas":size===16?"Oitavas":`Fase ${size}`; }
-function playKnockout(a,b,cfg,isFinal){
-  const twoLegs = cfg.legs==="two" && !(isFinal && cfg.finalRule==="single");
-  if(!twoLegs){
-    let m=playSingle(a,b,cfg,false);
-    let home=m.homeGoals, away=m.awayGoals, meta="Jogo único";
-    if(home===away){
-      if(cfg.extraTime){ const et=extraGoals(a,b,cfg); home+=et.a; away+=et.b; meta += ` • prorrog. ${et.a}-${et.b}`; }
-      if(home===away && cfg.penalties){ const p=pens(a,b,cfg); meta += ` • pênaltis ${p.a}-${p.b}`; return normalizeMatch(a,b,home,away,p.winA?a:b,p.winA?b:a,meta,p); }
+
+function allTournamentMatches(t){ return [...(t.league?.rounds||[]).flatMap(r=>r.matches), ...(t.groups||[]).flatMap(g=>g.matches), ...(t.knockout||[]).flatMap(r=>r.matches)]; }
+function nextPlayable(t){ return allTournamentMatches(t).find(m=>!m.played); }
+function simulateNext(){ const t=data.activeTournament; const m=nextPlayable(t); if(m) simulateMatch(m.id); }
+function simulateMatch(id){
+  const t=data.activeTournament; if(!t || t.status==="finished") return;
+  const m=allTournamentMatches(t).find(x=>x.id===id); if(!m || m.played) return;
+  const result = m.allowDraw ? playGroupOrLeague(m.home,m.away,t.cfg) : playKnockout(m.home,m.away,t.cfg, m.stage==="Final");
+  Object.assign(m,result,{played:true});
+  if(t.currentStage==="league") updateLeagueTable(t,m);
+  if(t.currentStage==="groups") updateGroupTable(t,m);
+  advanceIfNeeded(t); save(); renderTournament();
+}
+function advanceIfNeeded(t){
+  if(t.currentStage==="groups" && t.groups.every(g=>g.matches.every(m=>m.played))){
+    t.groups.forEach(sortGroup);
+    const qualified=[]; t.groups.forEach(g=>g.table.slice(0,2).forEach((tm,i)=>qualified.push({...tm, group:g.name, pos:i+1})));
+    setupKnockout(t, orderForBracket(qualified,t.cfg), "Mata-mata");
+  }
+  if(t.currentStage==="knockout"){
+    const last=t.knockout.at(-1); if(last && last.matches.every(m=>m.played)){
+      if(last.matches.length===1){ finishTournament(t,last.matches[0]); return; }
+      const winners=last.matches.map(m=>m.winner); const r={ name:roundName(winners.length), matches:[] };
+      for(let i=0;i<winners.length;i+=2) r.matches.push(newMatch(winners[i],winners[i+1],r.name,false));
+      t.knockout.push(r);
     }
-    const winA=home>=away; return normalizeMatch(a,b,home,away,winA?a:b,winA?b:a,meta,null);
   }
-  const leg1=playSingle(a,b,cfg,false), leg2=playSingle(b,a,cfg,false);
-  let aggA=leg1.homeGoals+leg2.awayGoals, aggB=leg1.awayGoals+leg2.homeGoals;
-  let meta=`Ida ${leg1.homeGoals}-${leg1.awayGoals} • volta ${leg2.homeGoals}-${leg2.awayGoals}`;
-  if(aggA===aggB && cfg.awayGoals){
-    const awayA=leg2.awayGoals, awayB=leg1.awayGoals;
-    if(awayA!==awayB){ const winA=awayA>awayB; meta += " • gol fora"; return normalizeMatch(a,b,aggA,aggB,winA?a:b,winA?b:a,meta,null); }
+  if(t.currentStage==="league" && t.league.rounds.every(r=>r.matches.every(m=>m.played))){
+    sortLeague(t); const champ=t.league.table[0], vice=t.league.table[1]; finishTournament(t,{winner:champ, loser:vice, home:champ, away:vice, homeGoals:0, awayGoals:0, meta:"pontos corridos"});
   }
-  if(aggA===aggB && cfg.extraTime){ const et=extraGoals(a,b,cfg); aggA+=et.a; aggB+=et.b; meta += ` • prorrog. ${et.a}-${et.b}`; }
-  if(aggA===aggB && cfg.penalties){ const p=pens(a,b,cfg); meta += ` • pênaltis ${p.a}-${p.b}`; return normalizeMatch(a,b,aggA,aggB,p.winA?a:b,p.winA?b:a,meta,p); }
-  const winA=aggA>=aggB; return normalizeMatch(a,b,aggA,aggB,winA?a:b,winA?b:a,meta,null);
 }
-function normalizeMatch(a,b,scoreA,scoreB,winner,loser,meta,pens){ return { home:a, away:b, homeGoals:scoreA, awayGoals:scoreB, winner, loser, meta, pens }; }
-function playSingle(a,b,cfg,allowDraw){
-  const diff=a.power-b.power; const randomness={low:8,medium:15,high:24,chaos:38}[cfg.upset];
-  const formA=diff/14+(Math.random()*2-1)*(randomness/18); const formB=-diff/14+(Math.random()*2-1)*(randomness/18);
-  const base = cfg.realism==="chaotic"?1.8:cfg.realism==="normal"?1.35:1.05;
-  let ga = goalsFromRating(base+formA), gb = goalsFromRating(base+formB);
-  if(cfg.realism==="realistic" && Math.random()<.16){ ga=Math.min(ga,2); gb=Math.min(gb,2); }
-  if(!allowDraw && ga===gb && Math.random()<.55){ (Math.random()+diff/180>.5)?ga++:gb++; }
-  return { home:a, away:b, homeGoals:clamp(ga,0,9), awayGoals:clamp(gb,0,9) };
+function finishTournament(t, finalMatch){
+  t.status="finished"; t.champion=finalMatch.winner.name; t.runnerUp=finalMatch.loser?.name || "—"; t.finishedAt=new Date().toISOString();
+  if(!t.saved){ saveEdition(t); t.saved=true; }
 }
-function goalsFromRating(x){
-  const r=Math.random();
-  const boost=Math.max(-.9,Math.min(1.8,x-1));
-  const probs=[.23-.05*boost,.31-.04*boost,.25,.13+.04*boost,.055+.025*boost,.02+.02*boost,.005+.01*boost];
-  let acc=0; for(let i=0;i<probs.length;i++){ acc+=Math.max(0,probs[i]); if(r<acc) return i; } return Math.random()<.5?4:5;
+function playGroupOrLeague(a,b,c){ const r=playSingle(a,b,c,true); return {...r,winner:r.homeGoals===r.awayGoals?null:(r.homeGoals>r.awayGoals?a:b),loser:r.homeGoals===r.awayGoals?null:(r.homeGoals>r.awayGoals?b:a),meta:""}; }
+function playKnockout(a,b,c,isFinal){
+  const two = c.legs==="two" && !(isFinal && c.finalRule==="single");
+  if(!two){
+    let r=playSingle(a,b,c,false), hg=r.homeGoals, ag=r.awayGoals, meta="Jogo único";
+    if(hg===ag && c.extraTime){ const et=extraGoals(a,b,c); hg+=et.a; ag+=et.b; meta+=` • prorrog. ${et.a}-${et.b}`; }
+    if(hg===ag && c.penalties){ const p=pens(a,b); meta+=` • pênaltis ${p.a}-${p.b}`; const win=p.winA; return {homeGoals:hg,awayGoals:ag,winner:win?a:b,loser:win?b:a,meta,pens:p}; }
+    const win=hg>=ag; return {homeGoals:hg,awayGoals:ag,winner:win?a:b,loser:win?b:a,meta};
+  }
+  const l1=playSingle(a,b,c,true), l2=playSingle(b,a,c,true);
+  let ga=l1.homeGoals+l2.awayGoals, gb=l1.awayGoals+l2.homeGoals;
+  let meta=`Ida ${l1.homeGoals}-${l1.awayGoals} • volta ${l2.homeGoals}-${l2.awayGoals}`;
+  if(ga===gb && c.awayGoals){ const awayA=l2.awayGoals, awayB=l1.awayGoals; if(awayA!==awayB){ const win=awayA>awayB; return {homeGoals:ga,awayGoals:gb,winner:win?a:b,loser:win?b:a,meta:meta+" • gol fora"}; } }
+  if(ga===gb && c.extraTime){ const et=extraGoals(a,b,c); ga+=et.a; gb+=et.b; meta+=` • prorrog. ${et.a}-${et.b}`; }
+  if(ga===gb && c.penalties){ const p=pens(a,b); meta+=` • pênaltis ${p.a}-${p.b}`; const win=p.winA; return {homeGoals:ga,awayGoals:gb,winner:win?a:b,loser:win?b:a,meta,pens:p}; }
+  const win=ga>=gb; return {homeGoals:ga,awayGoals:gb,winner:win?a:b,loser:win?b:a,meta};
 }
-function extraGoals(a,b,cfg){ const m=playSingle(a,b,{...cfg,realism:"realistic",upset:cfg.upset},true); return {a:Math.min(2,m.homeGoals), b:Math.min(2,m.awayGoals)}; }
-function pens(a,b,cfg){ const bias=(a.power-b.power)/220; const winA=Math.random()+bias>.5; const base=4+Math.floor(Math.random()*2); return winA?{a:base+1,b:base,winA:true}:{a:base,b:base+1,winA:false}; }
+function playSingle(a,b,c,allowDraw){
+  const diff=(a.power||70)-(b.power||70), rand={low:8,medium:15,high:25,chaos:39}[c.upset];
+  const base=c.realism==="chaotic"?1.75:c.realism==="normal"?1.35:1.03;
+  const formA=diff/15+(Math.random()*2-1)*(rand/18), formB=-diff/15+(Math.random()*2-1)*(rand/18);
+  let hg=goals(base+formA,c.realism), ag=goals(base+formB,c.realism);
+  if(!allowDraw && hg===ag && Math.random()<.55) (Math.random()+diff/180>.5)?hg++:ag++;
+  return {homeGoals:clamp(hg,0,9),awayGoals:clamp(ag,0,9)};
+}
+function goals(x,realism){
+  const boost=clamp(x-1,-.9,1.9), r=Math.random();
+  let p = realism==="chaotic" ? [.12,.22,.25,.19,.11,.06,.03,.015] : [.25,.32,.24,.12,.05,.017,.006,.002];
+  p=p.map((v,i)=>Math.max(0,v + (i>=3?boost*.025:-boost*.018)));
+  let a=0; for(let i=0;i<p.length;i++){ a+=p[i]; if(r<a) return i; } return realism==="chaotic"?Math.floor(Math.random()*7):4;
+}
+function extraGoals(a,b,c){ const r=playSingle(a,b,{...c,realism:"realistic"},true); return {a:Math.min(2,r.homeGoals),b:Math.min(2,r.awayGoals)}; }
+function pens(a,b){ const bias=((a.power||70)-(b.power||70))/220, winA=Math.random()+bias>.5, base=4+Math.floor(Math.random()*2); return winA?{a:base+1,b:base,winA:true}:{a:base,b:base+1,winA:false}; }
+function updateLeagueTable(t,m){ applyStats(t.league.teams,m); sortLeague(t); }
+function sortLeague(t){ t.league.teams.forEach(x=>x.gd=x.gf-x.ga); t.league.table=[...t.league.teams].sort(tableSort); }
+function updateGroupTable(t,m){ const g=t.groups.find(x=>x.matches.some(mm=>mm.id===m.id)); if(!g) return; applyStats(g.teams,m); sortGroup(g); }
+function sortGroup(g){ g.teams.forEach(x=>x.gd=x.gf-x.ga); g.table=[...g.teams].sort(tableSort); }
+function tableSort(a,b){ return b.pts-a.pts || b.gd-a.gd || b.gf-a.gf || b.w-a.w || b.power-a.power || a.name.localeCompare(b.name); }
+function applyStats(rows,m){ const h=rows.find(x=>x.id===m.home.id), a=rows.find(x=>x.id===m.away.id); h.gf+=m.homeGoals; h.ga+=m.awayGoals; a.gf+=m.awayGoals; a.ga+=m.homeGoals; if(m.homeGoals>m.awayGoals){h.pts+=3;h.w++;a.l++;} else if(m.homeGoals<m.awayGoals){a.pts+=3;a.w++;h.l++;} else {h.pts++;a.pts++;h.d++;a.d++;} }
 
-function renderTournament(t){
-  $("#tournamentTitle").textContent=t.cfg.name; $("#tournamentFormatLabel").textContent=t.formatLabel;
-  $("#summaryBar").innerHTML = [`🏆 Campeão: ${t.champion}`,`🥈 Vice: ${t.runnerUp}`,`${t.teams.length} times`,t.cfg.format==="league"?(t.cfg.leagueTurns==="double"?"turno e returno":"turno único"):(t.cfg.legs==="two"?"ida-volta":"jogo único"),t.cfg.awayGoals?"gol fora":"sem gol fora",`zebra ${label(t.cfg.upset)}`].map(x=>`<div class="summary-item">${x}</div>`).join("");
-  renderLeague(t.league); renderGroups(t.groups); renderBracket(t.knockout);
+function renderTournament(){
+  const t=data.activeTournament;
+  if(!t){ $("#tournamentName").textContent="Nenhum torneio"; $("#tournamentFormat").textContent="Torneio atual"; $("#tournamentActions").innerHTML=""; $("#summaryBar").innerHTML=""; $("#leagueArea").innerHTML=`<div class="empty-field">Crie um torneio para começar.</div>`; $("#groupsArea").innerHTML=""; $("#bracketArea").innerHTML=""; $("#knockoutTitle").style.display="none"; return; }
+  $("#tournamentName").textContent=t.cfg.name; $("#tournamentFormat").textContent=formatLabel(t.cfg.format);
+  const next=nextPlayable(t);
+  $("#tournamentActions").innerHTML = t.status==="finished" ? `<button class="play-btn dark">🏆 Torneio finalizado e salvo</button>` : `<button class="play-btn" id="simulateNext">Simular próxima partida</button><button class="play-btn dark" data-go="create">Criar outro</button>`;
+  $("#summaryBar").innerHTML = [`${t.teams.length} times`, t.status==="finished"?`🏆 ${t.champion}`:`Próxima: ${next?`${next.home.name} x ${next.away.name}`:"aguardando"}`, `zebra ${label(t.cfg.upset)}`, t.cfg.legs==="two"?"ida-volta":"jogo único", t.cfg.awayGoals?"gol fora":"sem gol fora"].map(x=>`<div class="summary-item">${x}</div>`).join("");
+  renderLeague(t); renderGroups(t); renderBracket(t);
+  const btn=$("#simulateNext"); if(btn) btn.onclick=simulateNext;
 }
-function renderLeague(league){
-  if(!league){ $("#leagueArea").innerHTML=""; return; }
+function renderLeague(t){
+  if(!t.league){ $("#leagueArea").innerHTML=""; return; }
   $("#knockoutTitle").style.display="none";
-  $("#leagueArea").innerHTML = `<div class="section-title on-field"><h2>Tabela</h2></div><div class="group-card league-card"><table class="table"><thead><tr><th>#</th><th>Time</th><th>Pts</th><th>J</th><th>V</th><th>SG</th><th>GP</th></tr></thead><tbody>${league.table.map((t,i)=>`<tr><td>${i+1}</td><td>${i===0?"🏆 ":""}${t.name}</td><td>${t.pts}</td><td>${t.w+t.d+t.l}</td><td>${t.w}</td><td>${t.gd}</td><td>${t.gf}</td></tr>`).join("")}</tbody></table></div><div class="section-title on-field"><h2>Rodadas</h2></div><div class="groups-grid rounds-grid">${league.rounds.map(r=>`<div class="group-card"><h3>${r.name}</h3>${r.matches.map(m=>`<div class="mini-match"><span>${m.home.name} ${m.homeGoals}</span><span>${m.awayGoals} ${m.away.name}</span></div>`).join("")}</div>`).join("")}</div>`;
+  const table=t.league.table||t.league.teams;
+  $("#leagueArea").innerHTML = `<div class="section-title on-field"><h2>Tabela</h2></div><div class="group-card"><table class="table"><thead><tr><th>#</th><th>Time</th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>SG</th><th>GP</th></tr></thead><tbody>${table.map((x,i)=>`<tr><td>${i+1}</td><td>${t.status==="finished"&&i===0?"🏆 ":""}${x.name}</td><td>${x.pts}</td><td>${x.w+x.d+x.l}</td><td>${x.w}</td><td>${x.d}</td><td>${x.l}</td><td>${x.gd}</td><td>${x.gf}</td></tr>`).join("")}</tbody></table></div><div class="section-title on-field"><h2>Rodadas</h2></div><div class="groups-grid">${t.league.rounds.map(r=>`<div class="group-card"><h3>${r.name}</h3><div class="match-list">${r.matches.map(matchMini).join("")}</div></div>`).join("")}</div>`;
 }
-function renderGroups(groups){
-  if(!groups?.length){ $("#groupsArea").innerHTML=""; return; }
+function renderGroups(t){
+  if(!t.groups?.length){ $("#groupsArea").innerHTML=""; return; }
+  $("#groupsArea").innerHTML = `<div class="section-title on-field"><h2>Fase de grupos</h2></div><div class="groups-grid">${t.groups.map(g=>`<div class="group-card"><h3>Grupo ${g.name}</h3><table class="table"><thead><tr><th>Time</th><th>Pts</th><th>J</th><th>SG</th><th>GP</th></tr></thead><tbody>${(g.table.length?g.table:g.teams).map((x,i)=>`<tr><td>${i<2?"✅ ":""}${x.name}</td><td>${x.pts}</td><td>${x.w+x.d+x.l}</td><td>${x.gd}</td><td>${x.gf}</td></tr>`).join("")}</tbody></table><div class="match-list">${g.matches.map(matchMini).join("")}</div></div>`).join("")}</div>`;
+}
+function matchMini(m){ const score=m.played?`${m.homeGoals} x ${m.awayGoals}`:"x"; return `<div class="mini-match ${m.played?"played":""}"><span>${m.home.name}</span><strong>${score}</strong><span>${m.away.name}</span>${m.played?"":`<button data-sim="${m.id}">simular</button>`}</div>`; }
+function renderBracket(t){
+  if(!t.knockout?.length){ $("#bracketArea").innerHTML=""; $("#knockoutTitle").style.display=t.league?"none":"flex"; return; }
   $("#knockoutTitle").style.display="flex";
-  $("#groupsArea").innerHTML = `<div class="section-title on-field"><h2>Fase de grupos</h2></div><div class="groups-grid">${groups.map(g=>`<div class="group-card"><h3>Grupo ${g.name}</h3><table class="table"><thead><tr><th>Time</th><th>Pts</th><th>J</th><th>SG</th><th>GP</th></tr></thead><tbody>${g.table.map((t,i)=>`<tr><td>${i<2?"✅ ":""}${t.name}</td><td>${t.pts}</td><td>${t.w+t.d+t.l}</td><td>${t.gd}</td><td>${t.gf}</td></tr>`).join("")}</tbody></table><div class="group-matches">${g.matches.map(m=>`<div class="mini-match"><span>${m.home.name} ${m.homeGoals}</span><span>${m.awayGoals} ${m.away.name}</span></div>`).join("")}</div></div>`).join("")}</div>`;
-}
-function renderBracket(rounds){
-  if(!rounds?.length){ $("#bracketArea").innerHTML=""; return; }
-  $("#knockoutTitle").style.display="flex";
-  const finalWinner = rounds.at(-1)?.matches[0]?.winner?.name;
-  $("#bracketArea").innerHTML = rounds.map(r=>`<div class="round"><h3>${r.name}</h3>${r.matches.map(m=>{ const ca=m.winner.name===finalWinner && r.name==="Final"; return `<div class="match"><div class="match-team ${m.winner.id===m.home.id?"winner":""} ${ca&&m.winner.id===m.home.id?"champion":""}"><span>${ca&&m.winner.id===m.home.id?"🏆 ":""}${m.home.name}</span><strong>${m.homeGoals}</strong></div><div class="match-team ${m.winner.id===m.away.id?"winner":""} ${ca&&m.winner.id===m.away.id?"champion":""}"><span>${ca&&m.winner.id===m.away.id?"🏆 ":""}${m.away.name}</span><strong>${m.awayGoals}</strong></div><div class="match-meta">${m.meta}</div></div>` }).join("")}</div>`).join("");
-}
-function flattenMatches(t){
-  const out=[];
-  (t.league?.rounds||[]).forEach(r=>r.matches.forEach(m=>out.push({...m,stage:r.name})));
-  (t.groups||[]).forEach(g=>g.matches.forEach(m=>out.push({...m,stage:`Grupo ${g.name}`})));
-  (t.knockout||[]).forEach(r=>r.matches.forEach(m=>out.push({...m,stage:r.name})));
-  return out.map(m=>({home:m.home.name,away:m.away.name,homeGoals:m.homeGoals,awayGoals:m.awayGoals,winner:m.winner?.name || (m.homeGoals>m.awayGoals?m.home.name:m.away.name),loser:m.loser?.name || (m.homeGoals>m.awayGoals?m.away.name:m.home.name),stage:m.stage,meta:m.meta,pens:m.pens}));
-}
-function saveEdition(t){
-  const comp=data.competitions.find(c=>c.id===$("#competitionSelect").value) || data.competitions[0]; if(!comp) return;
-  comp.editions.push({ id:crypto.randomUUID(), name:t.cfg.name, champion:t.champion, runnerUp:t.runnerUp, teams:t.teams.map(x=>x.name), format:t.formatLabel, date:new Date().getFullYear().toString(), matches:flattenMatches(t), leagueTable:t.league?.table?.map(x=>({team:x.name,pts:x.pts,w:x.w,d:x.d,l:x.l,gf:x.gf,ga:x.ga,gd:x.gd}))||null });
-  save();
+  const finalWinner=t.status==="finished"?t.champion:null;
+  $("#bracketArea").innerHTML = t.knockout.map(r=>`<div class="round"><h3>${r.name}</h3>${r.matches.map(m=>`<div class="match"><div class="match-team ${m.played&&m.winner?.id===m.home.id?"winner":""} ${finalWinner===m.home.name&&r.name==="Final"?"champion":""}"><span>${finalWinner===m.home.name&&r.name==="Final"?"🏆 ":""}${m.home.name}</span><strong>${m.played?m.homeGoals:"-"}</strong></div><div class="match-team ${m.played&&m.winner?.id===m.away.id?"winner":""} ${finalWinner===m.away.name&&r.name==="Final"?"champion":""}"><span>${finalWinner===m.away.name&&r.name==="Final"?"🏆 ":""}${m.away.name}</span><strong>${m.played?m.awayGoals:"-"}</strong></div><div class="match-meta">${m.played?m.meta:"Aguardando simulação"}</div>${m.played?"":`<div class="match-actions"><button data-sim="${m.id}">Simular partida</button></div>`}</div>`).join("")}</div>`).join("");
 }
 
-$$('.tab').forEach(t=>t.onclick=()=>{ $$('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); $$('.tab-page').forEach(p=>p.classList.remove('active')); const page = $(`#${t.dataset.tab}Tab`); if(page) page.classList.add('active'); });
-$("#resetDemo").onclick=()=>{ if(confirm("Limpar dados salvos neste navegador?")){ localStorage.removeItem(STORAGE); localStorage.removeItem(LEGACY_STORAGE); data=load(); currentCompetitionId=data.competitions[0]?.id; selectedTeams=[]; renderAll(); go("home"); } };
+function flattenMatches(t){ return allTournamentMatches(t).filter(m=>m.played).map(m=>({home:m.home.name,away:m.away.name,homeGoals:m.homeGoals,awayGoals:m.awayGoals,winner:m.winner?.name || (m.homeGoals===m.awayGoals?null:(m.homeGoals>m.awayGoals?m.home.name:m.away.name)),loser:m.loser?.name || null,stage:m.stage,meta:m.meta,pens:m.pens,played:true})); }
+function saveEdition(t){ const c=data.competitions.find(x=>x.id===t.cfg.competitionId) || data.competitions[0]; if(!c) return; c.editions.push({id:uid(), name:t.cfg.name, format:formatLabel(t.cfg.format), champion:t.champion, runnerUp:t.runnerUp, date:new Date().getFullYear().toString(), teams:t.teams.map(x=>x.name), matches:flattenMatches(t), leagueTable:t.league?.table?.map(x=>({team:x.name,pts:x.pts,w:x.w,d:x.d,l:x.l,gf:x.gf,ga:x.ga,gd:x.gd}))||null}); save(); }
+
+function statsFor(c){
+  const editions=c.editions||[], matches=editions.flatMap(e=>e.matches||[]), teams=[...new Set(editions.flatMap(e=>e.teams||[]))];
+  const titles={}, vices={}, finals={}, parts={}, pensTitles={}, teamStats={};
+  const ensure=n=> n ? (teamStats[n] ||= {team:n,titles:0,vices:0,finals:0,parts:0,played:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,points:0}) : null;
+  editions.forEach(e=>{ if(e.champion){titles[e.champion]=(titles[e.champion]||0)+1; ensure(e.champion).titles++;} if(e.runnerUp){vices[e.runnerUp]=(vices[e.runnerUp]||0)+1; ensure(e.runnerUp).vices++;} [e.champion,e.runnerUp].filter(Boolean).forEach(n=>{finals[n]=(finals[n]||0)+1; ensure(n).finals++;}); (e.teams||[]).forEach(n=>{parts[n]=(parts[n]||0)+1; ensure(n).parts++;}); const fm=(e.matches||[]).find(m=>(m.stage||"").toLowerCase().includes("final")); if(fm?.pens && e.champion) pensTitles[e.champion]=(pensTitles[e.champion]||0)+1; });
+  matches.forEach(m=>{ const h=ensure(m.home), a=ensure(m.away); if(!h||!a) return; const hg=Number(m.homeGoals||0), ag=Number(m.awayGoals||0); h.gf+=hg;h.ga+=ag;h.played++;a.gf+=ag;a.ga+=hg;a.played++; if(hg>ag){h.w++;a.l++;h.points+=3;} else if(hg<ag){a.w++;h.l++;a.points+=3;} else {h.d++;a.d++;h.points++;a.points++;} });
+  Object.values(teamStats).forEach(t=>t.gd=t.gf-t.ga);
+  const biggestWin=matches.map(m=>({m,diff:Math.abs((m.homeGoals||0)-(m.awayGoals||0)),total:(m.homeGoals||0)+(m.awayGoals||0)})).sort((a,b)=>b.diff-a.diff||b.total-a.total)[0]?.m;
+  const finalGoals=matches.filter(m=>(m.stage||"").toLowerCase().includes("final")).map(m=>({m,total:(m.homeGoals||0)+(m.awayGoals||0)})).sort((a,b)=>b.total-a.total)[0]?.m;
+  const undefeated=editions.filter(e=>e.champion && !(e.matches||[]).some(m=> (m.home===e.champion && m.homeGoals<m.awayGoals) || (m.away===e.champion && m.awayGoals<m.homeGoals))).map(e=>e.champion);
+  const topChampion=rankEntries(titles)[0]?.[0] || "—";
+  return {editions,matches,teams,titles,vices,finals,parts,pensTitles,teamStats,biggestWin,finalGoals,undefeated,topChampion};
+}
+function rankCard(title,obj,unit){ const rows=rankEntries(obj).slice(0,6).map(([n,v],i)=>`<div class="rank-row"><span>${medal(i)} ${n}</span><strong>${v} ${unit}</strong></div>`).join("") || `<small class="muted">Sem dados ainda.</small>`; return `<div class="stat-card"><h3>${title}</h3>${rows}</div>`; }
+function feature(title,value,sub=""){ return `<div class="stat-card featured"><small>${title}</small><strong>${value||"—"}</strong><span>${sub}</span></div>`; }
+function matchText(m){ return m?`${m.home} ${m.homeGoals} x ${m.awayGoals} ${m.away}`:"—"; }
+function renderCompetitionDetail(c){
+  const s=statsFor(c);
+  $("#competitionHero").innerHTML = [`<div class="stat"><small>Edições</small><strong>${s.editions.length}</strong></div>`,`<div class="stat"><small>Jogos salvos</small><strong>${s.matches.length}</strong></div>`,`<div class="stat"><small>Times</small><strong>${s.teams.length}</strong></div>`,`<div class="stat"><small>Maior campeão</small><strong>${s.topChampion}</strong></div>`].join("");
+  $("#overviewStats").innerHTML = [feature("🏆 Maior campeão",s.topChampion),feature("🥈 Rei dos vices",rankEntries(s.vices)[0]?.[0]||"—"),feature("⚽ Maior goleada",matchText(s.biggestWin)),feature("🔥 Final com mais gols",matchText(s.finalGoals)),rankCard("Maiores campeões",s.titles,"títulos"),rankCard("Mais finais",s.finals,"finais")].join("");
+  $("#rankingStats").innerHTML = [rankCard("Maiores campeões",s.titles,"títulos"),rankCard("Maiores vices",s.vices,"vices"),rankCard("Mais finais",s.finals,"finais"),rankCard("Mais participações",s.parts,"part."),rankCard("Títulos nos pênaltis",s.pensTitles,"títulos")].join("");
+  $("#teamStatsList").innerHTML = Object.values(s.teamStats).sort((a,b)=>b.titles-a.titles||b.points-a.points||b.gd-a.gd||b.gf-a.gf).map(t=>`<div class="list-card"><div><strong>${t.team}</strong><small>${t.titles} títulos • ${t.vices} vices • ${t.parts} participações</small><small>${t.played}J ${t.w}V ${t.d}E ${t.l}D • GP ${t.gf} • GC ${t.ga} • SG ${t.gd}</small></div><span class="pill">${t.points} pts</span></div>`).join("") || `<div class="panel">Sem estatísticas de times.</div>`;
+  $("#recordStats").innerHTML = [feature("Maior goleada",matchText(s.biggestWin)),feature("Final com mais gols",matchText(s.finalGoals)),feature("Campeões invictos",[...new Set(s.undefeated)].slice(0,5).join(", ")||"—"),rankCard("Títulos decididos nos pênaltis",s.pensTitles,"títulos")].join("");
+  $("#editionList").innerHTML = c.editions.map(e=>`<div class="list-card"><div><strong>${e.name}</strong><small>${e.format||"Torneio"} • campeão: ${e.champion||"—"} • vice: ${e.runnerUp||"—"}</small><small>${(e.matches||[]).length} jogos • ${(e.teams||[]).length} times</small></div><button class="danger mini-danger" data-delete-edition="${e.id}">apagar</button></div>`).join("") || `<div class="panel">Nenhuma edição salva.</div>`;
+}
+
+function deleteEdition(id){ const c=data.competitions.find(x=>x.id===currentCompetitionId); if(!c) return; if(confirm("Apagar esta edição?")){ c.editions=c.editions.filter(e=>e.id!==id); save(); renderCompetitionDetail(c); renderCompetitions(); } }
+function deleteCustomTeam(id){ if(confirm("Apagar este time criado?")){ data.customTeams=data.customTeams.filter(t=>t.id!==id); save(); renderAll(); } }
+
+$("#toggleCompetitionForm").onclick=()=>$("#competitionForm").hidden=!$("#competitionForm").hidden;
+$("#saveCompetition").onclick=()=>{ const name=$("#newCompetitionName").value.trim(); if(!name) return; const c={id:uid(),name,editions:[]}; data.competitions.push(c); currentCompetitionId=c.id; $("#newCompetitionName").value=""; $("#competitionForm").hidden=true; save(); renderAll(); };
+$("#renameCompetition").onclick=()=>{ const c=data.competitions.find(x=>x.id===currentCompetitionId); if(!c) return; c.name=$("#editCompetitionName").value.trim()||c.name; save(); openCompetition(c.id); };
+$("#deleteCompetition").onclick=()=>{ const c=data.competitions.find(x=>x.id===currentCompetitionId); if(!c) return; if(confirm(`Apagar o campeonato "${c.name}" e todas as edições?`)){ data.competitions=data.competitions.filter(x=>x.id!==c.id); if(!data.competitions.length) data.competitions.push({id:uid(),name:"Novo Campeonato",editions:[]}); currentCompetitionId=data.competitions[0].id; save(); go("competitions"); } };
+$("#addCustomTeam").onclick=()=>{ const name=$("#customTeamName").value.trim(), power=clamp(Number($("#customTeamPower").value)||70,1,100); if(!name) return; data.customTeams.push(team(name,power,"Meu time")); $("#customTeamName").value=""; save(); renderAll(); };
+$("#pickStrongest").onclick=pickStrongest; $("#pickRandom").onclick=pickRandom; $("#pickBalanced").onclick=pickBalanced; $("#clearTeams").onclick=()=>{selectedTeams=[];renderSelected();};
+$("#generateTournament").onclick=generateTournament;
+$("#formatSelect").onchange=toggleRuleVisibility; $("#teamCount").onchange=()=>{ selectedTeams=selectedTeams.slice(0,Number($("#teamCount").value)); renderSelected(); };
+$("#competitionSelect").onchange=e=>currentCompetitionId=e.target.value;
+$("#resetLocal").onclick=()=>{ if(confirm("Limpar dados locais do Brocket neste navegador?")){ localStorage.removeItem(STORAGE); data=structuredClone(starter); currentCompetitionId=data.competitions[0].id; selectedTeams=[]; save(); renderAll(); go("home"); } };
+document.addEventListener("change",e=>{ const p=e.target.closest("[data-pack]"); if(p){ p.checked?selectedPacks.add(p.dataset.pack):selectedPacks.delete(p.dataset.pack); selectedTeams=[]; renderAll(); }});
+$$('.tab').forEach(t=>t.onclick=()=>{ $$('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); $$('.tab-page').forEach(p=>p.classList.remove('active')); $(`#${t.dataset.tab}Tab`)?.classList.add('active'); });
 
 renderAll();
-selectedTeams = balancedPick(allPool(), Number($("#teamCount").value));
-renderSelectedTeams();
+if(!selectedTeams.length) pickBalanced();

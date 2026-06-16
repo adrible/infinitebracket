@@ -1,25 +1,30 @@
-# Brocket V5
+# Brocket V6 — Polida
 
-App web estático para criar, simular e guardar campeonatos.
+Versão unificada e corrigida do Brocket.
 
-## Novidades da V5
+## Principais ajustes
 
-- Tudo da V4: pacotes de times, times personalizados, playoffs, grupos + mata-mata, Copa do Mundo de Clubes e regras avançadas.
-- Novo formato: Liga / pontos corridos.
-- Página de estatísticas mais polida.
-- Rankings: campeões, vices, finais, participações e desempenho por time.
-- Recordes: maior goleada, final com mais gols, total de gols e decisões nos pênaltis.
-- Apagar campeonato.
-- Apagar edição individual.
-- Salvamento local no navegador via `localStorage`.
+- Visual voltou para a pegada da V3, mais app/mobile e menos seco.
+- Simulação não é mais obrigatoriamente completa de uma vez.
+- Cada partida pode ser simulada individualmente.
+- Botão de simular próxima partida.
+- Estatísticas persistentes por campeonato e edição.
+- Botão de apagar campeonato dentro da aba Config, não aparecendo sempre.
+- Botão para apagar edição.
+- Estatísticas reforçadas: campeões, vices, finais, participações, desempenho por time, recordes, goleadas e pênaltis.
+- Shuffle nos grupos e no chaveamento.
+- Opção de grupos equilibrados por força.
+- Liga / pontos corridos mantida.
+- Grupos + mata-mata mantido.
+- Regras avançadas mantidas: ida-volta, final jogo único, gol fora, prorrogação, pênaltis, zebra e realismo.
 
-## Como publicar no GitHub Pages
+## Como subir no GitHub Pages
 
-Envie estes arquivos para a raiz do repositório:
+Suba somente os arquivos da raiz desta pasta:
 
 - `index.html`
 - `style.css`
 - `script.js`
 - `README.md`
 
-Não envie a pasta inteira dentro do repositório. Os arquivos precisam ficar na raiz.
+Não envie a pasta inteira dentro do repositório.
