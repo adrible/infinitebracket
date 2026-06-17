@@ -1,7 +1,7 @@
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
-const STORAGE = "brocket-0-7-6-1";
-const LEGACY_KEYS = ["brocket-v7", "brocket-v6-polida", "brocket-v5", "brocket-v4", "brocket-v3"];
+const STORAGE = "brocket-0-7";
+const LEGACY_KEYS = ["brocket-0-7-6-1","brocket-v7","brocket-v6-polida","brocket-v5","brocket-v4","brocket-v3"];
 
 const packs = {
   brasileiros:{ name:"Clubes brasileiros", icon:"🇧🇷", teams:[["Flamengo",86],["Palmeiras",86],["Botafogo",84],["Atlético-MG",82],["São Paulo",82],["Fluminense",81],["Corinthians",80],["Grêmio",80],["Internacional",80],["Athletico-PR",79],["Bahia",78],["Fortaleza",78],["Cruzeiro",78],["Vasco",77],["Santos",77],["Ceará",74],["Sport",73],["Vitória",73],["Bragantino",78],["Cuiabá",72]]},
@@ -32,6 +32,10 @@ const starter = { competitions:[], customTeams:[], customPacks:[], activeTournam
 
 let data = load();
 function sanitizeLoadedData(d){
+  if(!d) return structuredClone(starter);
+  d.competitions = Array.isArray(d.competitions) ? d.competitions : [];
+  d.customTeams = Array.isArray(d.customTeams) ? d.customTeams : [];
+  d.customPacks = Array.isArray(d.customPacks) ? d.customPacks : [];
   if(d?.activeTournament?.cfg?.format==="league" && Number(d.activeTournament.cfg.teamCount)>24){
     d.activeTournament=null;
   }
@@ -51,6 +55,8 @@ let previewSeed = 0;
 let previewOrder = null;
 let manualGroups = null;
 let editingMatchId = null;
+let selectedLeagueRound = null;
+let selectedGroupRound = null;
 
 function uid(){ return crypto?.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)+Date.now(); }
 function mSaved(home,away,hg,ag,winner,loser,stage,meta,pens=null){ return {home,away,homeGoals:hg,awayGoals:ag,winner,loser,stage,meta,pens,played:true}; }
@@ -86,6 +92,27 @@ function allPacks(){
 }
 function rankEntries(obj){ return Object.entries(obj).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0])); }
 function medal(i){ return i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`; }
+
+
+function isFinalStage(stage){ return String(stage||"").trim().toLowerCase()==="final"; }
+function safeId(s){ return String(s||"").replace(/[^a-zA-Z0-9_-]/g,"_"); }
+function currentLeagueRoundIndex(t){
+  const rounds=t?.league?.rounds||[];
+  const i=rounds.findIndex(r=>r.matches.some(m=>!m.played));
+  return i>=0 ? i : Math.max(0,rounds.length-1);
+}
+function currentGroupRoundName(t){
+  const matches=(t?.groups||[]).flatMap(g=>g.matches||[]);
+  const unplayed=matches.find(m=>!m.played);
+  const any=unplayed || matches[0];
+  return (any?.stage.match(/Rodada \d+/)||["Rodada 1"])[0];
+}
+function setLeagueRound(idx){ selectedLeagueRound=Number(idx); renderTournament(); }
+function setGroupRound(name){ selectedGroupRound=name; renderTournament(); }
+function roundNav(kind,currentIndex,total){
+  const prev=Math.max(0,currentIndex-1), next=Math.min(total-1,currentIndex+1);
+  return `<div class="round-selector"><button ${currentIndex<=0?"disabled":""} data-${kind}-round="${prev}">← anterior</button><select data-${kind}-select>${Array.from({length:total},(_,i)=>`<option value="${i}" ${i===currentIndex?"selected":""}>Rodada ${i+1}</option>`).join("")}</select><button ${currentIndex>=total-1?"disabled":""} data-${kind}-round="${next}">próxima →</button></div>`;
+}
 
 function isPowerOfTwo(n){ return n>0 && (n & (n-1))===0; }
 function prevPowerOfTwo(n){ let p=1; while(p*2<n) p*=2; return p; }
@@ -142,7 +169,7 @@ function decisionLabel(m){
 function go(screen){
   $$(".screen").forEach(s=>s.classList.toggle("active",s.id===screen));
   $$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.go===screen));
-  const titles = {home:["0.7.6.1","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
+  const titles = {home:["0.7.7","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
   $("#pageSubtitle").textContent = titles[screen]?.[0] || "Brocket";
   $("#pageTitle").textContent = titles[screen]?.[1] || "Brocket";
   window.scrollTo(0,0);
@@ -150,6 +177,8 @@ function go(screen){
 }
 
 document.addEventListener("click", e=>{
+  const leagueRound=e.target.closest("[data-league-round]"); if(leagueRound){ setLeagueRound(leagueRound.dataset.leagueRound); return; }
+  const groupRound=e.target.closest("[data-group-round]"); if(groupRound){ const t=data.activeTournament; const stages=[...new Set((t?.groups||[]).flatMap(g=>g.matches.map(m=>(m.stage.match(/Rodada \d+/)||["Rodada 1"])[0])))]; setGroupRound(stages[Number(groupRound.dataset.groupRound)]||stages[0]); return; }
   const nav = e.target.closest("[data-go]"); if(nav){ go(nav.dataset.go); return; }
   const comp = e.target.closest("[data-comp]"); if(comp){ openCompetition(comp.dataset.comp); return; }
   const quickComp = e.target.closest("#quickCreateCompetition"); if(quickComp){ $("#competitionForm").hidden=false; return; }
@@ -158,6 +187,7 @@ document.addEventListener("click", e=>{
   const editMatch=e.target.closest("[data-edit-match]"); if(editMatch){ openManualResult(editMatch.dataset.editMatch); return; }
   const delEdition = e.target.closest("[data-delete-edition]"); if(delEdition){ deleteEdition(delEdition.dataset.deleteEdition); return; }
   const delCustom = e.target.closest("[data-delete-custom]"); if(delCustom){ deleteCustomTeam(delCustom.dataset.deleteCustom); return; }
+  const delPack = e.target.closest("[data-delete-pack]"); if(delPack){ data.customPacks=(data.customPacks||[]).filter(p=>p.id!==delPack.dataset.deletePack); selectedPacks.delete(delPack.dataset.deletePack); save(); renderAll(); return; }
   const toggleTeam = e.target.closest("[data-toggle-team]"); if(toggleTeam){ const id=toggleTeam.dataset.toggleTeam; const t=pool().find(x=>x.id===id); if(!t) return; isSelected(id)?removeTeam(id):addTeam(t); renderSelected(); return; }
   const removeBtn = e.target.closest("[data-remove-team]"); if(removeBtn){ removeTeam(removeBtn.dataset.removeTeam); renderSelected(); return; }
 });
@@ -511,11 +541,13 @@ function simulateRound(){
 function simulateAll(){
   const t=data.activeTournament; if(!t || t.status==="finished") return;
   let guard=0;
-  while(t.status!=="finished" && nextPlayable(t) && guard<1000){
+  while(t.status!=="finished" && nextPlayable(t) && guard<2000){
     simulateMatch(nextPlayable(t).id, {deferAdvance:true});
     advanceIfNeeded(t);
     guard++;
   }
+  (t.groups||[]).forEach(g=>g.teams.forEach(x=>x.posDelta=0));
+  if(t.league) t.league.teams.forEach(x=>x.posDelta=0);
   save(); renderTournament();
 }
 function simulateMatch(id, opts={}){
@@ -591,11 +623,15 @@ function playKnockout(a,b,c,isFinal){
   const win=ga>=gb; return {homeGoals:ga,awayGoals:gb,winner:win?a:b,loser:win?b:a,meta};
 }
 function playSingle(a,b,c,allowDraw){
-  const diff=(a.power||70)-(b.power||70), rand={low:8,medium:15,high:25,chaos:39}[c.upset];
-  const base=c.realism==="chaotic"?1.75:c.realism==="normal"?1.35:1.03;
-  const formA=diff/15+(Math.random()*2-1)*(rand/18), formB=-diff/15+(Math.random()*2-1)*(rand/18);
+  const diff=(a.power||70)-(b.power||70);
+  const rand={low:5,medium:9,high:19,chaos:38}[c.upset] ?? 9;
+  const strengthDiv={low:10,medium:11,high:15,chaos:22}[c.upset] ?? 11;
+  const base=c.realism==="chaotic"?1.72:c.realism==="normal"?1.30:1.00;
+  const noise=(Math.random()*2-1)*(rand/24);
+  const formA=diff/strengthDiv + noise;
+  const formB=-diff/strengthDiv - noise;
   let hg=goals(base+formA,c.realism), ag=goals(base+formB,c.realism);
-  if(!allowDraw && hg===ag && Math.random()<.55) (Math.random()+diff/180>.5)?hg++:ag++;
+  if(!allowDraw && hg===ag && Math.random()<.55) (Math.random()+diff/160>.5)?hg++:ag++;
   return {homeGoals:clamp(hg,0,9),awayGoals:clamp(ag,0,9)};
 }
 function goals(x,realism){
@@ -660,11 +696,55 @@ function renderTournament(){
   renderLeague(t); renderGroups(t); renderBracket(t);
   const btn=$("#simulateNext"); if(btn) btn.onclick=simulateNext; const roundBtn=$("#simulateRound"); if(roundBtn) roundBtn.onclick=simulateRound; const allBtn=$("#simulateAll"); if(allBtn) allBtn.onclick=simulateAll;
 }
+
+function groupClassificationInfo(t){
+  const isCopa48 = Number(t.cfg.teamCount)===48 && Number(t.cfg.groupSize)===4 && (t.cfg.format==="groups" || t.cfg.format==="clubWorldCup") && t.groups.length===12;
+  const direct = [];
+  const thirds = [];
+  const thirdIds = new Set();
+  if(isCopa48){
+    t.groups.forEach(g=>{
+      const table=g.table?.length?g.table:g.teams;
+      table.slice(0,2).forEach((tm,i)=>direct.push({...tm, group:g.name, pos:i+1}));
+      if(table[2]) thirds.push({...table[2], group:g.name, pos:3});
+    });
+    thirds.sort((a,b)=>compareRows(a,b,t.cfg));
+    thirds.slice(0,8).forEach(x=>thirdIds.add(x.id));
+  }else{
+    t.groups.forEach(g=>{
+      const table=g.table?.length?g.table:g.teams;
+      table.slice(0,2).forEach((tm,i)=>direct.push({...tm, group:g.name, pos:i+1}));
+    });
+  }
+  return {isCopa48,direct,thirds,thirdIds};
+}
+function groupRowTag(t,x,i,info){
+  if(i<2) return `<span class="class-tag direct">Class.</span>`;
+  if(info?.thirdIds?.has(x.id)) return `<span class="class-tag third">3º melhor</span>`;
+  return "";
+}
+function renderQualifiedSummary(t){
+  if(!t.groups?.length) return "";
+  const info=groupClassificationInfo(t);
+  if(!info.isCopa48 && !t.groups.every(g=>g.matches.every(m=>m.played))) return "";
+  const directGroups=t.groups.map(g=>{
+    const table=g.table?.length?g.table:g.teams;
+    const names=table.slice(0,2).map(x=>x.name).join(" e ");
+    return `<small><strong>Grupo ${g.name}:</strong> ${names||"—"}</small>`;
+  }).join("");
+  const thirds=info.isCopa48 ? info.thirds.slice(0,8).map((x,i)=>`<small>${i+1}. ${x.name} — Grupo ${x.group}</small>`).join("") : "";
+  return `<details class="qualified-box" open><summary>Classificados ${info.isCopa48?"(24 diretos + 8 terceiros)":"(2 por grupo)"}</summary><div class="qualified-grid"><div><strong>Diretos</strong>${directGroups}</div>${info.isCopa48?`<div><strong>Melhores terceiros</strong>${thirds}</div>`:""}</div></details>`;
+}
+
 function renderLeague(t){
   if(!t.league){ $("#leagueArea").innerHTML=""; return; }
   $("#knockoutTitle").style.display="none";
   const table=t.league.table||t.league.teams;
-  $("#leagueArea").innerHTML = `<div class="section-title on-field"><h2>Tabela</h2></div><div class="group-card"><table class="table"><thead><tr><th>Pos</th><th>Time</th><th></th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>SG</th><th>GP</th></tr></thead><tbody>${table.map((x,i)=>`<tr class="${t.status==="finished"&&i===0?"champion-row":""}"><td>${i+1}</td><td>${t.status==="finished"&&i===0?"🏆 ":""}<strong class="${t.status==="finished"&&i===0?"champion-name":""}">${x.name}</strong></td><td>${deltaBadge(x.posDelta)}</td><td>${x.pts}</td><td>${x.w+x.d+x.l}</td><td>${x.w}</td><td>${x.d}</td><td>${x.l}</td><td>${x.gd}</td><td>${x.gf}</td></tr>`).join("")}</tbody></table></div><div class="section-title on-field"><h2>Rodadas</h2></div><div class="groups-grid">${t.league.rounds.map(r=>`<div class="group-card"><h3>${r.name}</h3><div class="match-list">${r.matches.map(matchMini).join("")}</div></div>`).join("")}</div>`;
+  const rounds=t.league.rounds||[];
+  if(selectedLeagueRound===null || selectedLeagueRound>=rounds.length) selectedLeagueRound=currentLeagueRoundIndex(t);
+  const idx=clamp(Number(selectedLeagueRound)||0,0,Math.max(0,rounds.length-1));
+  const round=rounds[idx];
+  $("#leagueArea").innerHTML = `<div class="section-title on-field"><h2>Tabela</h2></div><div class="group-card table-card"><div class="table-scroll"><table class="table standings-table"><thead><tr><th>Pos</th><th>Time</th><th></th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>SG</th><th>GP</th></tr></thead><tbody>${table.map((x,i)=>`<tr class="${t.status==="finished"&&i===0?"champion-row":""}"><td>${i+1}</td><td>${t.status==="finished"&&i===0?"🏆 ":""}<strong class="${t.status==="finished"&&i===0?"champion-name":""}">${x.name}</strong></td><td>${deltaBadge(x.posDelta)}</td><td>${x.pts}</td><td>${x.w+x.d+x.l}</td><td>${x.w}</td><td>${x.d}</td><td>${x.l}</td><td>${x.gd}</td><td>${x.gf}</td></tr>`).join("")}</tbody></table></div></div><div class="section-title on-field"><h2>Rodadas</h2></div>${roundNav("league",idx,rounds.length)}<div class="groups-grid one-round">${round?`<div class="group-card"><h3>${round.name}</h3><div class="match-list">${round.matches.map(matchMini).join("")}</div></div>`:""}</div>`;
 }
 function groupMatchesByStage(matches){
   const map=new Map();
@@ -674,7 +754,13 @@ function groupMatchesByStage(matches){
 function renderGroups(t){
   if(!t.groups?.length){ $("#groupsArea").innerHTML=""; return; }
   const adj=t.autoAdjustment ? (t.autoAdjustment.copa48 ? `<div class="auto-adjust-note"><strong>Formato Copa 48:</strong> 12 grupos de 4. Classificam 1º, 2º e os 8 melhores terceiros para a fase de 32.</div>` : `<div class="auto-adjust-note"><strong>Ajuste automático:</strong> ${t.autoAdjustment.classified} classificados geram Rodada preliminar. ${t.autoAdjustment.byes} entram direto e ${t.autoAdjustment.prelimTeams} jogam a preliminar.</div>`) : "";
-  $("#groupsArea").innerHTML = `<div class="section-title on-field"><h2>Fase de grupos</h2></div>${adj}<div class="groups-grid">${t.groups.map(g=>`<div class="group-card group-card--clean"><h3>Grupo ${g.name}</h3><table class="table group-table"><thead><tr><th>Pos</th><th>Time</th><th></th><th>Pts</th><th>J</th><th>SG</th><th>GP</th></tr></thead><tbody>${(g.table.length?g.table:g.teams).map((x,i)=>`<tr class="${i<2?"qualified":""}"><td>${i+1}</td><td>${x.name}</td><td>${deltaBadge(x.posDelta)}</td><td>${x.pts}</td><td>${x.w+x.d+x.l}</td><td>${x.gd}</td><td>${x.gf}</td></tr>`).join("")}</tbody></table><div class="rounded-matches">${groupMatchesByStage(g.matches).map(([stage,matches])=>`<div class="round-block"><strong>${stage.replace("Grupo "+g.name+" - ","")}</strong><div class="match-list">${matches.map(matchMini).join("")}</div></div>`).join("")}</div></div>`).join("")}</div>`;
+  const info=groupClassificationInfo(t);
+  const allStages=[...new Set(t.groups.flatMap(g=>g.matches.map(m=>(m.stage.match(/Rodada \d+/)||["Rodada 1"])[0])))];
+  if(selectedGroupRound===null || !allStages.includes(selectedGroupRound)) selectedGroupRound=currentGroupRoundName(t);
+  const roundName=selectedGroupRound || allStages[0] || "Rodada 1";
+  const roundIdx=Math.max(0,allStages.indexOf(roundName));
+  const roundMatches=t.groups.map(g=>({group:g.name,matches:g.matches.filter(m=>m.stage.includes(roundName))})).filter(x=>x.matches.length);
+  $("#groupsArea").innerHTML = `<div class="section-title on-field"><h2>Fase de grupos</h2></div>${adj}${renderQualifiedSummary(t)}<div class="groups-grid">${t.groups.map(g=>`<div class="group-card group-card--clean"><h3>Grupo ${g.name}</h3><div class="table-scroll"><table class="table group-table standings-table"><thead><tr><th>Pos</th><th>Time</th><th></th><th>Pts</th><th>J</th><th>SG</th><th>GP</th><th></th></tr></thead><tbody>${(g.table.length?g.table:g.teams).map((x,i)=>`<tr class="${i<2||info.thirdIds?.has(x.id)?"qualified":""}"><td>${i+1}</td><td>${x.name}</td><td>${deltaBadge(x.posDelta)}</td><td>${x.pts}</td><td>${x.w+x.d+x.l}</td><td>${x.gd}</td><td>${x.gf}</td><td>${groupRowTag(t,x,i,info)}</td></tr>`).join("")}</tbody></table></div></div>`).join("")}</div><div class="section-title on-field"><h2>Rodadas</h2></div>${roundNav("group",roundIdx,allStages.length)}<div class="groups-grid one-round">${roundMatches.map(g=>`<div class="group-card"><h3>Grupo ${g.group} • ${roundName}</h3><div class="match-list">${g.matches.map(matchMini).join("")}</div></div>`).join("")}</div>`;
 }
 function matchMini(m){
   const score=m.played?`${scoreCell(m,"home")} x ${scoreCell(m,"away")}`:"x";
@@ -686,7 +772,7 @@ function renderBracket(t){
   if(!t.knockout?.length){ $("#bracketArea").innerHTML=""; $("#knockoutTitle").style.display=t.league?"none":"flex"; return; }
   $("#knockoutTitle").style.display="flex";
   const finalWinner=t.status==="finished"?t.champion:null;
-  $("#bracketArea").innerHTML = t.knockout.map(r=>`<div class="round compact-round"><h3>${r.name}</h3>${r.byes?.length?`<details class="bye-box compact-byes"><summary>Entram direto (${r.byes.length})</summary><div class="bye-chip-grid">${r.byes.map(b=>`<small>${b.name}</small>`).join("")}</div></details>`:""}${r.matches.map(m=>`<div class="match compact-match"><div class="match-line ${m.played&&m.winner?.id===m.home.id?"winner":""} ${finalWinner===m.home.name&&r.name==="Final"?"champion":""}"><span>${finalWinner===m.home.name&&r.name==="Final"?"🏆 ":""}${m.home.name}</span><strong>${scoreCell(m,"home")}</strong></div><div class="match-line ${m.played&&m.winner?.id===m.away.id?"winner":""} ${finalWinner===m.away.name&&r.name==="Final"?"champion":""}"><span>${finalWinner===m.away.name&&r.name==="Final"?"🏆 ":""}${m.away.name}</span><strong>${scoreCell(m,"away")}</strong></div><div class="match-footer"><span class="match-status">${decisionLabel(m)}</span><div class="match-actions compact-actions">${m.played?`<button data-edit-match="${m.id}">Editar</button>`:`<button data-sim="${m.id}">Simular</button><button data-edit-match="${m.id}">Manual</button>`}</div></div></div>`).join("")}</div>`).join("");
+  $("#bracketArea").innerHTML = t.knockout.map(r=>`<div class="round compact-round ${r.name==="Final"?"final-round":""}"><h3>${r.name}</h3>${r.byes?.length?`<details class="bye-box compact-byes"><summary>Entram direto (${r.byes.length})</summary><div class="bye-chip-grid">${r.byes.map(b=>`<small>${b.name}</small>`).join("")}</div></details>`:""}${r.matches.map(m=>`<div class="match compact-match ${r.name==="Final"?"final-match":""}"><div class="match-line ${m.played&&m.winner?.id===m.home.id?"winner":""} ${finalWinner===m.home.name&&r.name==="Final"?"gold-champion":""}"><span>${finalWinner===m.home.name&&r.name==="Final"?"🏆 ":""}${m.home.name}</span><strong>${scoreCell(m,"home")}</strong></div><div class="match-line ${m.played&&m.winner?.id===m.away.id?"winner":""} ${finalWinner===m.away.name&&r.name==="Final"?"gold-champion":""}"><span>${finalWinner===m.away.name&&r.name==="Final"?"🏆 ":""}${m.away.name}</span><strong>${scoreCell(m,"away")}</strong></div><div class="match-footer"><span class="match-status">${decisionLabel(m)}</span><div class="match-actions compact-actions">${m.played?`<button data-edit-match="${m.id}">Editar</button>`:`<button data-sim="${m.id}">Simular</button><button data-edit-match="${m.id}">Manual</button>`}</div></div></div>`).join("")}</div>`).join("");
 }
 function openManualResult(id){
   const t=data.activeTournament; if(!t) return;
@@ -738,13 +824,13 @@ function statsFor(c){
   const editions=c.editions||[], matches=editions.flatMap(e=>e.matches||[]), teams=[...new Set(editions.flatMap(e=>e.teams||[]))];
   const titles={}, vices={}, finals={}, parts={}, pensTitles={}, teamStats={};
   const ensure=n=> n ? (teamStats[n] ||= {team:n,titles:0,vices:0,finals:0,parts:0,played:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,points:0}) : null;
-  editions.forEach(e=>{ if(e.champion){titles[e.champion]=(titles[e.champion]||0)+1; ensure(e.champion).titles++;} if(e.runnerUp){vices[e.runnerUp]=(vices[e.runnerUp]||0)+1; ensure(e.runnerUp).vices++;} [e.champion,e.runnerUp].filter(Boolean).forEach(n=>{finals[n]=(finals[n]||0)+1; ensure(n).finals++;}); (e.teams||[]).forEach(n=>{parts[n]=(parts[n]||0)+1; ensure(n).parts++;}); const fm=(e.matches||[]).find(m=>(m.stage||"").toLowerCase().includes("final")); if(fm?.pens && e.champion) pensTitles[e.champion]=(pensTitles[e.champion]||0)+1; });
+  editions.forEach(e=>{ if(e.champion){titles[e.champion]=(titles[e.champion]||0)+1; ensure(e.champion).titles++;} if(e.runnerUp){vices[e.runnerUp]=(vices[e.runnerUp]||0)+1; ensure(e.runnerUp).vices++;} [e.champion,e.runnerUp].filter(Boolean).forEach(n=>{finals[n]=(finals[n]||0)+1; ensure(n).finals++;}); (e.teams||[]).forEach(n=>{parts[n]=(parts[n]||0)+1; ensure(n).parts++;}); const fm=(e.matches||[]).find(m=>isFinalStage(m.stage)); if(fm?.pens && e.champion) pensTitles[e.champion]=(pensTitles[e.champion]||0)+1; });
   matches.forEach(m=>{ const h=ensure(m.home), a=ensure(m.away); if(!h||!a) return; const hg=Number(m.homeGoals||0), ag=Number(m.awayGoals||0); h.gf+=hg;h.ga+=ag;h.played++;a.gf+=ag;a.ga+=hg;a.played++; if(hg>ag){h.w++;a.l++;h.points+=3;} else if(hg<ag){a.w++;h.l++;a.points+=3;} else {h.d++;a.d++;h.points++;a.points++;} });
   Object.values(teamStats).forEach(t=>t.gd=t.gf-t.ga);
     const leaguePoints={}, leagueWins={}, leagueGF={}, leagueDefense={};
   editions.forEach(e=>(e.leagueTable||[]).forEach(r=>{ leaguePoints[r.team]=(leaguePoints[r.team]||0)+(r.pts||0); leagueWins[r.team]=(leagueWins[r.team]||0)+(r.w||0); leagueGF[r.team]=(leagueGF[r.team]||0)+(r.gf||0); leagueDefense[r.team]=(leagueDefense[r.team]===undefined?(r.ga||0):Math.min(leagueDefense[r.team],r.ga||0)); }));
 const biggestWin=matches.map(m=>({m,diff:Math.abs((m.homeGoals||0)-(m.awayGoals||0)),total:(m.homeGoals||0)+(m.awayGoals||0)})).sort((a,b)=>b.diff-a.diff||b.total-a.total)[0]?.m;
-  const finalGoals=matches.filter(m=>(m.stage||"").toLowerCase().includes("final")).map(m=>({m,total:(m.homeGoals||0)+(m.awayGoals||0)})).sort((a,b)=>b.total-a.total)[0]?.m;
+  const finalGoals=matches.filter(m=>isFinalStage(m.stage)).map(m=>({m,total:(m.homeGoals||0)+(m.awayGoals||0)})).sort((a,b)=>b.total-a.total)[0]?.m;
   const undefeated=editions.filter(e=>e.champion && !(e.matches||[]).some(m=> (m.home===e.champion && m.homeGoals<m.awayGoals) || (m.away===e.champion && m.awayGoals<m.homeGoals))).map(e=>e.champion);
   const topChampion=rankEntries(titles)[0]?.[0] || "—";
   return {editions,matches,teams,titles,vices,finals,parts,pensTitles,teamStats,leaguePoints,leagueWins,leagueGF,leagueDefense,biggestWin,finalGoals,undefeated,topChampion};
@@ -754,8 +840,8 @@ function feature(title,value,sub=""){ return `<div class="stat-card featured"><s
 function matchText(m){ return m?`${m.home} ${m.homeGoals} x ${m.awayGoals} ${m.away}`:"—"; }
 function renderCompetitionDetail(c){
   const s=statsFor(c);
-  const hasFinals=s.matches.some(m=>(m.stage||"").toLowerCase().includes("final"));
-  const hasLeague=(c.editions||[]).some(e=>(e.format==="Pontos corridos" || e.format==="Pontos corridos") || e.leagueTable);
+  const hasFinals=s.matches.some(m=>isFinalStage(m.stage));
+  const hasLeague=(c.editions||[]).some(e=>e.format==="Pontos corridos" || e.leagueTable);
   $("#competitionHero").innerHTML = [`<div class="stat"><small>Edições</small><strong>${s.editions.length}</strong></div>`,`<div class="stat"><small>Jogos salvos</small><strong>${s.matches.length}</strong></div>`,`<div class="stat"><small>Times</small><strong>${s.teams.length}</strong></div>`,`<div class="stat"><small>Maior campeão</small><strong>${s.topChampion}</strong></div>`].join("");
   $("#overviewStats").innerHTML = [feature("🏆 Maior campeão",s.topChampion),feature("🥈 Vice-campeão",rankEntries(s.vices)[0]?.[0]||"—"),feature("⚽ Maior goleada",matchText(s.biggestWin)),hasFinals?feature("🔥 Final com mais gols",matchText(s.finalGoals)):"",rankCard("Maiores campeões",s.titles,"títulos"),hasFinals?rankCard("Mais finais",s.finals,"finais"):""].join("");
   $("#rankingStats").innerHTML = [rankCard("Maiores campeões",s.titles,"títulos"),rankCard("Maiores vices",s.vices,"vices"),hasFinals?rankCard("Mais finais",s.finals,"finais"):"",rankCard("Mais participações",s.parts,"part."),hasFinals?rankCard("Títulos nos pênaltis",s.pensTitles,"títulos"):"",hasLeague?rankCard("Mais pontos em ligas",s.leaguePoints,"pts"):"",hasLeague?rankCard("Mais vitórias em ligas",s.leagueWins,"vitórias"):""].join("");
@@ -781,6 +867,8 @@ bind("#generateTournament","onclick",generateTournament);
 bind("#formatSelect","onchange",()=>{ previewOrder=null; toggleRuleVisibility(); renderDrawPreview(); }); bind("#teamCount","onchange",()=>{ selectedTeams=selectedTeams.slice(0,Number($("#teamCount").value)); previewOrder=null; renderSelected(); });
 bind("#competitionSelect","onchange",e=>currentCompetitionId=e.target.value);
 document.addEventListener("change",e=>{
+  const leagueSel=e.target.closest("[data-league-select]"); if(leagueSel){ setLeagueRound(leagueSel.value); return; }
+  const groupSel=e.target.closest("[data-group-select]"); if(groupSel){ const t=data.activeTournament; const stages=[...new Set((t?.groups||[]).flatMap(g=>g.matches.map(m=>(m.stage.match(/Rodada \d+/)||["Rodada 1"])[0])))]; setGroupRound(stages[Number(groupSel.value)]||stages[0]); return; }
   const p=e.target.closest("[data-pack]"); if(p){ p.checked?selectedPacks.add(p.dataset.pack):selectedPacks.delete(p.dataset.pack); selectedTeams=[]; manualGroups=null; previewOrder=null; renderAll(); return; }
   const addGroup=e.target.closest("[data-add-to-group]"); if(addGroup && addGroup.value){ const t=getPreviewOrder(cfg()).find(x=>x.id===addGroup.value); if(t){ manualGroups.forEach(g=>{ const idx=g.findIndex(x=>x.id===t.id); if(idx>=0) g.splice(idx,1); }); manualGroups[Number(addGroup.dataset.addToGroup)].push(t); renderManualGroups(); } return; }
   const pow=e.target.closest("[data-power-team]"); if(pow){ const t=selectedTeams.find(x=>x.id===pow.dataset.powerTeam); if(t){ t.power=clamp(Number(pow.value)||70,1,100); previewOrder=null; renderSelected(); } return; }

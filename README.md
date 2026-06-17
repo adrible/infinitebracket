@@ -1,19 +1,36 @@
-# Brocket 0.7.6.1
+# Brocket 0.7.7
 
-Correção emergencial da 0.7.6.
+Versão organizada com correções de lógica, navegação e visual, sem duplicar funcionalidades já existentes.
 
-## Corrigido
+## Principais ajustes
 
-- Pontos corridos agora fica realmente limitado a 24 times.
-- Se trocar para Pontos corridos, o seletor remove 32, 36, 40 e 48.
-- Se havia 48 selecionado, ajusta para 24.
-- Se houver torneio antigo de liga com mais de 24 salvo no navegador, ele não é carregado como torneio ativo.
-- Rótulo simplificado para "Pontos corridos".
-- Tabelas usam "Pos" e cabeçalho vazio para movimento, sem # e sem Δ.
+- Mantida chave estável de armazenamento (`brocket-0-7`) para preservar dados entre versões.
+- Migração aceita dados da 0.7.6.1 sem apagar campeonatos, times ou pacotes.
+- Liga/Pontos corridos continua limitada a 24 times.
+- Grupos e mata-mata continuam permitindo até 48 times.
+- Formato Copa 48 mantido automaticamente:
+  - 12 grupos de 4
+  - classificam 1º, 2º e 8 melhores terceiros
+  - mata-mata começa com 32 times
+- Classificados aparecem explicitamente, incluindo melhores terceiros.
+- Tabelas mantêm `Pos` e coluna de movimento sem título.
+- Tabela mobile melhorada com scroll interno e colunas mais compactas.
+- Rodadas de liga e grupos agora aparecem por seletor, sem listar tudo de uma vez.
+- Estatística "Final com mais gols" considera apenas `stage === "Final"`.
+- Títulos nos pênaltis contam apenas pênaltis na final.
+- Efeito dourado aplicado ao campeão na final e na tabela.
+- Chaveamento visual mais limpo, com final mais destacada.
+- Simular tudo limpa a variação de posição para evitar movimentos acumulados absurdos.
+- Modo Médio ficou menos propenso a zebras.
+- Hotbar com mais respiro inferior para não cobrir conteúdo.
 
-## Observação
+## Funcionalidades já existentes mantidas
 
-Esta versão usa uma chave de armazenamento nova para evitar que torneios antigos criados em versões anteriores continuem aparecendo como se fossem da versão corrigida.
+- Resultados manuais.
+- Grupos manuais.
+- Pacotes personalizados.
+- Exportar/importar backup.
+- Limpar dados locais apenas em Configurações.
 
 ## Como subir
 
