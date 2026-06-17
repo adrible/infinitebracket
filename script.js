@@ -90,7 +90,7 @@ function allPacks(){
   (data.customPacks||[]).forEach(p=>custom[p.id]={name:p.name, icon:"🧩", teams:p.teams.map(t=>[t.name,t.power])});
   return {...packs, ...custom};
 }
-function rankEntries(obj){ return Object.entries(obj).sort((a,b)=>b[1]-a[1] || a[0].localeCompare(b[0])); }
+function rankEntries(obj,asc=false){ return Object.entries(obj).sort((a,b)=>asc ? (a[1]-b[1] || a[0].localeCompare(b[0])) : (b[1]-a[1] || a[0].localeCompare(b[0]))); }
 function medal(i){ return i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}.`; }
 
 
@@ -177,7 +177,7 @@ function decisionLabel(m){
 function go(screen){
   $$(".screen").forEach(s=>s.classList.toggle("active",s.id===screen));
   $$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.go===screen));
-  const titles = {home:["0.7.8.3","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
+  const titles = {home:["0.7.8.4","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
   $("#pageSubtitle").textContent = titles[screen]?.[0] || "Brocket";
   $("#pageTitle").textContent = titles[screen]?.[1] || "Brocket";
   window.scrollTo(0,0);
@@ -673,21 +673,30 @@ function playKnockout(a,b,c,isFinal){
 function playSingle(a,b,c,allowDraw){
   const diff=(a.power||70)-(b.power||70);
 
-  // 0.7.8.3: mesma fórmula para todos os formatos.
-  // Favoritos fortes ficam mais consistentes, mas a zebra continua possível.
+  // 0.7.8.4: mesma fórmula para todos os formatos.
+  // Ajusta a chance antes do placar sair: tudo é possível,
+  // mas o azarão tem menos chance de placar elástico contra favorito.
   const rand={low:3,medium:5,high:14,chaos:34}[c.upset] ?? 5;
   const strengthDiv={low:6.8,medium:7.4,high:11.5,chaos:18}[c.upset] ?? 7.4;
 
   const base=c.realism==="chaotic"?1.70:c.realism==="normal"?1.28:1.02;
   const noise=(Math.random()*2-1)*(rand/30);
-
   const advantage=diff/strengthDiv;
-  const formA=advantage + noise;
-  const formB=-advantage - noise;
+
+  let formA=advantage + noise;
+  let formB=-advantage - noise;
+
+  // Se houver grande diferença de força, reduz apenas a chance de explosão ofensiva
+  // do time bem mais fraco. Não reduz placar depois de sorteado.
+  const gap=Math.abs(diff);
+  if(gap>=10){
+    const damp=clamp((gap-10)/34,0,.55);
+    if(diff>0 && formB>0) formB*=1-damp; // B é azarão
+    if(diff<0 && formA>0) formA*=1-damp; // A é azarão
+  }
 
   let hg=goals(base+formA,c.realism), ag=goals(base+formB,c.realism);
 
-  // Em mata-mata sem empate, o desempate ainda respeita a força, mas não elimina zebra.
   if(!allowDraw && hg===ag && Math.random()<.55){
     (Math.random()+diff/140>.5)?hg++:ag++;
   }
@@ -919,7 +928,7 @@ const biggestWin=matches.map(m=>({m,diff:Math.abs((m.homeGoals||0)-(m.awayGoals|
   const topChampion=rankEntries(titles)[0]?.[0] || "—";
   return {editions,matches,teams,titles,vices,finals,parts,pensTitles,teamStats,leaguePoints,leagueWins,leagueGF,leagueDefense,biggestWin,finalGoals,undefeated,topChampion};
 }
-function rankCard(title,obj,unit){ const rows=rankEntries(obj).slice(0,6).map(([n,v],i)=>`<div class="rank-row"><span>${medal(i)} ${n}</span><strong>${v} ${unit}</strong></div>`).join("") || `<small class="muted">Sem dados ainda.</small>`; return `<div class="stat-card"><h3>${title}</h3>${rows}</div>`; }
+function rankCard(title,obj,unit,asc=false){ const rows=rankEntries(obj,asc).slice(0,6).map(([n,v],i)=>`<div class="rank-row"><span>${medal(i)} ${n}</span><strong>${v} ${unit}</strong></div>`).join("") || `<small class="muted">Sem dados ainda.</small>`; return `<div class="stat-card"><h3>${title}</h3>${rows}</div>`; }
 function feature(title,value,sub=""){ return `<div class="stat-card featured"><small>${title}</small><strong>${value||"—"}</strong><span>${sub}</span></div>`; }
 function matchText(m){ return m?`${m.home} ${m.homeGoals} x ${m.awayGoals} ${m.away}`:"—"; }
 function renderCompetitionDetail(c){
@@ -929,8 +938,8 @@ function renderCompetitionDetail(c){
   $("#competitionHero").innerHTML = [`<div class="stat"><small>Edições</small><strong>${s.editions.length}</strong></div>`,`<div class="stat"><small>Jogos salvos</small><strong>${s.matches.length}</strong></div>`,`<div class="stat"><small>Times</small><strong>${s.teams.length}</strong></div>`,`<div class="stat"><small>Maior campeão</small><strong>${s.topChampion}</strong></div>`].join("");
   $("#overviewStats").innerHTML = [feature("🏆 Maior campeão",s.topChampion),feature("🥈 Vice-campeão",rankEntries(s.vices)[0]?.[0]||"—"),feature("⚽ Maior goleada",matchText(s.biggestWin)),hasFinals?feature("🔥 Final com mais gols",matchText(s.finalGoals)):"",rankCard("Maiores campeões",s.titles,"títulos"),hasFinals?rankCard("Mais finais",s.finals,"finais"):""].join("");
   $("#rankingStats").innerHTML = [rankCard("Maiores campeões",s.titles,"títulos"),rankCard("Maiores vices",s.vices,"vices"),hasFinals?rankCard("Mais finais",s.finals,"finais"):"",rankCard("Mais participações",s.parts,"part."),hasFinals?rankCard("Títulos nos pênaltis",s.pensTitles,"títulos"):"",hasLeague?rankCard("Mais pontos em ligas",s.leaguePoints,"pts"):"",hasLeague?rankCard("Mais vitórias em ligas",s.leagueWins,"vitórias"):""].join("");
-  $("#teamStatsList").innerHTML = Object.values(s.teamStats).sort((a,b)=>b.titles-a.titles||b.points-a.points||b.gd-a.gd||b.gf-a.gf).map(t=>`<div class="list-card"><div><strong>${t.team}</strong><small>${t.titles} títulos • ${t.vices} vices • ${t.parts} participações</small><small>${t.played}J ${t.w}V ${t.d}E ${t.l}D • GP ${t.gf} • GC ${t.ga} • SG ${t.gd}</small></div><span class="pill">${t.points} pts</span></div>`).join("") || `<div class="panel">Sem estatísticas de times.</div>`;
-  $("#recordStats").innerHTML = [feature("Maior goleada",matchText(s.biggestWin)),hasFinals?feature("Final com mais gols",matchText(s.finalGoals)):"",feature("Campeões invictos",[...new Set(s.undefeated)].slice(0,5).join(", ")||"—"),hasLeague?rankCard("Melhor ataque em ligas",s.leagueGF,"GP"):"",hasLeague?rankCard("Melhor defesa em ligas",s.leagueDefense,"GC"):""].join("");
+  $("#teamStatsList").innerHTML = Object.values(s.teamStats).sort((a,b)=>b.titles-a.titles||b.points-a.points||b.gd-a.gd||b.gf-a.gf).map(t=>`<div class="list-card"><div><strong>${t.team}</strong><small>${t.titles} títulos • ${t.vices} vices • ${t.parts} participações</small><small>${t.played}J ${t.w}V ${t.d}E ${t.l}D • ${t.gf} gols • ${t.ga} gols sofridos • SG ${t.gd}</small></div><span class="pill">${t.points} pts</span></div>`).join("") || `<div class="panel">Sem estatísticas de times.</div>`;
+  $("#recordStats").innerHTML = [feature("Maior goleada",matchText(s.biggestWin)),hasFinals?feature("Final com mais gols",matchText(s.finalGoals)):"",feature("Campeões invictos",[...new Set(s.undefeated)].slice(0,5).join(", ")||"—"),hasLeague?rankCard("Melhor ataque em ligas",s.leagueGF,"gols"):"",hasLeague?rankCard("Melhor defesa em ligas",s.leagueDefense,"gols sofridos",true):""].join("");
   $("#editionList").innerHTML = (c.editions||[]).map(e=>`<div class="list-card"><div><strong>${e.name}</strong><small>${e.format} • campeão: ${e.champion}</small><small>${(e.teams||[]).length} times • ${(e.matches||[]).length} jogos</small></div><button class="mini-danger" data-delete-edition="${e.id}">apagar</button></div>`).join("") || `<div class="panel">Sem edições ainda.</div>`;
 }
 

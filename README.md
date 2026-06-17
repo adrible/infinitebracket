@@ -1,11 +1,11 @@
-# Brocket 0.7.8.3
+# Brocket 0.7.8.4
 
 Versão organizada com correções de lógica, navegação e visual, sem duplicar funcionalidades já existentes.
 
 ## Principais ajustes
 
 - Mantida chave estável de armazenamento (`brocket-0-7`) para preservar dados entre versões.
-- Migração aceita dados da 0.7.8.3 sem apagar campeonatos, times ou pacotes.
+- Migração aceita dados da 0.7.8.4 sem apagar campeonatos, times ou pacotes.
 - Liga/Pontos corridos continua limitada a 24 times.
 - Grupos e mata-mata continuam permitindo até 48 times.
 - Formato Copa 48 mantido automaticamente:
@@ -42,7 +42,7 @@ Suba somente estes arquivos na raiz do GitHub:
 - README.md
 
 
-## Brocket 0.7.8.3
+## Brocket 0.7.8.4
 
 - Visual do chaveamento mais polido.
 - Campeão com destaque dourado mais uniforme.
@@ -58,7 +58,7 @@ Suba somente estes arquivos na raiz do GitHub:
 - Montagem manual de grupos com contador por grupo e bloqueio de grupo incompleto.
 
 
-## Brocket 0.7.8.3
+## Brocket 0.7.8.4
 
 Correção pontual da tabela mobile:
 
@@ -68,7 +68,7 @@ Correção pontual da tabela mobile:
 - Simular tudo mantém a variação da última rodada simulada.
 
 
-## Brocket 0.7.8.3
+## Brocket 0.7.8.4
 
 Patch de lógica e tabela:
 
@@ -77,3 +77,17 @@ Patch de lógica e tabela:
 - Corrige o ranking Melhores Defesas: agora ordena pelo menor GC primeiro.
 - Remove o negrito forte da coluna J/Jogos no mobile.
 - Mantém Pts como principal destaque da tabela.
+
+
+## Brocket 0.7.8.4
+
+Patch de ranking e zebra:
+
+- Corrige “Melhor defesa em ligas”: agora menor número de gols sofridos fica primeiro.
+- Troca “GP” por “gols” no ranking de ataque.
+- Troca “GC” por “gols sofridos” no ranking de defesa.
+- Ajusta a zebra pela chance antes do placar sair:
+  - tudo continua possível;
+  - azarão pode vencer favorito;
+  - azarão golear favorito fica mais raro;
+  - favorito golear azarão continua possível.
