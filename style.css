@@ -65,7 +65,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.7 correções de UX */
+/* 0.7.8 correções de UX */
 .content{padding-bottom:170px}
 .screen{padding-bottom:42px}
 .bottom-nav{z-index:80}
@@ -84,7 +84,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.7 mobile-first e respiro */
+/* 0.7.8 mobile-first e respiro */
 .content{
   padding:20px 18px calc(230px + env(safe-area-inset-bottom));
 }
@@ -321,7 +321,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.7 acabamento */
+/* 0.7.8 acabamento */
 .topbar__row{grid-template-columns:1fr}
 .hotbar-v075{
   grid-template-columns:repeat(5,1fr);
@@ -444,7 +444,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.7 final */
+/* 0.7.8 final */
 .topbar__row{grid-template-columns:1fr}
 .hotbar-v075{grid-template-columns:repeat(5,1fr)}
 .nav-btn{gap:3px}
@@ -489,7 +489,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.7 ajustes */
+/* 0.7.8 ajustes */
 .content{
   padding-bottom:calc(340px + env(safe-area-inset-bottom))!important;
 }
@@ -651,7 +651,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.7 navegação, classificados e polimento */
+/* 0.7.8 navegação, classificados e polimento */
 .content{
   padding-bottom:calc(430px + env(safe-area-inset-bottom))!important;
 }
@@ -848,5 +848,209 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   .class-tag{
     font-size:10px;
     padding:3px 6px;
+  }
+}
+
+
+/* 0.7.8 — leitura mobile, Copa 48 limpa e polimento */
+.quick-generate-top{
+  width:100%;
+  margin:10px 0 14px;
+  min-height:48px;
+  font-size:16px;
+}
+.danger-lite{
+  border-color:#f3c2c2 !important;
+  background:#fff5f5 !important;
+  color:#9f1d1d !important;
+}
+.compact-qualified{
+  padding:12px 14px;
+  margin:0 0 14px;
+  border-radius:22px;
+}
+.compact-qualified.rule-only{
+  display:grid;
+  gap:4px;
+}
+.compact-qualified.rule-only strong{
+  color:var(--green-dark, #0f5c35);
+  font-size:17px;
+  line-height:1.15;
+}
+.compact-qualified.rule-only small{
+  color:#60746a;
+  font-weight:800;
+  line-height:1.25;
+}
+@media (max-width: 720px){
+  .table-wrap,
+  .standings-wrap,
+  .rank-table-wrap{
+    overflow-x:visible !important;
+  }
+  table.standings,
+  .standings table,
+  .rank-table{
+    min-width:0 !important;
+    width:100% !important;
+    table-layout:fixed;
+  }
+  /* Mobile: Pos, Time, Pts, J, V, SG */
+  table.standings th:nth-child(6),
+  table.standings td:nth-child(6),
+  table.standings th:nth-child(7),
+  table.standings td:nth-child(7),
+  table.standings th:nth-child(9),
+  table.standings td:nth-child(9),
+  .rank-table th:nth-child(6),
+  .rank-table td:nth-child(6),
+  .rank-table th:nth-child(7),
+  .rank-table td:nth-child(7),
+  .rank-table th:nth-child(9),
+  .rank-table td:nth-child(9){
+    display:none !important;
+  }
+  table.standings th,
+  table.standings td,
+  .rank-table th,
+  .rank-table td{
+    padding:9px 5px !important;
+    font-size:12px !important;
+  }
+  table.standings th:nth-child(1),
+  table.standings td:nth-child(1),
+  .rank-table th:nth-child(1),
+  .rank-table td:nth-child(1){ width:30px !important; }
+  table.standings th:nth-child(2),
+  table.standings td:nth-child(2),
+  .rank-table th:nth-child(2),
+  .rank-table td:nth-child(2){
+    width:auto !important;
+    font-size:13px !important;
+    font-weight:900;
+  }
+  table.standings th:nth-child(3),
+  table.standings td:nth-child(3),
+  .rank-table th:nth-child(3),
+  .rank-table td:nth-child(3){ width:42px !important; font-weight:950; }
+  table.standings th:nth-child(4),
+  table.standings td:nth-child(4),
+  table.standings th:nth-child(5),
+  table.standings td:nth-child(5),
+  table.standings th:nth-child(8),
+  table.standings td:nth-child(8),
+  .rank-table th:nth-child(4),
+  .rank-table td:nth-child(4),
+  .rank-table th:nth-child(5),
+  .rank-table td:nth-child(5),
+  .rank-table th:nth-child(8),
+  .rank-table td:nth-child(8){
+    width:34px !important;
+    text-align:center;
+  }
+  .qual-tag, .class-tag, .third-tag{
+    font-size:10px !important;
+    padding:3px 6px !important;
+    white-space:nowrap;
+  }
+}
+.bracket-card,
+.match-card{
+  border-radius:22px !important;
+  box-shadow:0 10px 24px rgba(17,57,37,.08) !important;
+}
+.final-round .match-card,
+.final-match{
+  border:1px solid rgba(215,164,55,.55) !important;
+  background:linear-gradient(180deg,#fff9e7,#ffffff) !important;
+}
+.gold-champion{
+  background:linear-gradient(90deg,#fff2b8,#fffaf0) !important;
+  border-color:#d7a437 !important;
+}
+
+
+/* 0.7.8 fix — tabela mobile sem scroll e sem esconder SG/V */
+@media (max-width: 720px){
+  .table-scroll{ overflow-x:visible !important; }
+  .standings-table{
+    min-width:0 !important;
+    width:100% !important;
+    table-layout:fixed !important;
+  }
+
+  /* Liga: Pos Time [mov] Pts J V E D SG GP => esconder mov, E, D e GP */
+  .standings-table:not(.group-table) th:nth-child(3),
+  .standings-table:not(.group-table) td:nth-child(3),
+  .standings-table:not(.group-table) th:nth-child(7),
+  .standings-table:not(.group-table) td:nth-child(7),
+  .standings-table:not(.group-table) th:nth-child(8),
+  .standings-table:not(.group-table) td:nth-child(8),
+  .standings-table:not(.group-table) th:nth-child(10),
+  .standings-table:not(.group-table) td:nth-child(10){
+    display:none !important;
+  }
+
+  /* Grupos: Pos Time Pts J V SG GP Tag => esconder GP; manter tag */
+  .group-table th:nth-child(7),
+  .group-table td:nth-child(7){
+    display:none !important;
+  }
+
+  .standings-table th,
+  .standings-table td{
+    padding:9px 4px !important;
+    font-size:12px !important;
+    white-space:nowrap;
+  }
+  .standings-table th:nth-child(1),
+  .standings-table td:nth-child(1){ width:30px !important; }
+  .standings-table th:nth-child(2),
+  .standings-table td:nth-child(2){
+    width:auto !important;
+    min-width:0 !important;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    font-size:13px !important;
+    font-weight:900;
+  }
+  .standings-table:not(.group-table) th:nth-child(4),
+  .standings-table:not(.group-table) td:nth-child(4){ width:40px !important; font-weight:950; }
+  .standings-table:not(.group-table) th:nth-child(5),
+  .standings-table:not(.group-table) td:nth-child(5),
+  .standings-table:not(.group-table) th:nth-child(6),
+  .standings-table:not(.group-table) td:nth-child(6),
+  .standings-table:not(.group-table) th:nth-child(9),
+  .standings-table:not(.group-table) td:nth-child(9){ width:34px !important; text-align:center; }
+
+  .group-table th:nth-child(3),
+  .group-table td:nth-child(3){ width:40px !important; font-weight:950; }
+  .group-table th:nth-child(4),
+  .group-table td:nth-child(4),
+  .group-table th:nth-child(5),
+  .group-table td:nth-child(5),
+  .group-table th:nth-child(6),
+  .group-table td:nth-child(6){ width:34px !important; text-align:center; }
+  .group-table th:nth-child(8),
+  .group-table td:nth-child(8){ width:64px !important; text-align:right; }
+
+  .manual-group-card h3{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .manual-group-card h3 small{
+    background:#eef7f1;
+    border-radius:999px;
+    padding:4px 8px;
+    font-size:12px;
+  }
+  .manual-group-card.complete{
+    border-color:rgba(35,127,78,.35);
+  }
+  .ok-note{
+    background:#f2fbf5 !important;
+    border-color:rgba(35,127,78,.25) !important;
   }
 }
