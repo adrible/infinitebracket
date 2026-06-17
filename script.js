@@ -177,7 +177,7 @@ function decisionLabel(m){
 function go(screen){
   $$(".screen").forEach(s=>s.classList.toggle("active",s.id===screen));
   $$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.go===screen));
-  const titles = {home:["0.7.8.1","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
+  const titles = {home:["0.7.8.3.3","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
   $("#pageSubtitle").textContent = titles[screen]?.[0] || "Brocket";
   $("#pageTitle").textContent = titles[screen]?.[1] || "Brocket";
   window.scrollTo(0,0);
@@ -672,14 +672,26 @@ function playKnockout(a,b,c,isFinal){
 }
 function playSingle(a,b,c,allowDraw){
   const diff=(a.power||70)-(b.power||70);
-  const rand={low:4,medium:7,high:17,chaos:38}[c.upset] ?? 9;
-  const strengthDiv={low:8,medium:9,high:15,chaos:22}[c.upset] ?? 11;
-  const base=c.realism==="chaotic"?1.72:c.realism==="normal"?1.30:1.00;
-  const noise=(Math.random()*2-1)*(rand/24);
-  const formA=diff/strengthDiv + noise;
-  const formB=-diff/strengthDiv - noise;
+
+  // 0.7.8.3: mesma fórmula para todos os formatos.
+  // Favoritos fortes ficam mais consistentes, mas a zebra continua possível.
+  const rand={low:3,medium:5,high:14,chaos:34}[c.upset] ?? 5;
+  const strengthDiv={low:6.8,medium:7.4,high:11.5,chaos:18}[c.upset] ?? 7.4;
+
+  const base=c.realism==="chaotic"?1.70:c.realism==="normal"?1.28:1.02;
+  const noise=(Math.random()*2-1)*(rand/30);
+
+  const advantage=diff/strengthDiv;
+  const formA=advantage + noise;
+  const formB=-advantage - noise;
+
   let hg=goals(base+formA,c.realism), ag=goals(base+formB,c.realism);
-  if(!allowDraw && hg===ag && Math.random()<.55) (Math.random()+diff/160>.5)?hg++:ag++;
+
+  // Em mata-mata sem empate, o desempate ainda respeita a força, mas não elimina zebra.
+  if(!allowDraw && hg===ag && Math.random()<.55){
+    (Math.random()+diff/140>.5)?hg++:ag++;
+  }
+
   return {homeGoals:clamp(hg,0,9),awayGoals:clamp(ag,0,9)};
 }
 function goals(x,realism){
