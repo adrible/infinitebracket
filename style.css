@@ -65,7 +65,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.8 correções de UX */
+/* 0.7.8.1 correções de UX */
 .content{padding-bottom:170px}
 .screen{padding-bottom:42px}
 .bottom-nav{z-index:80}
@@ -84,7 +84,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.8 mobile-first e respiro */
+/* 0.7.8.1 mobile-first e respiro */
 .content{
   padding:20px 18px calc(230px + env(safe-area-inset-bottom));
 }
@@ -321,7 +321,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.8 acabamento */
+/* 0.7.8.1 acabamento */
 .topbar__row{grid-template-columns:1fr}
 .hotbar-v075{
   grid-template-columns:repeat(5,1fr);
@@ -444,7 +444,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.8 final */
+/* 0.7.8.1 final */
 .topbar__row{grid-template-columns:1fr}
 .hotbar-v075{grid-template-columns:repeat(5,1fr)}
 .nav-btn{gap:3px}
@@ -489,7 +489,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.8 ajustes */
+/* 0.7.8.1 ajustes */
 .content{
   padding-bottom:calc(340px + env(safe-area-inset-bottom))!important;
 }
@@ -651,7 +651,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.8 navegação, classificados e polimento */
+/* 0.7.8.1 navegação, classificados e polimento */
 .content{
   padding-bottom:calc(430px + env(safe-area-inset-bottom))!important;
 }
@@ -852,7 +852,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.8 — leitura mobile, Copa 48 limpa e polimento */
+/* 0.7.8.1 — leitura mobile, Copa 48 limpa e polimento */
 .quick-generate-top{
   width:100%;
   margin:10px 0 14px;
@@ -971,7 +971,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.8 fix — tabela mobile sem scroll e sem esconder SG/V */
+/* 0.7.8.1 fix — tabela mobile sem scroll e sem esconder SG/V */
 @media (max-width: 720px){
   .table-scroll{ overflow-x:visible !important; }
   .standings-table{
@@ -1052,5 +1052,103 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   .ok-note{
     background:#f2fbf5 !important;
     border-color:rgba(35,127,78,.25) !important;
+  }
+}
+
+
+/* 0.7.8.1 — variação fake dentro da célula Time */
+.team-cell-fake{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-width:0;
+}
+.team-cell-fake strong{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  min-width:0;
+}
+.fake-delta{
+  display:inline-flex;
+  justify-content:flex-end;
+  align-items:center;
+  min-width:30px;
+  flex:0 0 30px;
+}
+.fake-delta:empty{
+  display:inline-flex;
+}
+.delta-badge{
+  border-radius:999px;
+  font-size:11px;
+  line-height:1;
+  font-weight:950;
+  padding:3px 5px;
+  white-space:nowrap;
+}
+.delta-badge.up{
+  background:#eaf8ef;
+  color:#137a41;
+}
+.delta-badge.down{
+  background:#fff1f1;
+  color:#b32626;
+}
+
+/* Cabeçalho limpo: Pos | Time | Pts | J | V | SG */
+@media (max-width:720px){
+  /* Liga agora: Pos Time Pts J V E D SG GP => esconder E, D, GP */
+  .standings-table:not(.group-table) th:nth-child(6),
+  .standings-table:not(.group-table) td:nth-child(6),
+  .standings-table:not(.group-table) th:nth-child(7),
+  .standings-table:not(.group-table) td:nth-child(7),
+  .standings-table:not(.group-table) th:nth-child(9),
+  .standings-table:not(.group-table) td:nth-child(9){
+    display:none !important;
+  }
+  /* garantir que Pts, J, V, SG apareçam */
+  .standings-table:not(.group-table) th:nth-child(3),
+  .standings-table:not(.group-table) td:nth-child(3),
+  .standings-table:not(.group-table) th:nth-child(4),
+  .standings-table:not(.group-table) td:nth-child(4),
+  .standings-table:not(.group-table) th:nth-child(5),
+  .standings-table:not(.group-table) td:nth-child(5),
+  .standings-table:not(.group-table) th:nth-child(8),
+  .standings-table:not(.group-table) td:nth-child(8){
+    display:table-cell !important;
+    text-align:center;
+  }
+  .standings-table:not(.group-table) th:nth-child(3),
+  .standings-table:not(.group-table) td:nth-child(3){
+    width:42px !important;
+    font-weight:950;
+  }
+  .standings-table:not(.group-table) th:nth-child(4),
+  .standings-table:not(.group-table) td:nth-child(4),
+  .standings-table:not(.group-table) th:nth-child(5),
+  .standings-table:not(.group-table) td:nth-child(5),
+  .standings-table:not(.group-table) th:nth-child(8),
+  .standings-table:not(.group-table) td:nth-child(8){
+    width:34px !important;
+  }
+
+  /* Grupos: Pos Time Pts J V SG GP Tag => esconder só GP */
+  .group-table th:nth-child(7),
+  .group-table td:nth-child(7){
+    display:none !important;
+  }
+  .group-table th:nth-child(3),
+  .group-table td:nth-child(3),
+  .group-table th:nth-child(4),
+  .group-table td:nth-child(4),
+  .group-table th:nth-child(5),
+  .group-table td:nth-child(5),
+  .group-table th:nth-child(6),
+  .group-table td:nth-child(6),
+  .group-table th:nth-child(8),
+  .group-table td:nth-child(8){
+    display:table-cell !important;
   }
 }

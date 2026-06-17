@@ -136,8 +136,10 @@ function compareRows(a,b,cfg){
   return (a.sortSeed||0)-(b.sortSeed||0) || a.name.localeCompare(b.name);
 }
 function deltaBadge(v){
-  if(v===undefined || v===null || v===0) return `<span class="pos-delta same">—</span>`;
-  return v>0 ? `<span class="pos-delta up">▲ +${v}</span>` : `<span class="pos-delta down">▼ ${v}</span>`;
+  if(!v) return "";
+  const n=Math.abs(Number(v)||0);
+  if(!n) return "";
+  return v>0 ? `<span class="delta-badge up">↑${n}</span>` : `<span class="delta-badge down">↓${n}</span>`;
 }
 function snapshotPositions(t){
   const snap={groups:{},league:{}};
@@ -148,6 +150,12 @@ function snapshotPositions(t){
 function applyPositionDeltas(t,before){
   (t.groups||[]).forEach(g=>(g.table.length?g.table:g.teams).forEach((x,i)=>x.posDelta=(before.groups[x.id]||i+1)-(i+1)));
   if(t.league) (t.league.table.length?t.league.table:t.league.teams).forEach((x,i)=>x.posDelta=(before.league[x.id]||i+1)-(i+1));
+}
+
+function teamCellWithDelta(x, champion=false){
+  const trophy=champion?"🏆 ":"";
+  const cls=champion?"champion-name":"";
+  return `<span class="team-cell-fake"><strong class="${cls}">${trophy}${x.name}</strong><span class="fake-delta">${deltaBadge(x.posDelta)}</span></span>`;
 }
 function scoreCell(m,side){
   if(!m.played) return "-";
@@ -169,7 +177,7 @@ function decisionLabel(m){
 function go(screen){
   $$(".screen").forEach(s=>s.classList.toggle("active",s.id===screen));
   $$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.go===screen));
-  const titles = {home:["0.7.8","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
+  const titles = {home:["0.7.8.1","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
   $("#pageSubtitle").textContent = titles[screen]?.[0] || "Brocket";
   $("#pageTitle").textContent = titles[screen]?.[1] || "Brocket";
   window.scrollTo(0,0);
@@ -550,13 +558,17 @@ function simulateRound(){
 function simulateAll(){
   const t=data.activeTournament; if(!t || t.status==="finished") return;
   let guard=0;
+  let before=snapshotPositions(t);
   while(t.status!=="finished" && nextPlayable(t) && guard<2000){
+    const stageBefore=t.currentStage;
+    const roundBefore=currentRoundMatches(t).map(m=>m.id).join("|");
+    before=snapshotPositions(t);
     simulateMatch(nextPlayable(t).id, {deferAdvance:true});
     advanceIfNeeded(t);
+    const stillSameRound=currentRoundMatches(t).map(m=>m.id).join("|")===roundBefore && t.currentStage===stageBefore;
+    if(!stillSameRound) applyPositionDeltas(t,before);
     guard++;
   }
-  (t.groups||[]).forEach(g=>g.teams.forEach(x=>x.posDelta=0));
-  if(t.league) t.league.teams.forEach(x=>x.posDelta=0);
   save(); renderTournament();
 }
 function simulateMatch(id, opts={}){
@@ -804,7 +816,7 @@ function renderLeague(t){
   if(selectedLeagueRound===null || selectedLeagueRound>=rounds.length) selectedLeagueRound=currentLeagueRoundIndex(t);
   const idx=clamp(Number(selectedLeagueRound)||0,0,Math.max(0,rounds.length-1));
   const round=rounds[idx];
-  $("#leagueArea").innerHTML = `<div class="section-title on-field"><h2>Tabela</h2></div><div class="group-card table-card"><div class="table-scroll"><table class="table standings-table"><thead><tr><th>Pos</th><th>Time</th><th></th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>SG</th><th>GP</th></tr></thead><tbody>${table.map((x,i)=>`<tr class="${t.status==="finished"&&i===0?"champion-row":""}"><td>${i+1}</td><td>${t.status==="finished"&&i===0?"🏆 ":""}<strong class="${t.status==="finished"&&i===0?"champion-name":""}">${x.name}</strong></td><td>${deltaBadge(x.posDelta)}</td><td>${x.pts}</td><td>${x.w+x.d+x.l}</td><td>${x.w}</td><td>${x.d}</td><td>${x.l}</td><td>${x.gd}</td><td>${x.gf}</td></tr>`).join("")}</tbody></table></div></div><div class="section-title on-field"><h2>Rodadas</h2></div>${roundNav("league",idx,rounds.length)}<div class="groups-grid one-round">${round?`<div class="group-card"><h3>${round.name}</h3><div class="match-list">${round.matches.map(matchMini).join("")}</div></div>`:""}</div>`;
+  $("#leagueArea").innerHTML = `<div class="section-title on-field"><h2>Tabela</h2></div><div class="group-card table-card"><div class="table-scroll"><table class="table standings-table"><thead><tr><th>Pos</th><th>Time</th><th>Pts</th><th>J</th><th>V</th><th>E</th><th>D</th><th>SG</th><th>GP</th></tr></thead><tbody>${table.map((x,i)=>`<tr class="${t.status==="finished"&&i===0?"champion-row":""}"><td>${i+1}</td><td>${teamCellWithDelta(x,t.status==="finished"&&i===0)}</td><td>${x.pts}</td><td>${x.w+x.d+x.l}</td><td>${x.w}</td><td>${x.d}</td><td>${x.l}</td><td>${x.gd}</td><td>${x.gf}</td></tr>`).join("")}</tbody></table></div></div><div class="section-title on-field"><h2>Rodadas</h2></div>${roundNav("league",idx,rounds.length)}<div class="groups-grid one-round">${round?`<div class="group-card"><h3>${round.name}</h3><div class="match-list">${round.matches.map(matchMini).join("")}</div></div>`:""}</div>`;
 }
 function groupMatchesByStage(matches){
   const map=new Map();
@@ -820,7 +832,7 @@ function renderGroups(t){
   const roundName=selectedGroupRound || allStages[0] || "Rodada 1";
   const roundIdx=Math.max(0,allStages.indexOf(roundName));
   const roundMatches=t.groups.map(g=>({group:g.name,matches:g.matches.filter(m=>m.stage.includes(roundName))})).filter(x=>x.matches.length);
-  $("#groupsArea").innerHTML = `<div class="section-title on-field"><h2>Fase de grupos</h2></div>${adj}${renderQualifiedSummary(t)}<div class="groups-grid">${t.groups.map(g=>`<div class="group-card group-card--clean"><h3>Grupo ${g.name}</h3><div class="table-scroll"><table class="table group-table standings-table"><thead><tr><th>Pos</th><th>Time</th><th>Pts</th><th>J</th><th>V</th><th>SG</th><th>GP</th><th></th></tr></thead><tbody>${(g.table.length?g.table:g.teams).map((x,i)=>`<tr class="${i<2||info.thirdIds?.has(x.id)?"qualified":""}"><td>${i+1}</td><td>${x.name}</td><td>${x.pts}</td><td>${x.w+x.d+x.l}</td><td>${x.w}</td><td>${x.gd}</td><td>${x.gf}</td><td>${groupRowTag(t,x,i,info)}</td></tr>`).join("")}</tbody></table></div></div>`).join("")}</div><div class="section-title on-field"><h2>Rodadas</h2></div>${roundNav("group",roundIdx,allStages.length)}<div class="groups-grid one-round">${roundMatches.map(g=>`<div class="group-card"><h3>Grupo ${g.group} • ${roundName}</h3><div class="match-list">${g.matches.map(matchMini).join("")}</div></div>`).join("")}</div>`;
+  $("#groupsArea").innerHTML = `<div class="section-title on-field"><h2>Fase de grupos</h2></div>${adj}${renderQualifiedSummary(t)}<div class="groups-grid">${t.groups.map(g=>`<div class="group-card group-card--clean"><h3>Grupo ${g.name}</h3><div class="table-scroll"><table class="table group-table standings-table"><thead><tr><th>Pos</th><th>Time</th><th>Pts</th><th>J</th><th>V</th><th>SG</th><th>GP</th><th></th></tr></thead><tbody>${(g.table.length?g.table:g.teams).map((x,i)=>`<tr class="${i<2||info.thirdIds?.has(x.id)?"qualified":""}"><td>${i+1}</td><td>${teamCellWithDelta(x,false)}</td><td>${x.pts}</td><td>${x.w+x.d+x.l}</td><td>${x.w}</td><td>${x.gd}</td><td>${x.gf}</td><td>${groupRowTag(t,x,i,info)}</td></tr>`).join("")}</tbody></table></div></div>`).join("")}</div><div class="section-title on-field"><h2>Rodadas</h2></div>${roundNav("group",roundIdx,allStages.length)}<div class="groups-grid one-round">${roundMatches.map(g=>`<div class="group-card"><h3>Grupo ${g.group} • ${roundName}</h3><div class="match-list">${g.matches.map(matchMini).join("")}</div></div>`).join("")}</div>`;
 }
 function matchMini(m){
   const score=m.played?`${scoreCell(m,"home")} x ${scoreCell(m,"away")}`:"x";
