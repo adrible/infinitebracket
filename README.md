@@ -1,11 +1,11 @@
-# Brocket 0.7.8.1
+# Brocket 0.7.8.3.3
 
 Versão organizada com correções de lógica, navegação e visual, sem duplicar funcionalidades já existentes.
 
 ## Principais ajustes
 
 - Mantida chave estável de armazenamento (`brocket-0-7`) para preservar dados entre versões.
-- Migração aceita dados da 0.7.8.1 sem apagar campeonatos, times ou pacotes.
+- Migração aceita dados da 0.7.8.3.3 sem apagar campeonatos, times ou pacotes.
 - Liga/Pontos corridos continua limitada a 24 times.
 - Grupos e mata-mata continuam permitindo até 48 times.
 - Formato Copa 48 mantido automaticamente:
@@ -42,7 +42,7 @@ Suba somente estes arquivos na raiz do GitHub:
 - README.md
 
 
-## Brocket 0.7.8.1
+## Brocket 0.7.8.3.3
 
 - Visual do chaveamento mais polido.
 - Campeão com destaque dourado mais uniforme.
@@ -58,7 +58,7 @@ Suba somente estes arquivos na raiz do GitHub:
 - Montagem manual de grupos com contador por grupo e bloqueio de grupo incompleto.
 
 
-## Brocket 0.7.8.1
+## Brocket 0.7.8.3.3
 
 Correção pontual da tabela mobile:
 
@@ -66,3 +66,14 @@ Correção pontual da tabela mobile:
 - A variação de posição aparece dentro da célula Time, alinhada como “coluna fake”.
 - Remove o “—” quando não houve mudança.
 - Simular tudo mantém a variação da última rodada simulada.
+
+
+## Brocket 0.7.8.3
+
+Patch de lógica e tabela:
+
+- Recalibra a partida individual, com a mesma fórmula para todos os formatos.
+- Favoritos fortes ficam mais consistentes, sem acabar com zebra.
+- Corrige o ranking Melhores Defesas: agora ordena pelo menor GC primeiro.
+- Remove o negrito forte da coluna J/Jogos no mobile.
+- Mantém Pts como principal destaque da tabela.

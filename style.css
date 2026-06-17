@@ -65,7 +65,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.8.1 correções de UX */
+/* 0.7.8.3.3 correções de UX */
 .content{padding-bottom:170px}
 .screen{padding-bottom:42px}
 .bottom-nav{z-index:80}
@@ -84,7 +84,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.8.1 mobile-first e respiro */
+/* 0.7.8.3.3 mobile-first e respiro */
 .content{
   padding:20px 18px calc(230px + env(safe-area-inset-bottom));
 }
@@ -321,7 +321,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.8.1 acabamento */
+/* 0.7.8.3.3 acabamento */
 .topbar__row{grid-template-columns:1fr}
 .hotbar-v075{
   grid-template-columns:repeat(5,1fr);
@@ -444,7 +444,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.8.1 final */
+/* 0.7.8.3.3 final */
 .topbar__row{grid-template-columns:1fr}
 .hotbar-v075{grid-template-columns:repeat(5,1fr)}
 .nav-btn{gap:3px}
@@ -489,7 +489,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.8.1 ajustes */
+/* 0.7.8.3.3 ajustes */
 .content{
   padding-bottom:calc(340px + env(safe-area-inset-bottom))!important;
 }
@@ -651,7 +651,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.8.1 navegação, classificados e polimento */
+/* 0.7.8.3.3 navegação, classificados e polimento */
 .content{
   padding-bottom:calc(430px + env(safe-area-inset-bottom))!important;
 }
@@ -852,7 +852,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.8.1 — leitura mobile, Copa 48 limpa e polimento */
+/* 0.7.8.3.3 — leitura mobile, Copa 48 limpa e polimento */
 .quick-generate-top{
   width:100%;
   margin:10px 0 14px;
@@ -971,7 +971,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.8.1 fix — tabela mobile sem scroll e sem esconder SG/V */
+/* 0.7.8.3.3 fix — tabela mobile sem scroll e sem esconder SG/V */
 @media (max-width: 720px){
   .table-scroll{ overflow-x:visible !important; }
   .standings-table{
@@ -1056,7 +1056,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.8.1 — variação fake dentro da célula Time */
+/* 0.7.8.3.3 — variação fake dentro da célula Time */
 .team-cell-fake{
   display:flex;
   align-items:center;
@@ -1150,5 +1150,41 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   .group-table th:nth-child(8),
   .group-table td:nth-child(8){
     display:table-cell !important;
+  }
+}
+
+
+/* 0.7.8.3 — coluna J/Jogos sem negrito forte */
+@media (max-width:720px){
+  /* Liga: Pos, Time, Pts, J, V, E, D, SG, GP */
+  .standings-table:not(.group-table) th:nth-child(4),
+  .standings-table:not(.group-table) td:nth-child(4){
+    font-weight:600 !important;
+  }
+  .standings-table:not(.group-table) th:nth-child(5),
+  .standings-table:not(.group-table) td:nth-child(5),
+  .standings-table:not(.group-table) th:nth-child(8),
+  .standings-table:not(.group-table) td:nth-child(8){
+    font-weight:600 !important;
+  }
+  .standings-table:not(.group-table) th:nth-child(3),
+  .standings-table:not(.group-table) td:nth-child(3){
+    font-weight:950 !important;
+  }
+
+  /* Grupos: Pos, Time, Pts, J, V, SG, GP, Tag */
+  .group-table th:nth-child(4),
+  .group-table td:nth-child(4){
+    font-weight:600 !important;
+  }
+  .group-table th:nth-child(5),
+  .group-table td:nth-child(5),
+  .group-table th:nth-child(6),
+  .group-table td:nth-child(6){
+    font-weight:600 !important;
+  }
+  .group-table th:nth-child(3),
+  .group-table td:nth-child(3){
+    font-weight:950 !important;
   }
 }
