@@ -1,6 +1,6 @@
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
-const STORAGE = "brocket-0-7";
+const STORAGE = "brocket-0-7-6-1";
 const LEGACY_KEYS = ["brocket-v7", "brocket-v6-polida", "brocket-v5", "brocket-v4", "brocket-v3"];
 
 const packs = {
@@ -31,6 +31,13 @@ const packs = {
 const starter = { competitions:[], customTeams:[], customPacks:[], activeTournament:null };
 
 let data = load();
+function sanitizeLoadedData(d){
+  if(d?.activeTournament?.cfg?.format==="league" && Number(d.activeTournament.cfg.teamCount)>24){
+    d.activeTournament=null;
+  }
+  return d;
+}
+data=sanitizeLoadedData(data);
 if(data.competitions?.length===1 && data.competitions[0]?.name==="Copa da Galera" && data.competitions[0]?.editions?.some(e=>e.name==="2024") && data.competitions[0]?.editions?.some(e=>e.name==="2025")){
   data.competitions=[];
   save();
@@ -135,7 +142,7 @@ function decisionLabel(m){
 function go(screen){
   $$(".screen").forEach(s=>s.classList.toggle("active",s.id===screen));
   $$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.go===screen));
-  const titles = {home:["0.7.6","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
+  const titles = {home:["0.7.6.1","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
   $("#pageSubtitle").textContent = titles[screen]?.[0] || "Brocket";
   $("#pageTitle").textContent = titles[screen]?.[1] || "Brocket";
   window.scrollTo(0,0);
@@ -258,22 +265,21 @@ function addCustomPack(){
 
 
 function teamCountOptionsForFormat(format){
-  const full=[4,6,8,10,12,16,20,24,32,36,40,48];
-  const league=[4,6,8,10,12,16,20,24];
-  return format==="league" ? league : full;
+  return format==="league" ? [4,6,8,10,12,16,20,24] : [4,6,8,10,12,16,20,24,32,36,40,48];
 }
 function refreshTeamCountOptions(){
   const sel=$("#teamCount"); if(!sel) return;
   const f=$("#formatSelect")?.value || "playoffs";
   const current=Number(sel.value)||16;
   const opts=teamCountOptionsForFormat(f);
-  const next=opts.includes(current) ? current : Math.min(24, opts.at(-1));
-  sel.innerHTML=opts.map(n=>`<option ${n===next?"selected":""}>${n}</option>`).join("");
+  let next=opts.includes(current) ? current : opts.at(-1);
+  if(f==="league" && next>24) next=24;
+  sel.innerHTML=opts.map(n=>`<option value="${n}" ${n===next?"selected":""}>${n}</option>`).join("");
+  sel.value=String(next);
   if(selectedTeams.length>next) selectedTeams=selectedTeams.slice(0,next);
   if(f==="groups" && next===48 && $("#groupSize")) $("#groupSize").value="4";
-  if(current!==next && f==="league") alert("Pontos corridos permite até 24 times. A quantidade foi ajustada para 24.");
+  renderSelected();
 }
-
 function toggleRuleVisibility(){
   refreshTeamCountOptions();
   const f=$("#formatSelect").value;
@@ -326,12 +332,17 @@ function applyQuotas(){
 
 function cfg(){
   const format=$("#formatSelect").value;
-  const teamCount=Number($("#teamCount").value);
+  let teamCount=Number($("#teamCount").value);
+  if(format==="league" && teamCount>24) teamCount=24;
   const copa48 = format==="groups" && teamCount===48;
   return { id:uid(), name:$("#editionName").value.trim()||"Torneio", saveMode:document.querySelector('input[name="saveMode"]:checked')?.value || "single", competitionId:$("#competitionSelect")?.value || "", format, teamCount, legs:$("#knockoutLegs").value, finalRule:$("#finalRule").value, upset:$("#upsetLevel").value, realism:$("#scoreRealism").value, extraTime:$("#extraTime").checked, penalties:$("#penalties").checked, awayGoals:$("#awayGoals").checked, leagueTurns:$("#leagueTurns").value, groupTurns:$("#groupTurns").value, groupSize:copa48?4:Number($("#groupSize").value), bracketShuffle:$("#bracketShuffle").value, groupShuffle:$("#groupShuffle").value, tiePreset:$("#tiePreset")?.value || "brasileirao" };
 }
 function generateTournament(){
-  const c=cfg(); if(c.saveMode==="history" && !c.competitionId){ alert("Crie ou selecione um campeonato para salvar no histórico."); return; } if(c.format==="league" && c.teamCount>24){ alert("Pontos corridos permite até 24 times."); return; } if(selectedTeams.length<c.teamCount){ alert(`Selecione ${c.teamCount} times.`); return; } if(c.format==="groups" && manualGroups && manualGroups.flat().length!==c.teamCount){ alert("A montagem manual dos grupos precisa usar todos os times selecionados ou ser limpa."); return; }
+  const c=cfg();
+  if(c.format==="league" && c.teamCount>24){ alert("Pontos corridos permite até 24 times."); refreshTeamCountOptions(); return; }
+  if(c.saveMode==="history" && !c.competitionId){ alert("Crie ou selecione um campeonato para salvar no histórico."); return; }
+  if(selectedTeams.length<c.teamCount){ alert(`Selecione ${c.teamCount} times.`); return; }
+  if(c.format==="groups" && manualGroups && manualGroups.flat().length!==c.teamCount){ alert("A montagem manual dos grupos precisa usar todos os times selecionados ou ser limpa."); return; }
   let teams = getPreviewOrder(c).slice(0,c.teamCount).map(t=>({...t}));
   const t = { id:uid(), cfg:c, teams, status:"running", saved:false, champion:null, runnerUp:null, groups:[], knockout:[], league:null, currentStage:"", createdAt:new Date().toISOString() };
   if(c.format==="league") setupLeague(t);
@@ -744,7 +755,7 @@ function matchText(m){ return m?`${m.home} ${m.homeGoals} x ${m.awayGoals} ${m.a
 function renderCompetitionDetail(c){
   const s=statsFor(c);
   const hasFinals=s.matches.some(m=>(m.stage||"").toLowerCase().includes("final"));
-  const hasLeague=(c.editions||[]).some(e=>(e.format==="Pontos corridos" || e.format==="Liga / pontos corridos") || e.leagueTable);
+  const hasLeague=(c.editions||[]).some(e=>(e.format==="Pontos corridos" || e.format==="Pontos corridos") || e.leagueTable);
   $("#competitionHero").innerHTML = [`<div class="stat"><small>Edições</small><strong>${s.editions.length}</strong></div>`,`<div class="stat"><small>Jogos salvos</small><strong>${s.matches.length}</strong></div>`,`<div class="stat"><small>Times</small><strong>${s.teams.length}</strong></div>`,`<div class="stat"><small>Maior campeão</small><strong>${s.topChampion}</strong></div>`].join("");
   $("#overviewStats").innerHTML = [feature("🏆 Maior campeão",s.topChampion),feature("🥈 Vice-campeão",rankEntries(s.vices)[0]?.[0]||"—"),feature("⚽ Maior goleada",matchText(s.biggestWin)),hasFinals?feature("🔥 Final com mais gols",matchText(s.finalGoals)):"",rankCard("Maiores campeões",s.titles,"títulos"),hasFinals?rankCard("Mais finais",s.finals,"finais"):""].join("");
   $("#rankingStats").innerHTML = [rankCard("Maiores campeões",s.titles,"títulos"),rankCard("Maiores vices",s.vices,"vices"),hasFinals?rankCard("Mais finais",s.finals,"finais"):"",rankCard("Mais participações",s.parts,"part."),hasFinals?rankCard("Títulos nos pênaltis",s.pensTitles,"títulos"):"",hasLeague?rankCard("Mais pontos em ligas",s.leaguePoints,"pts"):"",hasLeague?rankCard("Mais vitórias em ligas",s.leagueWins,"vitórias"):""].join("");

@@ -84,7 +84,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.6 mobile-first e respiro */
+/* 0.7.6.1 mobile-first e respiro */
 .content{
   padding:20px 18px calc(230px + env(safe-area-inset-bottom));
 }
@@ -321,7 +321,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.6 acabamento */
+/* 0.7.6.1 acabamento */
 .topbar__row{grid-template-columns:1fr}
 .hotbar-v075{
   grid-template-columns:repeat(5,1fr);
@@ -444,7 +444,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.6 final */
+/* 0.7.6.1 final */
 .topbar__row{grid-template-columns:1fr}
 .hotbar-v075{grid-template-columns:repeat(5,1fr)}
 .nav-btn{gap:3px}
@@ -489,7 +489,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.6 ajustes */
+/* 0.7.6.1 ajustes */
 .content{
   padding-bottom:calc(340px + env(safe-area-inset-bottom))!important;
 }
