@@ -1,28 +1,24 @@
-# Brocket 0.7.5
+# Brocket 0.7.6
 
-Versão focada em controle manual, regras adaptáveis e estatísticas mais inteligentes.
+Versão de correção visual e ajuste de regras.
 
-## Principais novidades
+## Principais ajustes
 
-- Inserção manual de resultados.
-- Escolha/montagem manual de grupos.
-- Mantido sorteio automático de grupos.
-- Formatos incomuns são adaptados automaticamente.
-- Rodada preliminar automática quando o número de classificados não fecha chave perfeita.
-- Melhores campanhas entram direto; piores campanhas jogam preliminar.
-- Confrontos da preliminar por sorteio.
-- Critérios de desempate ajustáveis.
-- Variação de posição nas tabelas.
-- Campeão de pontos corridos destacado em negrito/troféu.
-- Estatísticas adaptadas conforme o formato da edição.
-- Campeonatos podem ter edições de formatos diferentes.
-- Mais pacotes de times.
-- Criação de pacotes personalizados.
-- Prorrogação mais visível com tag A.P.
-- Pênaltis exibidos entre parênteses.
-- Botão limpar movido para Configurações.
-- Hotbar com Configurações e ícones melhores.
-- Mais espaço inferior para a hotbar não cobrir conteúdo.
+- Pontos corridos limitado a até 24 times.
+- Mata-mata e grupos + mata-mata permitem até 48 times.
+- Pacote Seleções mundiais ampliado para 48 seleções.
+- 48 times + grupos usa automaticamente o Formato Copa 48:
+  - 12 grupos de 4
+  - classificam 1º, 2º e 8 melhores terceiros
+  - mata-mata começa com 32 times
+- Nome do formato simplificado para "Pontos corridos".
+- Tabelas agora usam "Pos" no lugar de "#".
+- Cabeçalho da coluna de movimentação fica em branco.
+- Layout da tela de confrontos mais compacto.
+- "Entram direto" virou bloco recolhível.
+- Botões dos jogos ficam menores e mais limpos.
+- Hotbar com mais espaço inferior para não cobrir conteúdo.
+- Limpar dados permanece apenas em Configurações / Zona de perigo.
 
 ## Como subir
 
@@ -32,5 +28,3 @@ Suba somente estes arquivos na raiz do repositório:
 - style.css
 - script.js
 - README.md
-
-Não suba a pasta inteira.
