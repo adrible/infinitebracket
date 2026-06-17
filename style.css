@@ -1223,3 +1223,26 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   .standings-table:not(.group-table) th:nth-child(10),
   .standings-table:not(.group-table) td:nth-child(10){ display:table-cell !important; }
 }
+
+
+/* 0.7.9.1 — ida e volta em linhas separadas */
+.two-leg-detail{
+  display:grid;
+  gap:5px;
+  line-height:1.25;
+}
+.two-leg-detail > span{
+  display:grid;
+  gap:1px;
+}
+.two-leg-detail b{
+  display:block;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  opacity:.82;
+}
+.two-leg-note{
+  margin-top:2px;
+  font-weight:950;
+}

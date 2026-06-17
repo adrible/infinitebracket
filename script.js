@@ -667,12 +667,24 @@ function finishTournament(t, finalMatch){
   if(!t.saved){ saveEdition(t); t.saved=true; }
 }
 function playGroupOrLeague(a,b,c){ const r=playSingle(a,b,c,true); return {...r,winner:r.homeGoals===r.awayGoals?null:(r.homeGoals>r.awayGoals?a:b),loser:r.homeGoals===r.awayGoals?null:(r.homeGoals>r.awayGoals?b:a),meta:""}; }
+function twoLegMeta(a,b,l1,l2Home,l2Away,notes=[]){
+  const noteHtml = notes.length ? `<span class="two-leg-note">${notes.join(" • ")}</span>` : "";
+  return `<span class="two-leg-detail">
+    <span><b>Ida</b>${a.name} ${l1.homeGoals}-${l1.awayGoals} ${b.name}</span>
+    <span><b>Volta</b>${b.name} ${l2Home}-${l2Away} ${a.name}</span>
+    ${noteHtml}
+  </span>`;
+}
+
 function playKnockout(a,b,c,isFinal){
   const two = c.legs==="two" && !(isFinal && c.finalRule==="single");
   if(!two){
     let r=playSingle(a,b,c,false), hg=r.homeGoals, ag=r.awayGoals, meta="Jogo único";
     if(hg===ag && c.extraTime){ const et=extraGoals(a,b,c); hg+=et.a; ag+=et.b; meta+=` • A.P.`; }
-    if(hg===ag && c.penalties){ const p=pens(a,b); meta+=` • pênaltis ${p.a}-${p.b}`; const win=p.winA; return {homeGoals:hg,awayGoals:ag,winner:win?a:b,loser:win?b:a,meta,pens:p}; }
+    if(hg===ag && c.penalties){ const p=pens(a,b); meta = twoLegMeta(a,b,l1,l2Home,l2Away,[
+      ...(usedET ? ["A.P."] : []),
+      `pênaltis ${p.a}-${p.b}`
+    ]); const win=p.winA; return {homeGoals:hg,awayGoals:ag,winner:win?a:b,loser:win?b:a,meta,pens:p}; }
     const win=hg>=ag; return {homeGoals:hg,awayGoals:ag,winner:win?a:b,loser:win?b:a,meta};
   }
 
@@ -684,7 +696,7 @@ function playKnockout(a,b,c,isFinal){
   if(ga===gb && c.awayGoals){
     const awayA=l2Away, awayB=l1.awayGoals;
     if(awayA!==awayB){
-      const meta=`Ida: ${a.name} ${l1.homeGoals}-${l1.awayGoals} ${b.name} • Volta: ${b.name} ${l2Home}-${l2Away} ${a.name} • gol fora`;
+      const meta = twoLegMeta(a,b,l1,l2Home,l2Away,["gol fora"]);
       const win=awayA>awayB;
       return {homeGoals:ga,awayGoals:gb,winner:win?a:b,loser:win?b:a,meta};
     }
@@ -699,11 +711,14 @@ function playKnockout(a,b,c,isFinal){
     usedET=true;
   }
 
-  let meta=`Ida: ${a.name} ${l1.homeGoals}-${l1.awayGoals} ${b.name} • Volta: ${b.name} ${l2Home}-${l2Away} ${a.name}${usedET?" • A.P.":""}`;
+  let meta = twoLegMeta(a,b,l1,l2Home,l2Away,usedET ? ["A.P."] : []);
 
   if(ga===gb && c.penalties){
     const p=pens(a,b);
-    meta+=` • pênaltis ${p.a}-${p.b}`;
+    meta = twoLegMeta(a,b,l1,l2Home,l2Away,[
+      ...(usedET ? ["A.P."] : []),
+      `pênaltis ${p.a}-${p.b}`
+    ]);
     const win=p.winA;
     return {homeGoals:ga,awayGoals:gb,winner:win?a:b,loser:win?b:a,meta,pens:p};
   }
@@ -713,7 +728,7 @@ function playKnockout(a,b,c,isFinal){
 function playSingle(a,b,c,allowDraw){
   const diff=(a.power||70)-(b.power||70);
 
-  // 0.7.9: mesma fórmula para todos os formatos.
+  // 0.7.9.1: mesma fórmula para todos os formatos.
   // Ajusta a chance antes do placar sair: tudo é possível,
   // mas o azarão tem menos chance de placar elástico contra favorito.
   const rand={low:3,medium:5,high:14,chaos:34}[c.upset] ?? 5;
