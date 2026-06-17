@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brocket 0.7.8.4</title>
+  <title>Brocket 0.7.9</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -19,7 +19,7 @@
         </div>
       </div>
       <div class="hero">
-        <small id="pageSubtitle">0.7.8.4</small>
+        <small id="pageSubtitle">0.7.9</small>
         <h1 id="pageTitle">Início</h1>
       </div>
     </header>
@@ -33,23 +33,35 @@
           <button class="quick-card" data-go="tournament"><span>🎮</span><strong>Torneio atual</strong><small>simular partida por partida</small></button>
         </div>
         <div class="panel green-panel">
-          <strong>Brocket 0.7.8.4</strong>
-          <p>Regras adaptáveis, resultados manuais, grupos manuais, pacotes personalizados e estatísticas mais inteligentes.</p>
+          <strong>Brocket 0.7.9</strong>
+          <p>Campeonatos, divisões, grupos avançados, exportação de tabelas e estatísticas inteligentes.</p>
         </div>
         <div class="section-title"><h2>Campeonatos</h2><button class="link" data-go="competitions">ver todos</button></div>
         <div id="homeCompetitions" class="list"></div>
       </section>
 
       <section id="create" class="screen">
-        <div class="section-title"><h2>Novo torneio</h2><button class="link" data-go="home">voltar</button></div>
+        <div class="section-title"><h2>Novo campeonato/torneio</h2><button class="link" data-go="home">voltar</button></div>
         <button class="big-action quick-generate-top" id="quickGenerateTop">Gerar torneio</button>
 
         <div class="panel create-step">
           <div class="step-label">1. Modelo</div>
           <div class="form-grid">
-            <label>Nome do torneio<input id="editionName" value="Copa dos Amigos 2026" /></label>
+            <label>Campeonato<input id="championshipName" value="Liga Mundial" placeholder="Ex: Liga Mundial" /></label>
+            <label>Nome personalizado da edição <small>(opcional)</small><input id="editionName" placeholder="Ex: Temporada 2026" /></label>
             <label>Modelo do torneio<select id="formatSelect"><option value="playoffs">Mata-mata direto</option><option value="groups">Grupos + mata-mata</option><option value="league">Pontos corridos</option></select></label>
             <label>Quantidade de times<select id="teamCount"><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option><option selected>16</option><option>20</option><option>24</option><option>32</option><option>36</option><option>40</option><option>48</option></select></label>
+          </div>
+
+          <div class="rule-group division-rule" data-rule-for="league groups">
+            <h4>Divisão</h4>
+            <div class="form-grid">
+              <label>Nome da divisão<input id="divisionName" placeholder="Ex: Série A" /></label>
+              <label>Tipo da divisão<select id="divisionTier"><option value="top" selected>Divisão máxima</option><option value="middle">Divisão intermediária</option><option value="bottom">Última divisão</option><option value="none">Sem divisão</option></select></label>
+              <label>Promovidos<select id="promotedCount"><option selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select></label>
+              <label>Rebaixados<select id="relegatedCount"><option selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select></label>
+            </div>
+            <small class="muted">Na divisão máxima não aparece “Class.” por padrão; nas divisões inferiores aparecem promovidos e rebaixados.</small>
           </div>
 
           <div class="save-mode">
@@ -108,9 +120,14 @@
             <h4>Fase de grupos</h4>
             <div class="form-grid">
               <label>Grupos<select id="groupShuffle"><option value="shuffle" selected>Sortear grupos</option><option value="balanced">Equilibrar por força</option></select></label>
-              <label>Tamanho dos grupos<select id="groupSize"><option value="4" selected>4 times por grupo</option></select></label>
+              <label>Quantidade de grupos<select id="groupCount"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>8</option><option>10</option><option>12</option><option>16</option></select></label>
+              <label>Times por grupo<select id="groupSize"><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></label>
+              <label>Classificam por grupo<select id="qualifiersPerGroup"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></label>
+              <label>Melhores campanhas adicionais<select id="bestExtraQualifiers"><option selected>0</option><option>1</option><option>2</option><option>4</option><option>6</option><option>8</option><option>12</option></select></label>
+              <label>Rebaixados por grupo<select id="groupRelegatedCount"><option selected>0</option><option>1</option><option>2</option></select></label>
               <label>Rodadas da fase de grupos<select id="groupTurns"><option value="single" selected>1 rodada</option><option value="double">2 rodadas / ida e volta</option></select></label>
             </div>
+            <small class="muted">Se o grupo tiver número ímpar de times, o app cria descanso automático na rodada.</small>
           </div>
 
           <div class="rule-group" data-rule-for="league">
@@ -303,6 +320,7 @@
       </div>
     </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
