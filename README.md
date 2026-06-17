@@ -1,24 +1,28 @@
-# Brocket 0.7.4
+# Brocket 0.7.5
 
-Versão focada em UX mobile-first e limpeza do app.
+Versão focada em controle manual, regras adaptáveis e estatísticas mais inteligentes.
 
-## Ajustes principais
+## Principais novidades
 
-- Removido campeonato/edições de exemplo da tela inicial.
-- Pacotes de times foram mantidos.
-- Adicionado modo “Torneio único”, sem precisar salvar em campeonato.
-- Mantida opção “Salvar em campeonato” para edições e estatísticas históricas.
-- Escolha manual de times movida para tela própria.
-- Mobile com telas mais confortáveis e botões maiores.
-- PC mantém layout mais amplo.
-- Hotbar com mais espaço reservado para não cobrir conteúdo.
-- Telas vazias com cards explicativos.
-- Mais espaçamento geral entre cards e seções.
-- Visual do chaveamento melhorado.
-- Mantidos os modelos:
-  - Mata-mata direto
-  - Grupos + mata-mata
-  - Liga / pontos corridos
+- Inserção manual de resultados.
+- Escolha/montagem manual de grupos.
+- Mantido sorteio automático de grupos.
+- Formatos incomuns são adaptados automaticamente.
+- Rodada preliminar automática quando o número de classificados não fecha chave perfeita.
+- Melhores campanhas entram direto; piores campanhas jogam preliminar.
+- Confrontos da preliminar por sorteio.
+- Critérios de desempate ajustáveis.
+- Variação de posição nas tabelas.
+- Campeão de pontos corridos destacado em negrito/troféu.
+- Estatísticas adaptadas conforme o formato da edição.
+- Campeonatos podem ter edições de formatos diferentes.
+- Mais pacotes de times.
+- Criação de pacotes personalizados.
+- Prorrogação mais visível com tag A.P.
+- Pênaltis exibidos entre parênteses.
+- Botão limpar movido para Configurações.
+- Hotbar com Configurações e ícones melhores.
+- Mais espaço inferior para a hotbar não cobrir conteúdo.
 
 ## Como subir
 
