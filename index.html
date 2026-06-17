@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brocket 0.7.4</title>
+  <title>Brocket 0.7.6</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -17,10 +17,9 @@
             <small>torneios, edições e histórias</small>
           </div>
         </div>
-        <button class="ghost" id="resetLocal">limpar</button>
       </div>
       <div class="hero">
-        <small id="pageSubtitle">0.7.4</small>
+        <small id="pageSubtitle">0.7.6</small>
         <h1 id="pageTitle">Início</h1>
       </div>
     </header>
@@ -34,8 +33,8 @@
           <button class="quick-card" data-go="tournament"><span>🎮</span><strong>Torneio atual</strong><small>simular partida por partida</small></button>
         </div>
         <div class="panel green-panel">
-          <strong>Brocket 0.7.4</strong>
-          <p>UX mobile-first: seleção manual em tela própria, mais respiro, sem exemplos iniciais e torneio único opcional.</p>
+          <strong>Brocket 0.7.6</strong>
+          <p>Regras adaptáveis, resultados manuais, grupos manuais, pacotes personalizados e estatísticas mais inteligentes.</p>
         </div>
         <div class="section-title"><h2>Campeonatos</h2><button class="link" data-go="competitions">ver todos</button></div>
         <div id="homeCompetitions" class="list"></div>
@@ -49,7 +48,7 @@
           <div class="form-grid">
             <label>Nome do torneio<input id="editionName" value="Copa dos Amigos 2026" /></label>
             <label>Modelo do torneio<select id="formatSelect"><option value="playoffs">Mata-mata direto</option><option value="groups">Grupos + mata-mata</option><option value="league">Liga / pontos corridos</option></select></label>
-            <label>Quantidade de times<select id="teamCount"><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option><option selected>16</option><option>20</option><option>24</option><option>32</option></select></label>
+            <label>Quantidade de times<select id="teamCount"><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option><option selected>16</option><option>20</option><option>24</option><option>32</option><option>36</option><option>40</option><option>48</option></select></label>
           </div>
 
           <div class="save-mode">
@@ -72,7 +71,8 @@
             <button class="secondary" id="pickStrongest">Mais fortes</button>
             <button class="secondary" id="pickRandom">Sortear</button>
             <button class="secondary" id="pickBalanced">Equilibrado</button>
-            <button class="secondary" data-go="teamPicker">Selecionar manualmente</button>
+            <button class="secondary" data-go="teamPicker">Selecionar times</button>
+            <button class="secondary" data-go="groupBuilder">Montar grupos</button>
           </div>
 
           <div id="selectedTeams" class="team-list compact selected-summary"></div>
@@ -118,6 +118,16 @@
               <label>Turnos<select id="leagueTurns"><option value="single" selected>Turno único</option><option value="double">Turno e returno</option></select></label>
             </div>
           </div>
+          <div class="rule-group" data-rule-for="groups league">
+            <h4>Critérios de desempate</h4>
+            <div class="form-grid">
+              <label>Ordem dos critérios<select id="tiePreset">
+                <option value="brasileirao" selected>Pontos > Vitórias > Saldo > Gols pró</option>
+                <option value="grupos">Pontos > Saldo > Gols pró > Vitórias</option>
+                <option value="defensivo">Pontos > Vitórias > Saldo > Menos gols sofridos</option>
+              </select></label>
+            </div>
+          </div>
         </div>
 
         <div class="panel create-step">
@@ -153,6 +163,22 @@
 
         <div class="section-title"><h2>Selecionados</h2></div>
         <div id="manualSelectedTeams" class="team-list manual-selected-list"></div>
+      </section>
+
+      <section id="groupBuilder" class="screen">
+        <div class="picker-top">
+          <button class="link" data-go="create">← voltar</button>
+          <div><small id="groupBuilderCount">0 times</small><h2>Montar grupos</h2></div>
+          <button class="link" data-go="create">confirmar</button>
+        </div>
+        <div class="panel">
+          <p class="muted">Opcional. Se você não montar manualmente, o Brocket sorteia os grupos automaticamente.</p>
+          <div class="action-row">
+            <button class="secondary" id="autoFillGroups">Distribuir automaticamente</button>
+            <button class="secondary" id="clearManualGroups">Limpar montagem</button>
+          </div>
+        </div>
+        <div id="manualGroupsArea" class="manual-groups"></div>
       </section>
 
       <section id="tournament" class="screen tournament-screen">
@@ -219,16 +245,63 @@
         </div>
         <div class="section-title"><h2>Meus times criados</h2></div>
         <div id="customTeamList" class="team-list"></div>
+
+        <div class="panel">
+          <h3>Criar pacote personalizado</h3>
+          <div class="form-grid">
+            <label>Nome do pacote<input id="customPackName" placeholder="Ex: Amigos do bairro" /></label>
+            <label>Times do pacote<textarea id="customPackTeams" rows="6" placeholder="Um por linha. Ex:\nTime do João, 72\nTime do Pedro, 68"></textarea></label>
+          </div>
+          <button class="primary" id="addCustomPack">Criar pacote</button>
+        </div>
+        <div class="section-title"><h2>Meus pacotes</h2></div>
+        <div id="customPackList" class="team-list"></div>
+      </section>
+
+      <section id="settings" class="screen">
+        <div class="section-title"><h2>Configurações</h2><button class="link" data-go="home">voltar</button></div>
+        <div class="panel">
+          <h3>Dados do app</h3>
+          <p class="muted">Faça backup dos campeonatos, times, pacotes e torneio atual.</p>
+          <div class="action-row">
+            <button class="secondary" id="exportBackup">Exportar backup</button>
+            <button class="secondary" id="importBackup">Importar backup</button>
+          </div>
+          <textarea id="backupBox" class="backup-box" placeholder="O backup aparece aqui. Para importar, cole o JSON aqui."></textarea>
+        </div>
+        <div class="danger-zone">
+          <strong>Zona de perigo</strong>
+          <small>Apaga todos os campeonatos, torneio atual, times e pacotes personalizados deste navegador.</small>
+          <button class="danger" id="clearLocalData">Limpar dados locais</button>
+        </div>
       </section>
     </main>
 
-    <nav class="bottom-nav">
-      <button class="nav-btn active" data-go="home">⌂<span>Início</span></button>
-      <button class="nav-btn" data-go="create">＋<span>Criar</span></button>
-      <button class="nav-btn" data-go="competitions">▣<span>Campeonatos</span></button>
-      <button class="nav-btn" data-go="teams">◉<span>Times</span></button>
+    <nav class="bottom-nav hotbar-v075">
+      <button class="nav-btn active" data-go="home"><span class="nav-icon">⌂</span><span>Início</span></button>
+      <button class="nav-btn" data-go="create"><span class="nav-icon">＋</span><span>Criar</span></button>
+      <button class="nav-btn" data-go="tournament"><span class="nav-icon">▶</span><span>Torneio</span></button>
+      <button class="nav-btn" data-go="competitions"><span class="nav-icon">🏆</span><span>Camp.</span></button>
+      <button class="nav-btn" data-go="settings"><span class="nav-icon">⚙</span><span>Config</span></button>
     </nav>
   </div>
+
+    <div id="manualResultModal" class="modal" hidden>
+      <div class="modal-card">
+        <div class="section-title tight"><h3>Resultado manual</h3><button class="link" id="closeManualResult">fechar</button></div>
+        <div id="manualMatchTitle" class="manual-title">Partida</div>
+        <div class="form-grid">
+          <label>Gols mandante<input id="manualHomeGoals" type="number" min="0" value="0" /></label>
+          <label>Gols visitante<input id="manualAwayGoals" type="number" min="0" value="0" /></label>
+          <label>Decisão<select id="manualDecision"><option value="normal">Tempo normal</option><option value="ap">Após prorrogação</option><option value="pens">Pênaltis</option><option value="ap_pens">A.P. + Pênaltis</option></select></label>
+          <label>Vencedor<select id="manualWinner"></select></label>
+          <label>Pênaltis mandante<input id="manualHomePens" type="number" min="0" value="0" /></label>
+          <label>Pênaltis visitante<input id="manualAwayPens" type="number" min="0" value="0" /></label>
+        </div>
+        <button class="big-action" id="saveManualResult">Salvar resultado</button>
+      </div>
+    </div>
+
   <script src="script.js"></script>
 </body>
 </html>
