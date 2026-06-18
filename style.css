@@ -1331,3 +1331,61 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 .export-marker.champion{background:#d7a437;}
 .export-marker.promoted,.export-marker.direct{background:#19a84f;}
 .export-marker.relegated{background:#e53935;}
+
+/* 0.7.9.3 — campeonatos, tabela compacta e status lateral no mobile */
+.competition-card{
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:10px;
+}
+.competition-open{
+  text-align:left;
+  min-width:0;
+  padding:0;
+  background:transparent;
+  border:0;
+  color:inherit;
+}
+.competition-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+@media(max-width:720px){
+  .competition-card{grid-template-columns:1fr;}
+  .competition-actions{justify-content:space-between;}
+
+  .table-card{padding:10px 8px!important;}
+  .standings-table th,
+  .standings-table td{
+    padding:8px 3px!important;
+    font-size:12px!important;
+  }
+  .standings-table th:nth-child(1),
+  .standings-table td:nth-child(1){width:25px!important;}
+  .standings-table th:nth-child(2),
+  .standings-table td:nth-child(2){
+    width:auto!important;
+    font-size:13px!important;
+    letter-spacing:-.02em;
+  }
+  .standings-table:not(.group-table) th:nth-child(4),
+  .standings-table:not(.group-table) td:nth-child(4){width:34px!important;}
+  .standings-table:not(.group-table) th:nth-child(5),
+  .standings-table:not(.group-table) td:nth-child(5),
+  .standings-table:not(.group-table) th:nth-child(6),
+  .standings-table:not(.group-table) td:nth-child(6),
+  .standings-table:not(.group-table) th:nth-child(8),
+  .standings-table:not(.group-table) td:nth-child(8){width:28px!important;}
+  .standings-table:not(.group-table) th:nth-child(10),
+  .standings-table:not(.group-table) td:nth-child(10){display:none!important;}
+  .standings-table:not(.group-table) tbody tr.status-relegated td:first-child{border-left:4px solid #e53935;}
+  .standings-table:not(.group-table) tbody tr.status-promoted td:first-child{border-left:4px solid #19a84f;}
+  .standings-table:not(.group-table) tbody tr.status-champion td:first-child{border-left:4px solid #d7a437;}
+  .standings-table:not(.group-table) tbody tr td:first-child{border-left:4px solid transparent; padding-left:1px!important;}
+  .team-cell-fake{grid-template-columns:minmax(0,1fr) 28px!important; gap:3px!important;}
+  .fake-delta{min-width:28px!important; font-size:11px!important;}
+  .champion-row .team-cell-fake{grid-template-columns:auto minmax(0,1fr) 28px!important;}
+  .champion-row .team-cell-fake strong{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+}
