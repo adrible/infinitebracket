@@ -1,11 +1,11 @@
-# Brocket 0.7.9.1
+# Brocket 0.7.9.2
 
 Versão organizada com correções de lógica, navegação e visual, sem duplicar funcionalidades já existentes.
 
 ## Principais ajustes
 
 - Mantida chave estável de armazenamento (`brocket-0-7`) para preservar dados entre versões.
-- Migração aceita dados da 0.7.9.1 sem apagar campeonatos, times ou pacotes.
+- Migração aceita dados da 0.7.9.2 sem apagar campeonatos, times ou pacotes.
 - Liga/Pontos corridos continua limitada a 24 times.
 - Grupos e mata-mata continuam permitindo até 48 times.
 - Formato Copa 48 mantido automaticamente:
@@ -42,7 +42,7 @@ Suba somente estes arquivos na raiz do GitHub:
 - README.md
 
 
-## Brocket 0.7.9.1
+## Brocket 0.7.9.2
 
 - Visual do chaveamento mais polido.
 - Campeão com destaque dourado mais uniforme.
@@ -58,7 +58,7 @@ Suba somente estes arquivos na raiz do GitHub:
 - Montagem manual de grupos com contador por grupo e bloqueio de grupo incompleto.
 
 
-## Brocket 0.7.9.1
+## Brocket 0.7.9.2
 
 Correção pontual da tabela mobile:
 
@@ -68,7 +68,7 @@ Correção pontual da tabela mobile:
 - Simular tudo mantém a variação da última rodada simulada.
 
 
-## Brocket 0.7.9.1
+## Brocket 0.7.9.2
 
 Patch de lógica e tabela:
 
@@ -79,7 +79,7 @@ Patch de lógica e tabela:
 - Mantém Pts como principal destaque da tabela.
 
 
-## Brocket 0.7.9.1
+## Brocket 0.7.9.2
 
 Patch de ranking e zebra:
 
@@ -91,3 +91,19 @@ Patch de ranking e zebra:
   - azarão pode vencer favorito;
   - azarão golear favorito fica mais raro;
   - favorito golear azarão continua possível.
+
+## Brocket 0.7.9.2
+
+Refinamento pós 0.7.9.1:
+
+- Novo motor universal de placares, usado por liga, grupos, mata-mata e ida/volta.
+- Placares comuns ficam mais frequentes e placares caóticos ficam mais raros.
+- Diferença de força afeta a chance antes do placar sair; o placar não é reduzido depois.
+- Corrige jogo único de mata-mata para permitir empate antes de prorrogação/pênaltis.
+- Remove o texto grande “Rebaix.” da tabela e usa marcador visual compacto.
+- “Melhor defesa em ligas” vira “Menos gols sofridos em ligas”.
+- Exportação PNG/JPEG passa a gerar uma tabela própria, sem rodadas, botões ou hotbar.
+- Exportação usa largura maior e nomes completos com marcadores discretos.
+- Remove botão redundante de criar campeonato no card vazio da página Campeonatos.
+- Simplifica rótulos: Campeonato + Temporada/Edição + Divisão + Formato.
+- Mantém STORAGE estável em `brocket-0-7`.

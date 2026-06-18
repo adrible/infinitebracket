@@ -1246,3 +1246,88 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   margin-top:2px;
   font-weight:950;
 }
+
+/* 0.7.9.2 — refinamento visual, exportação e status compacto */
+.status-dot{
+  width:9px;
+  height:26px;
+  border-radius:999px;
+  display:inline-block;
+  vertical-align:middle;
+}
+.status-dot.relegated{background:#e53935; box-shadow:0 0 0 3px #ffe8e8;}
+.status-dot.promoted{background:#19a84f; box-shadow:0 0 0 3px #eaf8ef;}
+.status-dot.champion{background:#d7a437; box-shadow:0 0 0 3px #fff4c7;}
+.standings-table th:last-child,
+.standings-table td:last-child{width:24px!important; padding-left:2px!important; padding-right:2px!important;}
+.group-table th:last-child,
+.group-table td:last-child{width:60px!important;}
+.clean-empty .primary{display:none!important;}
+
+/* card claro do mata-mata/final sempre legível */
+.final-match .match-line,
+.final-match .match-status,
+.final-match .match-footer,
+.final-match .two-leg-detail,
+.final-match .two-leg-note{color:#183022!important;}
+.final-match .match-line strong{background:#eef7f1!important;color:#183022!important;}
+.final-match .match-status{background:#eef7f1!important;color:#183022!important;}
+.final-match .gold-champion span,
+.final-match .gold-champion strong{color:#6b4b00!important;text-shadow:none!important;}
+.final-match .gold-champion strong{background:#fff0b8!important;border-color:#d7a437!important;}
+@media(max-width:720px){
+  .bracket-scroll{scroll-padding-inline:14px;}
+  .visual-bracket{align-items:center;}
+  .final-round{margin-inline:auto;}
+  .standings-table th:last-child,
+  .standings-table td:last-child{width:18px!important;}
+  .group-table th:last-child,
+  .group-table td:last-child{width:54px!important;}
+}
+
+/* Exportação limpa: só tabela, com largura própria */
+.export-holder{
+  position:fixed;
+  left:-99999px;
+  top:0;
+  width:1120px;
+  pointer-events:none;
+  z-index:-1;
+}
+.export-sheet{
+  width:1080px;
+  background:#ffffff;
+  color:#15231a;
+  border-radius:28px;
+  padding:34px 38px 38px;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  box-shadow:0 24px 70px rgba(20,70,40,.16);
+}
+.export-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:20px;
+  padding-bottom:20px;
+  border-bottom:2px solid #e8f0eb;
+  margin-bottom:18px;
+}
+.export-head strong{font-size:34px;letter-spacing:-.03em;line-height:1.05;}
+.export-head small{font-size:15px;text-transform:uppercase;letter-spacing:.14em;color:#147a3b;font-weight:950;white-space:nowrap;}
+.export-group{margin-top:26px;}
+.export-group h3{font-size:22px;margin:0 0 10px;color:#147a3b;}
+.export-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:20px;}
+.export-table th{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:#66746b;text-align:center;padding:10px 12px;border-bottom:2px solid #e8f0eb;}
+.export-table td{padding:13px 12px;border-bottom:1px solid #edf3ef;text-align:center;font-weight:800;}
+.export-table th:nth-child(1),.export-table td:nth-child(1){width:70px;}
+.export-table th:nth-child(2),.export-table td:nth-child(2){width:auto;text-align:left;}
+.export-table th:nth-child(3),.export-table td:nth-child(3){width:90px;font-weight:950;}
+.export-table th:nth-child(4),.export-table td:nth-child(4),
+.export-table th:nth-child(5),.export-table td:nth-child(5),
+.export-table th:nth-child(6),.export-table td:nth-child(6){width:76px;}
+.export-team{display:flex;align-items:center;gap:10px;min-width:0;}
+.export-team strong{font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.export-marker{width:10px;height:30px;border-radius:999px;display:inline-block;flex:0 0 10px;background:transparent;}
+.export-marker.champion{background:#d7a437;}
+.export-marker.promoted,.export-marker.direct{background:#19a84f;}
+.export-marker.relegated{background:#e53935;}
