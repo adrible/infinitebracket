@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brocket 0.7.9.2</title>
+  <title>Brocket 0.7.9.3</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -19,7 +19,7 @@
         </div>
       </div>
       <div class="hero">
-        <small id="pageSubtitle">0.7.9.2</small>
+        <small id="pageSubtitle">0.7.9.3</small>
         <h1 id="pageTitle">Início</h1>
       </div>
     </header>
@@ -33,22 +33,22 @@
           <button class="quick-card" data-go="tournament"><span>🎮</span><strong>Torneio atual</strong><small>simular partida por partida</small></button>
         </div>
         <div class="panel green-panel">
-          <strong>Brocket 0.7.9.2</strong>
-          <p>Campeonatos, divisões, grupos avançados, exportação de tabelas e estatísticas inteligentes.</p>
+          <strong>Brocket 0.7.9.3</strong>
+          <p>Campeonatos, temporadas, divisões, grupos avançados e tabelas exportáveis.</p>
         </div>
         <div class="section-title"><h2>Campeonatos</h2><button class="link" data-go="competitions">ver todos</button></div>
         <div id="homeCompetitions" class="list"></div>
       </section>
 
       <section id="create" class="screen">
-        <div class="section-title"><h2>Novo campeonato</h2><button class="link" data-go="home">voltar</button></div>
+        <div class="section-title"><h2>Nova edição</h2><button class="link" data-go="home">voltar</button></div>
         <button class="big-action quick-generate-top" id="quickGenerateTop">Gerar torneio</button>
 
         <div class="panel create-step">
           <div class="step-label">1. Modelo</div>
           <div class="form-grid">
             <label>Campeonato<input id="championshipName" value="Liga Mundial" placeholder="Ex: Liga Mundial" /></label>
-            <label>Temporada/Edição<input id="editionName" placeholder="Ex: 2026 ou Temporada 1" /></label>
+            <label>Temporada<input id="editionName" placeholder="Ex: 2026 ou Temporada 1" /></label>
             <label>Formato<select id="formatSelect"><option value="playoffs">Mata-mata direto</option><option value="groups">Grupos + mata-mata</option><option value="league">Pontos corridos</option></select></label>
             <label>Quantidade de times<select id="teamCount"><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option><option selected>16</option><option>20</option><option>24</option><option>32</option><option>36</option><option>40</option><option>48</option></select></label>
           </div>
@@ -56,7 +56,7 @@
           <div class="rule-group division-rule" data-rule-for="league groups">
             <h4>Divisão</h4>
             <div class="form-grid">
-              <label>Nome da divisão<input id="divisionName" placeholder="Ex: Série A" /></label>
+              <label>Divisão<input id="divisionName" placeholder="Ex: Série A ou Principal" /></label>
               <label>Tipo da divisão<select id="divisionTier"><option value="top" selected>Divisão máxima</option><option value="middle">Divisão intermediária</option><option value="bottom">Última divisão</option><option value="none">Sem divisão</option></select></label>
               <label>Promovidos<select id="promotedCount"><option selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select></label>
               <label>Rebaixados<select id="relegatedCount"><option selected>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select></label>
@@ -66,7 +66,7 @@
 
           <div class="save-mode">
             <label><input type="radio" name="saveMode" value="single" checked /> <span><strong>Torneio único</strong><small>Simule sem salvar em um campeonato.</small></span></label>
-            <label><input type="radio" name="saveMode" value="history" /> <span><strong>Salvar em campeonato</strong><small>Guarda como edição e entra nas estatísticas.</small></span></label>
+            <label><input type="radio" name="saveMode" value="history" /> <span><strong>Salvar como edição</strong><small>Usa o campeonato selecionado e entra nas estatísticas.</small></span></label>
           </div>
 
           <div id="competitionChoice" class="competition-choice" hidden>

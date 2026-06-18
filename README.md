@@ -1,11 +1,11 @@
-# Brocket 0.7.9.2
+# Brocket 0.7.9.3
 
 Versão organizada com correções de lógica, navegação e visual, sem duplicar funcionalidades já existentes.
 
 ## Principais ajustes
 
 - Mantida chave estável de armazenamento (`brocket-0-7`) para preservar dados entre versões.
-- Migração aceita dados da 0.7.9.2 sem apagar campeonatos, times ou pacotes.
+- Migração aceita dados da 0.7.9.3 sem apagar campeonatos, times ou pacotes.
 - Liga/Pontos corridos continua limitada a 24 times.
 - Grupos e mata-mata continuam permitindo até 48 times.
 - Formato Copa 48 mantido automaticamente:
@@ -42,7 +42,7 @@ Suba somente estes arquivos na raiz do GitHub:
 - README.md
 
 
-## Brocket 0.7.9.2
+## Brocket 0.7.9.3
 
 - Visual do chaveamento mais polido.
 - Campeão com destaque dourado mais uniforme.
@@ -58,7 +58,7 @@ Suba somente estes arquivos na raiz do GitHub:
 - Montagem manual de grupos com contador por grupo e bloqueio de grupo incompleto.
 
 
-## Brocket 0.7.9.2
+## Brocket 0.7.9.3
 
 Correção pontual da tabela mobile:
 
@@ -68,7 +68,7 @@ Correção pontual da tabela mobile:
 - Simular tudo mantém a variação da última rodada simulada.
 
 
-## Brocket 0.7.9.2
+## Brocket 0.7.9.3
 
 Patch de lógica e tabela:
 
@@ -79,7 +79,7 @@ Patch de lógica e tabela:
 - Mantém Pts como principal destaque da tabela.
 
 
-## Brocket 0.7.9.2
+## Brocket 0.7.9.3
 
 Patch de ranking e zebra:
 
@@ -92,7 +92,7 @@ Patch de ranking e zebra:
   - azarão golear favorito fica mais raro;
   - favorito golear azarão continua possível.
 
-## Brocket 0.7.9.2
+## Brocket 0.7.9.3
 
 Refinamento pós 0.7.9.1:
 
@@ -107,3 +107,11 @@ Refinamento pós 0.7.9.1:
 - Remove botão redundante de criar campeonato no card vazio da página Campeonatos.
 - Simplifica rótulos: Campeonato + Temporada/Edição + Divisão + Formato.
 - Mantém STORAGE estável em `brocket-0-7`.
+
+
+## 0.7.9.3
+- Remoção de campeonato pela lista e pela configuração.
+- Campeonato salvo passa a ser a fonte do nome quando a edição é salva no histórico.
+- Nome principal segue Campeonato — Divisão — Temporada.
+- Tabela mobile mais compacta para caber melhor os nomes.
+- Status de campeão/promovido/rebaixado vira marcador lateral no mobile.
