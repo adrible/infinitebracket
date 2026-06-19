@@ -28,6 +28,22 @@ const packs = {
   classicos:{ name:"Times clássicos", icon:"📜", teams:[["Santos 1962",94],["Brasil 1970",98],["Milan 1989",95],["Barcelona 2011",97],["Real Madrid 2017",95],["Manchester United 1999",93],["Ajax 1995",92],["Boca Juniors 2003",90],["São Paulo 2005",89],["Flamengo 1981",91],["Palmeiras 1999",88],["Inter 2010",90]]}
 };
 
+const KNOWN_SHORTS = {
+  "Flamengo":"FLA", "Palmeiras":"PAL", "Botafogo":"BOT", "Atlético-MG":"CAM", "São Paulo":"SAO", "Fluminense":"FLU", "Corinthians":"COR", "Grêmio":"GRE", "Internacional":"INT", "Athletico-PR":"CAP", "Bahia":"BAH", "Fortaleza":"FOR", "Cruzeiro":"CRU", "Vasco":"VAS", "Santos":"SAN", "Ceará":"CEA", "Sport":"SPT", "Vitória":"VIT", "Bragantino":"RBB", "Cuiabá":"CUI",
+  "Goiás":"GOI", "Coritiba":"CFC", "Avaí":"AVA", "Chapecoense":"CHA", "Guarani":"GUA", "Ponte Preta":"PON", "Vila Nova":"VIL", "Novorizontino":"NOV", "CRB":"CRB", "Operário-PR":"OPE", "Paysandu":"PAY", "Remo":"REM", "Amazonas":"AMA", "Botafogo-SP":"BSP", "Criciúma":"CRI", "Juventude":"JUV",
+  "Real Madrid":"RMA", "Manchester City":"MCI", "Bayern München":"BAY", "PSG":"PSG", "Liverpool":"LIV", "Barcelona":"BAR", "Arsenal":"ARS", "Inter de Milão":"INT", "Bayer Leverkusen":"B04", "Atlético de Madrid":"ATM", "Borussia Dortmund":"BVB", "Milan":"MIL", "Juventus":"JUV", "Napoli":"NAP", "Chelsea":"CHE", "RB Leipzig":"RBL", "Benfica":"BEN", "Sporting":"SCP", "Porto":"POR", "Tottenham":"TOT", "Manchester United":"MUN", "Roma":"ROM", "Ajax":"AJA", "Sevilla":"SEV",
+  "Aston Villa":"AVL", "Newcastle":"NEW", "Brighton":"BHA", "Lille":"LIL", "Lyon":"LYO", "Marseille":"OM", "Atalanta":"ATA", "Fiorentina":"FIO", "Lazio":"LAZ", "Real Sociedad":"RSO", "Villarreal":"VIL", "Athletic Bilbao":"ATH", "Braga":"BRA", "PSV":"PSV", "Feyenoord":"FEY", "Celtic":"CEL", "Rangers":"RAN", "Galatasaray":"GAL", "Fenerbahçe":"FEN", "Shakhtar Donetsk":"SHK",
+  "River Plate":"RIV", "Boca Juniors":"BOC", "Independiente del Valle":"IDV", "Racing":"RAC", "Estudiantes":"EST", "LDU":"LDU", "Peñarol":"PEN", "Nacional-URU":"NAC", "Atlético Nacional":"NAL", "Olimpia":"OLI", "Colo-Colo":"COL", "San Lorenzo":"SLO", "Cerro Porteño":"CER", "Barcelona SC":"BSC", "Millonarios":"MIL", "Universidad de Chile":"UCH", "Deportivo Cali":"CAL", "Independiente":"IND",
+  "Al Hilal":"HIL", "Al Nassr":"NAS", "Al Ahly":"AHL", "Al Ittihad":"ITT", "Monterrey":"MTY", "América-MEX":"AME", "Tigres":"TIG", "Mamelodi Sundowns":"SUN", "Wydad Casablanca":"WYD", "Inter Miami":"MIA", "LAFC":"LAFC", "Urawa Red Diamonds":"URA", "Kawasaki Frontale":"KAW", "Zamalek":"ZAM", "Yokohama F. Marinos":"YFM", "Ulsan HD":"ULS", "Seattle Sounders":"SEA", "Jeonbuk Hyundai":"JEO",
+  "Al Ahli":"AHL", "Vissel Kobe":"VIS", "Pohang Steelers":"POH", "Shanghai Port":"SIP", "Al Sadd":"SAD", "Persepolis":"PER", "Orlando Pirates":"PIR", "Raja Casablanca":"RCA", "Esperance":"EST", "Étoile du Sahel":"ESS", "TP Mazembe":"TPM", "Simba SC":"SIM", "Young Africans":"YNG",
+  "Cruz Azul":"CAZ", "Chivas":"CHI", "Pachuca":"PAC", "Columbus Crew":"CLB", "NYCFC":"NYC", "Philadelphia Union":"PHI", "Toronto FC":"TOR", "Saprissa":"SAP", "Alajuelense":"ALA",
+  "França":"FRA", "Argentina":"ARG", "Brasil":"BRA", "Inglaterra":"ENG", "Espanha":"ESP", "Portugal":"POR", "Alemanha":"GER", "Holanda":"NED", "Itália":"ITA", "Bélgica":"BEL", "Uruguai":"URU", "Croácia":"CRO", "Colômbia":"COL", "Marrocos":"MAR", "Suíça":"SUI", "Senegal":"SEN", "Dinamarca":"DEN", "Japão":"JPN", "México":"MEX", "Estados Unidos":"USA", "Coreia do Sul":"KOR", "Egito":"EGY", "Chile":"CHI", "Austrália":"AUS", "Equador":"ECU", "Nigéria":"NGA", "Irã":"IRN", "Costa do Marfim":"CIV", "Argélia":"ALG", "Turquia":"TUR", "Sérvia":"SRB", "Noruega":"NOR", "Polônia":"POL", "Ucrânia":"UKR", "Áustria":"AUT", "Canadá":"CAN", "Arábia Saudita":"KSA", "Qatar":"QAT", "Gana":"GHA", "Camarões":"CMR", "Tunísia":"TUN", "África do Sul":"RSA", "Paraguai":"PAR", "Peru":"PER", "Panamá":"PAN", "Jamaica":"JAM", "Nova Zelândia":"NZL", "Uzbequistão":"UZB", "Escócia":"SCO", "Iraque":"IRQ", "Emirados Árabes":"UAE", "China":"CHN", "Venezuela":"VEN", "Bolívia":"BOL", "Mali":"MLI", "Congo DR":"COD", "Costa Rica":"CRC", "Honduras":"HON", "El Salvador":"SLV", "Haiti":"HAI", "Trinidad e Tobago":"TRI",
+  "Santos 1962":"SAN", "Brasil 1970":"BRA", "Milan 1989":"MIL", "Barcelona 2011":"BAR", "Real Madrid 2017":"RMA", "Manchester United 1999":"MUN", "Ajax 1995":"AJA", "Boca Juniors 2003":"BOC", "São Paulo 2005":"SAO", "Flamengo 1981":"FLA", "Palmeiras 1999":"PAL", "Inter 2010":"INT"
+};
+function cleanShort(v){ return `${v||""}`.trim().toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,5); }
+function fallbackShort(name){ const letters=`${name||""}`.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^A-Za-z0-9]/g,"").toUpperCase(); return (letters||"---").slice(0,3); }
+function teamShort(t){ return cleanShort(t?.short) || cleanShort(KNOWN_SHORTS[t?.name]) || fallbackShort(t?.name); }
+
 const starter = { competitions:[], customTeams:[], customPacks:[], activeTournament:null };
 
 let data = load();
@@ -71,7 +87,10 @@ function load(){
 }
 function save(){ localStorage.setItem(STORAGE, JSON.stringify(data)); }
 function slug(s){ return `${s}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
-function team(name,power,source=""){ return { id:slug(name), name, power, source }; }
+function team(name,power,source="",short=""){
+  const manualShort=cleanShort(short);
+  return { id:slug(name), name, power, source, short: manualShort || cleanShort(KNOWN_SHORTS[name]) || "" };
+}
 function shuffle(a){ return a.map(x=>[Math.random(),x]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]); }
 function clamp(n,a,b){ return Math.max(a,Math.min(b,n)); }
 function label(v){ return {low:"baixa",medium:"média",high:"alta",chaos:"caótica"}[v] || v; }
@@ -100,14 +119,14 @@ function pool(){
   const map = new Map();
   selectedPacks.forEach(k => {
     const p = allPacks()[k];
-    if(p) p.teams.forEach(([name,power]) => map.set(slug(name), team(name,power,p.name)));
+    if(p) p.teams.forEach(([name,power,short]) => map.set(slug(name), team(name,power,p.name,short)));
   });
   data.customTeams.forEach(t => map.set(t.id, t));
   return Array.from(map.values());
 }
 function allPacks(){
   const custom = {};
-  (data.customPacks||[]).forEach(p=>custom[p.id]={name:p.name, icon:"🧩", teams:p.teams.map(t=>[t.name,t.power])});
+  (data.customPacks||[]).forEach(p=>custom[p.id]={name:p.name, icon:"🧩", teams:p.teams.map(t=>[t.name,t.power,t.short||""])});
   return {...packs, ...custom};
 }
 function rankEntries(obj,asc=false){ return Object.entries(obj).sort((a,b)=>asc ? (a[1]-b[1] || a[0].localeCompare(b[0])) : (b[1]-a[1] || a[0].localeCompare(b[0]))); }
@@ -197,7 +216,7 @@ function decisionLabel(m){
 function go(screen){
   $$(".screen").forEach(s=>s.classList.toggle("active",s.id===screen));
   $$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.go===screen));
-  const titles = {home:["0.7.9.5","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
+  const titles = {home:["0.7.9.7","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
   $("#pageSubtitle").textContent = titles[screen]?.[0] || "Brocket";
   $("#pageTitle").textContent = titles[screen]?.[1] || "Brocket";
   window.scrollTo(0,0);
@@ -319,7 +338,7 @@ function renderSelected(){
   renderDrawPreview();
 }
 function renderCustomTeams(){
-  $("#customTeamList").innerHTML = data.customTeams.map(t=>`<div class="team-row"><div><strong>${t.name}</strong><small>Time criado • força ${t.power}</small></div><button class="danger mini-danger" data-delete-custom="${t.id}">apagar</button></div>`).join("") || `<div class="team-row"><small>Nenhum time criado.</small></div>`;
+  $("#customTeamList").innerHTML = data.customTeams.map(t=>`<div class="team-row"><div><strong>${t.name}</strong><small>Time criado • força ${t.power}${cleanShort(t.short)?` • short ${cleanShort(t.short)}`:""}</small></div><button class="danger mini-danger" data-delete-custom="${t.id}">apagar</button></div>`).join("") || `<div class="team-row"><small>Nenhum time criado.</small></div>`;
 }
 
 function renderCustomPacks(){
@@ -331,8 +350,8 @@ function addCustomPack(){
   const raw=$("#customPackTeams")?.value.trim();
   if(!name || !raw){ alert("Informe o nome do pacote e os times."); return; }
   const teams=raw.split(/\n+/).map(line=>{
-    const [n,p]=line.split(",").map(x=>x?.trim());
-    return n ? {name:n, power:clamp(Number(p)||70,1,100)} : null;
+    const [n,p,short]=line.split(",").map(x=>x?.trim());
+    return n ? {name:n, power:clamp(Number(p)||70,1,100), short:cleanShort(short)} : null;
   }).filter(Boolean);
   if(!teams.length){ alert("Adicione pelo menos um time."); return; }
   data.customPacks ||= [];
@@ -402,7 +421,7 @@ function applyQuotas(){
   selectedTeams=[];
   $$("[data-quota]").forEach(inp=>{
     const key=inp.dataset.quota, count=Math.max(0,Number(inp.value)||0);
-    const pack=allPacks()[key]; if(!pack) return; const chosen=shuffle(pack.teams.map(([name,power])=>team(name,power,pack.name))).slice(0,count);
+    const pack=allPacks()[key]; if(!pack) return; const chosen=shuffle(pack.teams.map(([name,power,short])=>team(name,power,pack.name,short))).slice(0,count);
     chosen.forEach(t=>{ if(selectedTeams.length<need && !isSelected(t.id)) selectedTeams.push(t); });
   });
   previewOrder=null; renderSelected();
@@ -689,9 +708,10 @@ function finishTournament(t, finalMatch){
 function playGroupOrLeague(a,b,c){ const r=playSingle(a,b,c,true); return {...r,winner:r.homeGoals===r.awayGoals?null:(r.homeGoals>r.awayGoals?a:b),loser:r.homeGoals===r.awayGoals?null:(r.homeGoals>r.awayGoals?b:a),meta:""}; }
 function twoLegMeta(a,b,l1,l2Home,l2Away,notes=[]){
   const noteHtml = notes.length ? `<span class="two-leg-note">${notes.join(" • ")}</span>` : "";
-  return `<span class="two-leg-detail">
-    <span><b>Ida</b>${a.name} ${l1.homeGoals}-${l1.awayGoals} ${b.name}</span>
-    <span><b>Volta</b>${b.name} ${l2Home}-${l2Away} ${a.name}</span>
+  const aShort=teamShort(a), bShort=teamShort(b);
+  return `<span class="two-leg-detail two-leg-short">
+    <span><b>Ida</b><em>${aShort} ${l1.homeGoals}-${l1.awayGoals} ${bShort}</em></span>
+    <span><b>Volta</b><em>${bShort} ${l2Home}-${l2Away} ${aShort}</em></span>
     ${noteHtml}
   </span>`;
 }
@@ -887,20 +907,25 @@ function deleteActiveTournament(){
   go("home");
 }
 
-function statusMarker(cls,label){ return `<span class="export-marker ${cls}" title="${label}"></span>`; }
+function exportLeagueStatus(t,x,i){ return leagueRowTag(t,x,i,"class") || ""; }
+function exportGroupStatus(t,x,info){
+  if(info?.directIds?.has(x.id) || info?.extraIds?.has(x.id)) return "qualified";
+  if(info?.relegatedIds?.has(x.id)) return "relegated";
+  return "";
+}
 function exportRowsForTable(t){
   if(t.league){
     const table=t.league.table||t.league.teams;
     return table.map((x,i)=>({
       pos:i+1, name:x.name, pts:x.pts, played:x.w+x.d+x.l, wins:x.w, gd:x.gd, gf:x.gf,
-      marker: leagueRowTag(t,x,i,"export")
+      status: exportLeagueStatus(t,x,i)
     }));
   }
   if(t.groups?.length){
     const info=groupClassificationInfo(t);
     return t.groups.flatMap(g=>(g.table.length?g.table:g.teams).map((x,i)=>({
       group:g.name, pos:i+1, name:x.name, pts:x.pts, played:x.w+x.d+x.l, wins:x.w, gd:x.gd, gf:x.gf,
-      marker: groupRowTag(t,x,i,info,"export")
+      status: exportGroupStatus(t,x,info)
     })));
   }
   return [];
@@ -912,7 +937,8 @@ function buildExportTable(t){
   wrap.className="export-sheet";
   const title=[t.cfg.championshipName||t.cfg.name, t.cfg.divisionName, t.cfg.seasonName||t.cfg.customEditionName].filter(Boolean).join(" — ");
   const isGroups=!!t.groups?.length && !t.league;
-  wrap.innerHTML=`<div class="export-head"><strong>${title||"Brocket"}</strong><small>${isGroups?"Fase de grupos":"Tabela"}</small></div>`;
+  const sub=[isGroups?"Fase de grupos":formatLabel(t.cfg.format), `${t.teams?.length||rows.length} times`].filter(Boolean).join(" • ");
+  wrap.innerHTML=`<div class="export-head"><strong>${title||"Brocket"}</strong><small>${sub}</small></div>`;
   if(isGroups){
     const byGroup=new Map();
     rows.forEach(r=>{ if(!byGroup.has(r.group)) byGroup.set(r.group,[]); byGroup.get(r.group).push(r); });
@@ -928,7 +954,7 @@ function buildExportTable(t){
   return wrap;
 }
 function exportTableMarkup(rows){
-  return `<table class="export-table"><thead><tr><th>Pos</th><th>Time</th><th>Pts</th><th>J</th><th>V</th><th>SG</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.pos}</td><td><span class="export-team">${r.marker||""}<strong>${r.name}</strong></span></td><td>${r.pts}</td><td>${r.played}</td><td>${r.wins}</td><td>${r.gd}</td></tr>`).join("")}</tbody></table>`;
+  return `<table class="export-table"><thead><tr><th>Pos</th><th>Time</th><th>Pts</th><th>J</th><th>V</th><th>SG</th></tr></thead><tbody>${rows.map(r=>{ const cls=r.status?` class="export-status-${r.status}"`:""; const trophy=r.status==="champion"?"🏆 ":""; return `<tr${cls}><td>${r.pos}</td><td><span class="export-team"><strong>${trophy}${r.name}</strong></span></td><td>${r.pts}</td><td>${r.played}</td><td>${r.wins}</td><td>${r.gd}</td></tr>`; }).join("")}</tbody></table>`;
 }
 function exportCurrentTable(type="png"){
   const t=data.activeTournament;
@@ -1147,7 +1173,7 @@ $("#toggleCompetitionForm").onclick=()=>$("#competitionForm").hidden=!$("#compet
 $("#saveCompetition").onclick=()=>{ const name=$("#newCompetitionName").value.trim(); if(!name) return; const c={id:uid(),name,editions:[]}; data.competitions.push(c); currentCompetitionId=c.id; renderCompetitionSelect(); $("#newCompetitionName").value=""; $("#competitionForm").hidden=true; save(); renderAll(); };
 $("#renameCompetition").onclick=()=>{ const c=data.competitions.find(x=>x.id===currentCompetitionId); if(!c) return; c.name=$("#editCompetitionName").value.trim()||c.name; save(); openCompetition(c.id); };
 $("#deleteCompetition").onclick=()=>deleteCompetition(currentCompetitionId);
-$("#addCustomTeam").onclick=()=>{ const name=$("#customTeamName").value.trim(), power=clamp(Number($("#customTeamPower").value)||70,1,100); if(!name) return; data.customTeams.push(team(name,power,"Meu time")); $("#customTeamName").value=""; save(); renderAll(); };
+$("#addCustomTeam").onclick=()=>{ const name=$("#customTeamName").value.trim(), power=clamp(Number($("#customTeamPower").value)||70,1,100), short=cleanShort($("#customTeamShort")?.value); if(!name) return; data.customTeams.push(team(name,power,"Meu time",short)); $("#customTeamName").value=""; if($("#customTeamShort")) $("#customTeamShort").value=""; save(); renderAll(); };
 const bind=(sel,ev,fn)=>{ const el=$(sel); if(el) el[ev]=fn; };
 bind("#pickStrongest","onclick",pickStrongest); bind("#pickRandom","onclick",pickRandom); bind("#pickBalanced","onclick",pickBalanced);
 bind("#clearTeams","onclick",()=>{selectedTeams=[]; previewOrder=null; renderSelected();});
