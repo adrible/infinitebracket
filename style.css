@@ -1765,3 +1765,42 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   font-weight:820;
 }
 .export-marker{display:none!important;}
+
+/* 0.7.9.7a — correção de espaçamento Pos/Time nas tabelas compactas */
+.group-table th:first-child,
+.group-table td:first-child,
+.standings-table th:first-child,
+.standings-table td:first-child{
+  width:38px !important;
+  min-width:38px !important;
+  padding-right:10px !important;
+  text-align:left !important;
+}
+.group-table th:nth-child(2),
+.group-table td:nth-child(2),
+.standings-table th:nth-child(2),
+.standings-table td:nth-child(2){
+  padding-left:8px !important;
+}
+@media(max-width:720px){
+  .table-card{padding:8px 7px!important;}
+  .standings-table th,
+  .standings-table td{
+    padding-top:7px!important;
+    padding-bottom:7px!important;
+  }
+  .group-table th:first-child,
+  .group-table td:first-child,
+  .standings-table th:first-child,
+  .standings-table td:first-child{
+    width:34px !important;
+    min-width:34px !important;
+    padding-right:8px !important;
+  }
+  .group-table th:nth-child(2),
+  .group-table td:nth-child(2),
+  .standings-table th:nth-child(2),
+  .standings-table td:nth-child(2){
+    padding-left:8px !important;
+  }
+}

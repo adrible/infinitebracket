@@ -99,11 +99,14 @@ function formatLabel(f){ return {playoffs:"Mata-mata direto",groups:"Grupos + ma
 function getInputNumber(id,fallback=0){ const el=$("#"+id); return el ? (Number(el.value)||fallback) : fallback; }
 function desiredTeamCount(){
   const f=$("#formatSelect")?.value || "playoffs";
+  const selectedCount=getInputNumber("teamCount",16);
   if(f==="groups"){
     const gc=getInputNumber("groupCount",4), gs=getInputNumber("groupSize",4);
-    return Math.max(2, gc*gs);
+    // 0.7.9.7a: em grupos, respeita a quantidade total escolhida
+    // e também suporta presets por grupos x tamanho quando isso for maior.
+    return Math.max(2, selectedCount, gc*gs);
   }
-  return getInputNumber("teamCount",16);
+  return selectedCount;
 }
 function competitionNameFromCfg(c){ return (c?.championshipName || c?.competitionName || c?.name || "Campeonato").trim(); }
 function divisionLabel(c){ return (c?.divisionName || "").trim(); }
@@ -216,7 +219,7 @@ function decisionLabel(m){
 function go(screen){
   $$(".screen").forEach(s=>s.classList.toggle("active",s.id===screen));
   $$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.go===screen));
-  const titles = {home:["0.7.9.7","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
+  const titles = {home:["0.7.9.7a","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
   $("#pageSubtitle").textContent = titles[screen]?.[0] || "Brocket";
   $("#pageTitle").textContent = titles[screen]?.[1] || "Brocket";
   window.scrollTo(0,0);
@@ -373,7 +376,8 @@ function refreshTeamCountOptions(){
   if(f==="league" && next>24) next=24;
   sel.innerHTML=opts.map(n=>`<option value="${n}" ${n===next?"selected":""}>${n}</option>`).join("");
   sel.value=String(next);
-  if(selectedTeams.length>next) selectedTeams=selectedTeams.slice(0,next);
+  const selectionLimit = f==="groups" ? Math.max(next, getInputNumber("groupCount",4)*getInputNumber("groupSize",4)) : next;
+  if(selectedTeams.length>selectionLimit) selectedTeams=selectedTeams.slice(0,selectionLimit);
   if(f==="groups" && next===48 && $("#groupSize")) $("#groupSize").value="4";
   renderSelected();
 }
@@ -439,8 +443,12 @@ function cfg(){
   const format=$("#formatSelect").value;
   let teamCount=desiredTeamCount();
   if(format==="league" && teamCount>24) teamCount=24;
-  const groupCount = format==="groups" ? getInputNumber("groupCount",Math.ceil(teamCount/(getInputNumber("groupSize",4)||4))) : 0;
-  const copa48 = format==="groups" && teamCount===48 && groupCount===12 && getInputNumber("groupSize",4)===4;
+  const selectedGroupSize=getInputNumber("groupSize",4)||4;
+  const selectedGroupCount=getInputNumber("groupCount",Math.ceil(teamCount/selectedGroupSize));
+  // 0.7.9.7a: em grupos, calcula grupos suficientes para comportar todos os times escolhidos.
+  // Ex.: 32 times + 4 por grupo = 8 grupos, mesmo que o campo antigo ainda esteja em 4.
+  const groupCount = format==="groups" ? Math.max(selectedGroupCount,Math.ceil(teamCount/selectedGroupSize)) : 0;
+  const copa48 = format==="groups" && teamCount===48 && groupCount===12 && selectedGroupSize===4;
   const saveMode=document.querySelector('input[name="saveMode"]:checked')?.value || "single";
   const competitionId=$("#competitionSelect")?.value || "";
   const selectedCompetition=data.competitions.find(x=>x.id===competitionId);
@@ -450,7 +458,7 @@ function cfg(){
   const divisionName=optionValue("divisionName","").trim();
   const seasonName=customEditionName || "Temporada 1";
   const temp={championshipName, divisionName, seasonName, customEditionName};
-  return { id:uid(), name: autoEditionName(temp), championshipName, customEditionName, seasonName, divisionName, divisionTier:optionValue("divisionTier","top"), promotedCount:getInputNumber("promotedCount",0), relegatedCount:getInputNumber("relegatedCount",0), saveMode, competitionId, format, teamCount, legs:$("#knockoutLegs").value, finalRule:$("#finalRule").value, upset:$("#upsetLevel").value, realism:$("#scoreRealism").value, extraTime:$("#extraTime").checked, penalties:$("#penalties").checked, awayGoals:$("#awayGoals").checked, leagueTurns:$("#leagueTurns").value, groupTurns:$("#groupTurns").value, groupCount, groupSize:copa48?4:getInputNumber("groupSize",4), qualifiersPerGroup:getInputNumber("qualifiersPerGroup",2), bestExtraQualifiers:copa48?8:getInputNumber("bestExtraQualifiers",0), groupRelegatedCount:getInputNumber("groupRelegatedCount",0), bracketShuffle:$("#bracketShuffle").value, groupShuffle:$("#groupShuffle").value, tiePreset:$("#tiePreset")?.value || "brasileirao" };
+  return { id:uid(), name: autoEditionName(temp), championshipName, customEditionName, seasonName, divisionName, divisionTier:optionValue("divisionTier","top"), promotedCount:getInputNumber("promotedCount",0), relegatedCount:getInputNumber("relegatedCount",0), saveMode, competitionId, format, teamCount, legs:$("#knockoutLegs").value, finalRule:$("#finalRule").value, upset:$("#upsetLevel").value, realism:$("#scoreRealism").value, extraTime:$("#extraTime").checked, penalties:$("#penalties").checked, awayGoals:$("#awayGoals").checked, leagueTurns:$("#leagueTurns").value, groupTurns:$("#groupTurns").value, groupCount, groupSize:copa48?4:selectedGroupSize, qualifiersPerGroup:getInputNumber("qualifiersPerGroup",2), bestExtraQualifiers:copa48?8:getInputNumber("bestExtraQualifiers",0), groupRelegatedCount:getInputNumber("groupRelegatedCount",0), bracketShuffle:$("#bracketShuffle").value, groupShuffle:$("#groupShuffle").value, tiePreset:$("#tiePreset")?.value || "brasileirao" };
 }
 function generateTournament(){
   const c=cfg();
