@@ -197,7 +197,7 @@ function decisionLabel(m){
 function go(screen){
   $$(".screen").forEach(s=>s.classList.toggle("active",s.id===screen));
   $$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.go===screen));
-  const titles = {home:["0.7.9.4","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
+  const titles = {home:["0.7.9.5","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
   $("#pageSubtitle").textContent = titles[screen]?.[0] || "Brocket";
   $("#pageTitle").textContent = titles[screen]?.[1] || "Brocket";
   window.scrollTo(0,0);
@@ -991,8 +991,8 @@ function groupClassificationInfo(t){
   return {directIds, extraIds, relegatedIds, per, extra, relegated:releg, isCopa48:Number(t.cfg.teamCount)===48 && Number(t.cfg.groupSize)===4 && t.groups.length===12};
 }
 function groupRowTag(t,x,i,info,mode="screen"){
-  if(info?.directIds?.has(x.id) || info?.extraIds?.has(x.id)) return mode==="export" ? statusMarker("direct","Classificado") : `<span class="class-tag direct">Class.</span>`;
-  if(info?.relegatedIds?.has(x.id)) return mode==="export" ? statusMarker("relegated","Rebaixado") : `<span class="status-dot relegated" title="Rebaixado" aria-label="Rebaixado"></span>`;
+  if(info?.directIds?.has(x.id) || info?.extraIds?.has(x.id)) return mode==="export" ? statusMarker("direct","Classificado") : "";
+  if(info?.relegatedIds?.has(x.id)) return mode==="export" ? statusMarker("relegated","Rebaixado") : "";
   return "";
 }
 function renderQualifiedSummary(t){
@@ -1012,9 +1012,9 @@ function leagueRowTag(t,x,i,mode="screen"){
   const tier=cfg.divisionTier||"top";
   const promoted=Number(cfg.promotedCount)||0;
   const relegated=Number(cfg.relegatedCount)||0;
-  if(t.status==="finished" && i===0 && tier==="top"){ if(mode==="class") return "champion"; return mode==="export" ? statusMarker("champion","Campeão") : `<span class="status-dot champion" title="Campeão" aria-label="Campeão"></span>`; }
-  if(tier!=="top" && promoted>0 && i<promoted){ if(mode==="class") return "promoted"; return mode==="export" ? statusMarker("promoted","Promovido") : `<span class="status-dot promoted" title="Promovido" aria-label="Promovido"></span>`; }
-  if(tier!=="bottom" && relegated>0 && i>=n-relegated){ if(mode==="class") return "relegated"; return mode==="export" ? statusMarker("relegated","Rebaixado") : `<span class="status-dot relegated" title="Rebaixado" aria-label="Rebaixado"></span>`; }
+  if(t.status==="finished" && i===0 && tier==="top"){ if(mode==="class") return "champion"; return mode==="export" ? statusMarker("champion","Campeão") : ""; }
+  if(tier!=="top" && promoted>0 && i<promoted){ if(mode==="class") return "promoted"; return mode==="export" ? statusMarker("promoted","Promovido") : ""; }
+  if(tier!=="bottom" && relegated>0 && i>=n-relegated){ if(mode==="class") return "relegated"; return mode==="export" ? statusMarker("relegated","Rebaixado") : ""; }
   return "";
 }
 function renderLeague(t){
@@ -1041,7 +1041,7 @@ function renderGroups(t){
   const roundName=selectedGroupRound || allStages[0] || "Rodada 1";
   const roundIdx=Math.max(0,allStages.indexOf(roundName));
   const roundMatches=t.groups.map(g=>({group:g.name,matches:g.matches.filter(m=>m.stage.includes(roundName)), byes:(g.byes||[]).filter(b=>b.stage.includes(roundName))})).filter(x=>x.matches.length||x.byes.length);
-  $("#groupsArea").innerHTML = `<div class="section-title on-field"><h2>Fase de grupos</h2></div>${adj}${renderQualifiedSummary(t)}<div class="groups-grid">${t.groups.map(g=>`<div class="group-card group-card--clean"><h3>Grupo ${g.name}</h3><div class="table-scroll"><table class="table group-table standings-table"><thead><tr><th>Pos</th><th>Time</th><th>Pts</th><th>J</th><th>V</th><th>SG</th><th>GP</th><th></th></tr></thead><tbody>${(g.table.length?g.table:g.teams).map((x,i)=>`<tr class="${(info.directIds?.has(x.id)||info.extraIds?.has(x.id))?"qualified":info.relegatedIds?.has(x.id)?"relegated-row":""}"><td>${i+1}</td><td>${teamCellWithDelta(x,false)}</td><td>${x.pts}</td><td>${x.w+x.d+x.l}</td><td>${x.w}</td><td>${x.gd}</td><td>${x.gf}</td><td>${groupRowTag(t,x,i,info)}</td></tr>`).join("")}</tbody></table></div></div>`).join("")}</div><div class="section-title on-field"><h2>Rodadas</h2></div>${roundNav("group",roundIdx,allStages.length)}<div class="groups-grid one-round">${roundMatches.map(g=>`<div class="group-card"><h3>Grupo ${g.group} • ${roundName}</h3><div class="match-list">${g.matches.map(matchMini).join("")}${g.byes.map(byeMini).join("")}</div></div>`).join("")}</div>`;
+  $("#groupsArea").innerHTML = `<div class="section-title on-field"><h2>Fase de grupos</h2></div>${adj}${renderQualifiedSummary(t)}<div class="groups-grid">${t.groups.map(g=>`<div class="group-card group-card--clean"><h3>Grupo ${g.name}</h3><div class="table-scroll"><table class="table group-table standings-table"><thead><tr><th>Pos</th><th>Time</th><th>Pts</th><th>J</th><th>V</th><th>SG</th><th>GP</th><th></th></tr></thead><tbody>${(g.table.length?g.table:g.teams).map((x,i)=>`<tr class="${(info.directIds?.has(x.id)||info.extraIds?.has(x.id))?"status-qualified":info.relegatedIds?.has(x.id)?"status-relegated":""}"><td>${i+1}</td><td>${teamCellWithDelta(x,false)}</td><td>${x.pts}</td><td>${x.w+x.d+x.l}</td><td>${x.w}</td><td>${x.gd}</td><td>${x.gf}</td><td>${groupRowTag(t,x,i,info)}</td></tr>`).join("")}</tbody></table></div></div>`).join("")}</div><div class="section-title on-field"><h2>Rodadas</h2></div>${roundNav("group",roundIdx,allStages.length)}<div class="groups-grid one-round">${roundMatches.map(g=>`<div class="group-card"><h3>Grupo ${g.group} • ${roundName}</h3><div class="match-list">${g.matches.map(matchMini).join("")}${g.byes.map(byeMini).join("")}</div></div>`).join("")}</div>`;
 }
 function byeMini(b){ return `<div class="mini-match bye-match"><span>Descansa</span><strong>—</strong><span>${b.team.name}</span><em>folga</em><div></div></div>`; }
 function matchMini(m){
