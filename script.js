@@ -197,7 +197,7 @@ function decisionLabel(m){
 function go(screen){
   $$(".screen").forEach(s=>s.classList.toggle("active",s.id===screen));
   $$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.go===screen));
-  const titles = {home:["0.7.9.3","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
+  const titles = {home:["0.7.9.4","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
   $("#pageSubtitle").textContent = titles[screen]?.[0] || "Brocket";
   $("#pageTitle").textContent = titles[screen]?.[1] || "Brocket";
   window.scrollTo(0,0);
@@ -222,12 +222,26 @@ document.addEventListener("click", e=>{
   const removeBtn = e.target.closest("[data-remove-team]"); if(removeBtn){ removeTeam(removeBtn.dataset.removeTeam); renderSelected(); return; }
 });
 
-function renderAll(){ renderCompetitions(); renderCompetitionSelect(); renderPacks(); renderSelected(); renderCustomTeams(); renderCustomPacks(); renderManualGroups(); toggleRuleVisibility(); renderTournament(); }
+function renderAll(){ renderCompetitions(); renderCompetitionSelect(); updateSaveModeUI(); renderPacks(); renderSelected(); renderCustomTeams(); renderCustomPacks(); renderManualGroups(); toggleRuleVisibility(); renderTournament(); }
 function renderCompetitionSelect(){
   const select=$("#competitionSelect"); if(!select) return;
-  if(!data.competitions.length){ select.innerHTML=`<option value="">Nenhum campeonato criado</option>`; currentCompetitionId=null; return; }
+  if(!data.competitions.length){ select.innerHTML=`<option value="">Nenhum campeonato criado</option>`; currentCompetitionId=null; updateSaveModeUI(); return; }
   if(!currentCompetitionId || !data.competitions.some(c=>c.id===currentCompetitionId)) currentCompetitionId=data.competitions[0]?.id || null;
   select.innerHTML = data.competitions.map(c=>`<option value="${c.id}" ${c.id===currentCompetitionId?"selected":""}>${c.name}</option>`).join("");
+  updateSaveModeUI();
+}
+function currentSaveMode(){ return document.querySelector('input[name="saveMode"]:checked')?.value || "single"; }
+function updateSaveModeUI(){
+  const mode=currentSaveMode();
+  const isHistory=mode==="history";
+  const singleNameField=$("#singleNameField");
+  const choice=$("#competitionChoice");
+  if(singleNameField) singleNameField.hidden=isHistory;
+  if(choice) choice.hidden=!isHistory;
+  const title=$("#create .section-title h2");
+  if(title) title.textContent=isHistory?"Nova edição":"Novo torneio";
+  const nameInput=$("#championshipName");
+  if(nameInput && !isHistory && !nameInput.value.trim()) nameInput.value="Liga Mundial";
 }
 function renderCompetitions(){
   const html = data.competitions.map(c=>{
@@ -928,11 +942,9 @@ function exportCurrentTable(type="png"){
   document.body.appendChild(holder);
   const fileBase=slug([t.cfg.championshipName||t.cfg.name, t.cfg.divisionName, "tabela"].filter(Boolean).join("-")) || "brocket-tabela";
   html2canvas(sheet,{backgroundColor:"#ffffff",scale:2,useCORS:true,logging:false}).then(canvas=>{
-    const mime=type==="jpeg"?"image/jpeg":"image/png";
-    const ext=type==="jpeg"?"jpg":"png";
-    const url=canvas.toDataURL(mime,0.95);
+    const url=canvas.toDataURL("image/png");
     const a=document.createElement("a");
-    a.href=url; a.download=`${fileBase}.${ext}`; a.click();
+    a.href=url; a.download=`${fileBase}.png`; a.click();
   }).catch(()=>alert("Não consegui gerar a imagem desta tabela.")).finally(()=>holder.remove());
 }
 function renderTournament(){
@@ -951,8 +963,8 @@ function renderTournament(){
   $("#tournamentName").textContent=t.cfg.name; $("#tournamentFormat").textContent=[formatLabel(t.cfg.format), t.cfg.divisionName].filter(Boolean).join(" • ");
   const next=nextPlayable(t);
   $("#tournamentActions").innerHTML = t.status==="finished"
-    ? `<button class="play-btn dark">🏆 Torneio finalizado e salvo</button><button class="play-btn export" data-export-table="png">Baixar PNG</button><button class="play-btn export" data-export-table="jpeg">Baixar JPEG</button>`
-    : `<button class="play-btn" id="simulateNext">Simular próxima partida</button><button class="play-btn" id="simulateRound">Simular rodada</button><button class="play-btn subtle" id="simulateAll">Simular tudo</button><button class="play-btn export" data-export-table="png">Baixar PNG</button><button class="play-btn export" data-export-table="jpeg">Baixar JPEG</button><button class="play-btn danger-lite" id="deleteActiveTournament">Apagar torneio</button><button class="play-btn dark" data-go="create">Criar outro</button>`;
+    ? `<button class="play-btn dark">🏆 Torneio finalizado e salvo</button><button class="play-btn export" data-export-table="png">Baixar PNG</button>`
+    : `<button class="play-btn" id="simulateNext">Simular próxima partida</button><button class="play-btn" id="simulateRound">Simular rodada</button><button class="play-btn subtle" id="simulateAll">Simular tudo</button><button class="play-btn export" data-export-table="png">Baixar PNG</button><button class="play-btn danger-lite" id="deleteActiveTournament">Apagar torneio</button><button class="play-btn dark" data-go="create">Criar outro</button>`;
   $("#summaryBar").innerHTML = t.status==="finished"
     ? `<div class="next-card"><small>Campeão</small><strong>🏆 ${t.champion}</strong></div>`
     : `<div class="next-card"><small>Próxima partida</small><strong>${next?`${next.home.name} x ${next.away.name}`:"aguardando"}</strong></div>`;
@@ -1155,7 +1167,7 @@ document.addEventListener("change",e=>{
 });
 $$('.tab').forEach(t=>t.onclick=()=>{ $$('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); $$('.tab-page').forEach(p=>p.classList.remove('active')); $(`#${t.dataset.tab}Tab`)?.classList.add('active'); });
 
-$$('input[name="saveMode"]').forEach(r=>r.onchange=()=>{ const choice=$("#competitionChoice"); if(choice) choice.hidden = r.value!=="history" || !r.checked; });
+$$('input[name="saveMode"]').forEach(r=>r.onchange=()=>{ updateSaveModeUI(); renderSelected(); renderDrawPreview(); });
 
 bind("#addCustomPack","onclick",addCustomPack);
 bind("#autoFillGroups","onclick",autoFillManualGroups);
