@@ -98,15 +98,10 @@ function formatLabel(f){ return {playoffs:"Mata-mata direto",groups:"Grupos + ma
 
 function getInputNumber(id,fallback=0){ const el=$("#"+id); return el ? (Number(el.value)||fallback) : fallback; }
 function desiredTeamCount(){
-  const f=$("#formatSelect")?.value || "playoffs";
-  const selectedCount=getInputNumber("teamCount",16);
-  if(f==="groups"){
-    const gc=getInputNumber("groupCount",4), gs=getInputNumber("groupSize",4);
-    // 0.7.9.7a: em grupos, respeita a quantidade total escolhida
-    // e também suporta presets por grupos x tamanho quando isso for maior.
-    return Math.max(2, selectedCount, gc*gs);
-  }
-  return selectedCount;
+  // 0.7.9.7a final: a quantidade escolhida pelo usuário manda.
+  // O número de grupos se adapta para caber essa quantidade, mas nunca aumenta
+  // a quantidade de times por causa de grupoCount x groupSize.
+  return getInputNumber("teamCount",16);
 }
 function competitionNameFromCfg(c){ return (c?.championshipName || c?.competitionName || c?.name || "Campeonato").trim(); }
 function divisionLabel(c){ return (c?.divisionName || "").trim(); }
@@ -310,7 +305,7 @@ function addTeam(t){
 }
 function removeTeam(id){ selectedTeams=selectedTeams.filter(t=>t.id!==id); previewOrder=null; }
 function renderAvailableTeams(){
-  const list=filteredPool(), need=Number($("#teamCount").value);
+  const list=filteredPool(), need=desiredTeamCount();
   const ac=$("#availableCount"); if(ac) ac.textContent = `${list.length} filtrados`;
   if($("#availableTeams")) $("#availableTeams").innerHTML = list.map(t=>{
     const checked=isSelected(t.id);
@@ -365,7 +360,8 @@ function addCustomPack(){
 
 
 function teamCountOptionsForFormat(format){
-  return format==="league" ? [4,6,8,10,12,16,20,24] : [4,6,8,10,12,16,20,24,32,36,40,48];
+  if(format==="league") return Array.from({length:21},(_,i)=>i+4); // 4 a 24
+  return Array.from({length:63},(_,i)=>i+2); // mata-mata/grupos: 2 a 64, sem pular tamanhos
 }
 function refreshTeamCountOptions(){
   const sel=$("#teamCount"); if(!sel) return;
@@ -398,8 +394,8 @@ function toggleRuleVisibility(){
   previewOrder=null; renderDrawPreview();
 }
 
-function pickStrongest(){ selectedTeams = pool().sort((a,b)=>b.power-a.power).slice(0,Number($("#teamCount").value)); previewOrder=null; renderSelected(); }
-function pickRandom(){ selectedTeams = shuffle(pool()).slice(0,Number($("#teamCount").value)); previewOrder=null; renderSelected(); }
+function pickStrongest(){ const need=desiredTeamCount(); selectedTeams = pool().sort((a,b)=>b.power-a.power).slice(0,need); previewOrder=null; renderSelected(); }
+function pickRandom(){ const need=desiredTeamCount(); selectedTeams = shuffle(pool()).slice(0,need); previewOrder=null; renderSelected(); }
 function pickBalanced(){
   const need=desiredTeamCount(), sorted=pool().sort((a,b)=>b.power-a.power);
   const tiers=[sorted.slice(0,Math.ceil(sorted.length*.25)),sorted.slice(Math.ceil(sorted.length*.25),Math.ceil(sorted.length*.55)),sorted.slice(Math.ceil(sorted.length*.55),Math.ceil(sorted.length*.8)),sorted.slice(Math.ceil(sorted.length*.8))].map(shuffle);
@@ -445,8 +441,8 @@ function cfg(){
   if(format==="league" && teamCount>24) teamCount=24;
   const selectedGroupSize=getInputNumber("groupSize",4)||4;
   const selectedGroupCount=getInputNumber("groupCount",Math.ceil(teamCount/selectedGroupSize));
-  // 0.7.9.7a: em grupos, calcula grupos suficientes para comportar todos os times escolhidos.
-  // Ex.: 32 times + 4 por grupo = 8 grupos, mesmo que o campo antigo ainda esteja em 4.
+  // 0.7.9.7a final: em grupos, calcula grupos suficientes para comportar a quantidade exata escolhida.
+  // Ex.: 31 times + 4 por grupo = 8 grupos, com folgas quando necessário.
   const groupCount = format==="groups" ? Math.max(selectedGroupCount,Math.ceil(teamCount/selectedGroupSize)) : 0;
   const copa48 = format==="groups" && teamCount===48 && groupCount===12 && selectedGroupSize===4;
   const saveMode=document.querySelector('input[name="saveMode"]:checked')?.value || "single";
@@ -739,7 +735,7 @@ function playKnockout(a,b,c,isFinal){
     if(hg===ag && c.penalties){
       const p=pens(a,b);
       const win=p.winA;
-      meta=[usedET?"A.P.":"",`pênaltis ${p.a}-${p.b}`].filter(Boolean).join(" • ");
+      meta=[usedET?"A.P.":"","pênaltis"].filter(Boolean).join(" • ");
       return {homeGoals:hg,awayGoals:ag,winner:win?a:b,loser:win?b:a,meta,pens:p};
     }
     if(hg===ag){
@@ -780,7 +776,7 @@ function playKnockout(a,b,c,isFinal){
     const p=pens(a,b);
     meta = twoLegMeta(a,b,l1,l2Home,l2Away,[
       ...(usedET ? ["A.P."] : []),
-      `pênaltis ${p.a}-${p.b}`
+      "pênaltis"
     ]);
     const win=p.winA;
     return {homeGoals:ga,awayGoals:gb,winner:win?a:b,loser:win?b:a,meta,pens:p};
@@ -804,7 +800,6 @@ function playSingle(a,b,c,allowDraw){
   const base={realistic:1.16,normal:1.28,chaotic:1.48}[realism] ?? 1.16;
   const strength={low:1.95,medium:1.62,high:1.22,chaos:.82}[upset] ?? 1.62;
   const volatility={low:.10,medium:.16,high:.26,chaos:.42}[upset] ?? .16;
-  const drawBias={realistic:.10,normal:.06,chaotic:.00}[realism] ?? .08;
 
   const homeAdv=.12;
   const form=(Math.random()*2-1)*volatility;
@@ -825,10 +820,6 @@ function playSingle(a,b,c,allowDraw){
   awayXg=clamp(awayXg,0.28,2.85);
   let hg=sampleGoals(homeXg,realism), ag=sampleGoals(awayXg,realism);
 
-  if(allowDraw && Math.abs(diff)<=8 && Math.random()<drawBias){
-    const g=Math.min(hg,ag,3);
-    hg=g; ag=g;
-  }
   if(!allowDraw && hg===ag){
     const winHome=Math.random()+diff/170>.5;
     if(winHome) hg++; else ag++;
