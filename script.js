@@ -788,7 +788,7 @@ function bracketMatchMarkup(m,stageName,finalWinner,opts={}){
   const awayWin=played && m.winner?.id===m.away.id;
   const homeChamp=isFinal && finalWinner===m.home.name;
   const awayChamp=isFinal && finalWinner===m.away.name;
-  const decision=played ? compactDecisionLabel(m) : "";
+  const decision="";
   const status=decision ? `<div class="match-status">(${decision})</div>` : ``;
   const details=played ? `<div class="match-details ${expanded?"open":""}">${matchDetailsMarkup(m)}</div>` : "";
   const actions=opts.export ? "" : (played ? `<div class="match-expand-marker">${expanded?"−":"+"}</div>` : `<div class="match-actions compact-actions"><button data-sim="${m.id}">Simular</button><button data-edit-match="${m.id}">Manual</button></div>`);
