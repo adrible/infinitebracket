@@ -788,19 +788,75 @@ function bracketMatchMarkup(m,stageName,finalWinner,opts={}){
   const awayWin=played && m.winner?.id===m.away.id;
   const homeChamp=isFinal && finalWinner===m.home.name;
   const awayChamp=isFinal && finalWinner===m.away.name;
-  const decision="";
-  const status="";
   const details=played ? `<div class="match-details ${expanded?"open":""}">${matchDetailsMarkup(m)}</div>` : "";
   const actions=opts.export ? "" : (played ? `<div class="match-expand-marker">${expanded?"−":"+"}</div>` : `<div class="match-actions compact-actions"><button data-sim="${m.id}">Simular</button><button data-edit-match="${m.id}">Manual</button></div>`);
-  return `<div class="match compact-match ${isFinal?"final-match":""} ${expanded?"expanded":""}" data-toggle-match-details="${m.id}">
+  return `<div class="match compact-match bracket-node ${isFinal?"final-match":""} ${expanded?"expanded":""}" data-toggle-match-details="${m.id}">
     <div class="match-line ${homeWin?"winner":""} ${homeChamp?"gold-champion":""}"><span>${homeChamp?"🏆 ":""}${m.home.name}</span><strong>${scoreCell(m,"home")}</strong></div>
     <div class="match-line ${awayWin?"winner":""} ${awayChamp?"gold-champion":""}"><span>${awayChamp?"🏆 ":""}${m.away.name}</span><strong>${scoreCell(m,"away")}</strong></div>
-    ${status}
     ${details}
     <div class="match-footer">${actions}</div>
   </div>`;
 }
 
+function bracketRoundLabel(name){
+  return name==="Rodada preliminar" ? "Preliminar" : name;
+}
+function buildBracketLayout(t, opts={}){
+  const rounds=t.knockout||[];
+  const cardW=opts.cardW||220, cardH=opts.cardH||76, roundGap=opts.roundGap||58, baseGap=opts.baseGap||22;
+  const pitch0=cardH+baseGap;
+  const maxMatches=Math.max(1,...rounds.map(r=>Math.max(r.matches?.length||0, r.byes?.length||0)));
+  const bodyHeight=Math.max(cardH, maxMatches*pitch0);
+  const positions={}, connectors=[];
+  rounds.forEach((round,rIdx)=>{
+    const matches=round.matches||[];
+    const prevCount=rIdx===0 ? matches.length : Math.max(1, (rounds[rIdx-1]?.matches||[]).length);
+    const expected=Math.max(1, Math.ceil(prevCount/2));
+    const pitch=pitch0*Math.pow(2,rIdx);
+    const first=(pitch0/2)*Math.pow(2,rIdx);
+    const x=rIdx*(cardW+roundGap);
+    matches.forEach((m,sIdx)=>{
+      let y=first+sIdx*pitch;
+      if(matches.length<expected && matches.length===1) y=bodyHeight/2;
+      positions[m.id]={x,y,round:rIdx,slot:sIdx};
+    });
+  });
+  rounds.forEach((round,rIdx)=>{
+    if(rIdx>=rounds.length-1) return;
+    (round.matches||[]).forEach((m,sIdx)=>{
+      const from=positions[m.id];
+      const next=(rounds[rIdx+1]?.matches||[])[Math.floor(sIdx/2)];
+      if(!from || !next) return;
+      const to=positions[next.id];
+      if(!to) return;
+      const startX=from.x+cardW, startY=from.y, midX=startX+roundGap/2, endX=to.x, endY=to.y;
+      connectors.push({id:`${m.id}-${next.id}`, d:`M ${startX} ${startY} L ${midX} ${startY} L ${midX} ${endY} L ${endX} ${endY}`, active:!!m.winner});
+    });
+  });
+  return {cardW,cardH,roundGap,baseGap,positions,connectors,width:Math.max(cardW,rounds.length*cardW+Math.max(0,rounds.length-1)*roundGap),height:bodyHeight};
+}
+function renderBracketSvg(layout){
+  return `<svg class="bracket-svg" width="${layout.width}" height="${layout.height}" viewBox="0 0 ${layout.width} ${layout.height}" aria-hidden="true">
+    ${layout.connectors.map(c=>`<path d="${c.d}" class="bracket-path ${c.active?"active":""}" />`).join("")}
+  </svg>`;
+}
+function renderBracketBoard(t, opts={}){
+  const rounds=t.knockout||[];
+  const finalWinner=t.status==="finished"?t.champion:null;
+  const layout=buildBracketLayout(t,opts);
+  const headers=rounds.map((r,i)=>`<div class="bracket-round-label ${r.name==="Final"?"final-label":""}" style="left:${i*(layout.cardW+layout.roundGap)}px;width:${layout.cardW}px">${bracketRoundLabel(r.name)}</div>`).join("");
+  const cards=rounds.flatMap((r,rIdx)=>(r.matches||[]).map((m,sIdx)=>{
+    const pos=layout.positions[m.id]; if(!pos) return "";
+    return `<div class="bracket-card-slot ${r.name==="Final"?"final-round":""}" style="left:${pos.x}px;top:${pos.y-layout.cardH/2}px;width:${layout.cardW}px">${bracketMatchMarkup(m,r.name,finalWinner,opts)}</div>`;
+  })).join("");
+  return `<div class="bracket-canvas ${opts.export?"export-canvas":""}" style="width:${layout.width}px">
+    <div class="bracket-headers" style="width:${layout.width}px;height:46px">${headers}</div>
+    <div class="bracket-body" style="width:${layout.width}px;height:${layout.height}px">
+      ${renderBracketSvg(layout)}
+      ${cards}
+    </div>
+  </div>`;
+}
 
 function playKnockout(a,b,c,isFinal){
   const two = c.legs==="two" && !(isFinal && c.finalRule==="single");
@@ -1065,8 +1121,7 @@ function buildExportBracket(t){
   wrap.className="export-bracket-sheet";
   const title=[t.cfg.championshipName||t.cfg.name, t.cfg.divisionName, t.cfg.seasonName||t.cfg.customEditionName].filter(Boolean).join(" — ");
   const sub=[formatLabel(t.cfg.format), `${t.teams?.length||0} times`].filter(Boolean).join(" • ");
-  const finalWinner=t.status==="finished"?t.champion:null;
-  wrap.innerHTML=`<div class="export-bracket-head"><strong>${title||"Brocket"}</strong><small>${sub}</small></div><div class="export-bracket-board">${t.knockout.map(r=>`<div class="round compact-round ${r.name==="Final"?"final-round":""}"><h3>${r.name}</h3>${r.matches.map(m=>bracketMatchMarkup(m,r.name,finalWinner,{export:true})).join("")}</div>`).join("")}</div>`;
+  wrap.innerHTML=`<div class="export-bracket-head"><strong>${title||"Brocket"}</strong><small>${sub}</small></div>${renderBracketBoard(t,{export:true,cardW:220,cardH:76,roundGap:62,baseGap:22})}`;
   return wrap;
 }
 function exportCurrentBracket(){
@@ -1194,8 +1249,7 @@ function matchMini(m){
 function renderBracket(t){
   if(!t.knockout?.length){ $("#bracketArea").innerHTML=""; $("#knockoutTitle").style.display=t.league?"none":"flex"; return; }
   $("#knockoutTitle").style.display="flex";
-  const finalWinner=t.status==="finished"?t.champion:null;
-  $("#bracketArea").innerHTML = t.knockout.map(r=>`<div class="round compact-round ${r.name==="Final"?"final-round":""}"><h3>${r.name}</h3>${r.byes?.length?`<details class="bye-box compact-byes"><summary>Entram direto (${r.byes.length})</summary><div class="bye-chip-grid">${r.byes.map(b=>`<small>${b.name}</small>`).join("")}</div></details>`:""}${r.matches.map(m=>bracketMatchMarkup(m,r.name,finalWinner)).join("")}</div>`).join("");
+  $("#bracketArea").innerHTML = renderBracketBoard(t);
 }
 
 function openManualResult(id){
