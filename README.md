@@ -1,22 +1,23 @@
-# Brocket 0.7.9.7c
+# Brocket 0.7.9.7e
 
 Versão organizada com correções de lógica, navegação e visual, sem duplicar funcionalidades já existentes.
 
-## 0.7.9.7c
+## 0.7.9.7e
 
-- Mata-mata com card compacto e expansível.
-- Card recolhido mostra só placar principal; pênaltis ficam entre parênteses.
-- Detalhes ao tocar no confronto: Ida, Volta e Pênaltis quando houver.
-- Prorrogação não aparece como jogo separado; entra no placar do jogo.
-- Background do mata-mata mais polido.
-- Nova opção: baixar mata-mata em PNG.
+- Reformulação visual do mata-mata, com cards mais limpos e legíveis.
+- Final refeita em visual dark premium, sem o bloco branco anterior.
+- Card recolhido mostra o status resumido entre parênteses: `(PR)`, `(PEN)` ou `(PR + PEN)`.
+- Detalhes do confronto agora mostram Ida, Volta/Jogo e Decisão, sem repetir o placar dos pênaltis.
+- Clique no card para expandir; o botão/aviso de detalhes foi removido.
+- Contraste dos placares reforçado para não serem ofuscados pelo fundo.
+- Background do mata-mata e exportação em PNG mais polidos.
 - Motor de placares mantido.
 
 
 ## Principais ajustes
 
 - Mantida chave estável de armazenamento (`brocket-0-7`) para preservar dados entre versões.
-- Migração aceita dados da 0.7.9.7c sem apagar campeonatos, times ou pacotes.
+- Migração aceita dados da 0.7.9.7e sem apagar campeonatos, times ou pacotes.
 - Liga/Pontos corridos continua limitada a 24 times.
 - Grupos e mata-mata continuam permitindo até 48 times.
 - Formato Copa 48 mantido automaticamente:
@@ -53,7 +54,7 @@ Suba somente estes arquivos na raiz do GitHub:
 - README.md
 
 
-## Brocket 0.7.9.7c
+## Brocket 0.7.9.7e
 
 - Visual do chaveamento mais polido.
 - Campeão com destaque dourado mais uniforme.
@@ -69,7 +70,7 @@ Suba somente estes arquivos na raiz do GitHub:
 - Montagem manual de grupos com contador por grupo e bloqueio de grupo incompleto.
 
 
-## Brocket 0.7.9.7c
+## Brocket 0.7.9.7e
 
 Correção pontual da tabela mobile:
 
@@ -79,7 +80,7 @@ Correção pontual da tabela mobile:
 - Simular tudo mantém a variação da última rodada simulada.
 
 
-## Brocket 0.7.9.7c
+## Brocket 0.7.9.7e
 
 Patch de lógica e tabela:
 
@@ -90,7 +91,7 @@ Patch de lógica e tabela:
 - Mantém Pts como principal destaque da tabela.
 
 
-## Brocket 0.7.9.7c
+## Brocket 0.7.9.7e
 
 Patch de ranking e zebra:
 
@@ -103,7 +104,7 @@ Patch de ranking e zebra:
   - azarão golear favorito fica mais raro;
   - favorito golear azarão continua possível.
 
-## Brocket 0.7.9.7c
+## Brocket 0.7.9.7e
 
 Refinamento pós 0.7.9.1:
 
@@ -120,7 +121,7 @@ Refinamento pós 0.7.9.1:
 - Mantém STORAGE estável em `brocket-0-7`.
 
 
-## 0.7.9.7c
+## 0.7.9.7e
 - Remoção de campeonato pela lista e pela configuração.
 - Campeonato salvo passa a ser a fonte do nome quando a edição é salva no histórico.
 - Nome principal segue Campeonato — Divisão — Temporada.
@@ -128,7 +129,7 @@ Refinamento pós 0.7.9.1:
 - Status de campeão/promovido/rebaixado vira marcador lateral no mobile.
 
 
-## 0.7.9.7c
+## 0.7.9.7e
 
 - Corrige a redundância entre Torneio único e Salvar como edição.
 - Em edição, usa apenas o campeonato selecionado; o campo de nome do torneio fica oculto.
@@ -138,14 +139,14 @@ Refinamento pós 0.7.9.1:
 - Mantém o motor universal de placares da 0.7.9.2.
 
 
-## 0.7.9.7c
+## 0.7.9.7e
 - Troca marcadores laterais duros por brilho suave nas linhas.
 - Classificados/promovidos ficam em negrito e brilho verde, sem selo “Class.”.
 - Campeão ganha brilho dourado suave.
 - Rebaixados ficam com brilho vermelho suave, sem texto ocupando coluna.
 
 
-## Brocket 0.7.9.7c
+## Brocket 0.7.9.7e
 - Mata-mata com apenas o classificado em negrito.
 - Final mais compacta e alinhada ao estilo dos demais cards.
 - Ida/volta em formato curto com short names.
@@ -153,7 +154,7 @@ Refinamento pós 0.7.9.1:
 - Pacotes personalizados aceitam: Nome, força, short.
 
 
-## 0.7.9.7c
+## 0.7.9.7e
 - Exportação PNG alinhada ao visual novo da tabela.
 - Destaques dourado, verde e vermelho aplicados no PNG.
 - Exportação sem “Class.” ou “Rebaix.” textual.
@@ -161,8 +162,16 @@ Refinamento pós 0.7.9.1:
 - Motor de placares mantido.
 
 
-## 0.7.9.7c final
+## 0.7.9.7e final
 - Quantidade escolhida pelo usuário é respeitada para grupos e mata-mata.
 - Grupos ajustam automaticamente a quantidade de grupos para caber os times escolhidos.
 - Opções de tamanho em grupos/mata-mata vão de 2 a 64 sem pular tamanhos.
 - Correção reforçada do espaçamento Pos/Time.
+
+
+## 0.7.9.7e
+- Negrito fica reservado aos classificados/promovidos/campeão.
+- Rebaixados e times normais ficam sem negrito pesado.
+- Sorteio padrão de grupos agora é por potes, divididos pelo power dos times.
+- O sorteio por potes distribui os mais fortes em potes e embaralha dentro dos grupos.
+- Mantido STORAGE brocket-0-7 e motor de placares.
