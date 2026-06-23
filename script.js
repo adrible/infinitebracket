@@ -73,6 +73,7 @@ let manualGroups = null;
 let editingMatchId = null;
 let selectedLeagueRound = null;
 let selectedGroupRound = null;
+let expandedMatches = new Set();
 
 function uid(){ return crypto?.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)+Date.now(); }
 function mSaved(home,away,hg,ag,winner,loser,stage,meta,pens=null){ return {home,away,homeGoals:hg,awayGoals:ag,winner,loser,stage,meta,pens,played:true}; }
@@ -214,7 +215,7 @@ function decisionLabel(m){
 function go(screen){
   $$(".screen").forEach(s=>s.classList.toggle("active",s.id===screen));
   $$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.go===screen));
-  const titles = {home:["0.7.9.7a","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
+  const titles = {home:["0.7.9.7c","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
   $("#pageSubtitle").textContent = titles[screen]?.[0] || "Brocket";
   $("#pageTitle").textContent = titles[screen]?.[1] || "Brocket";
   window.scrollTo(0,0);
@@ -225,6 +226,7 @@ document.addEventListener("click", e=>{
   const leagueRound=e.target.closest("[data-league-round]"); if(leagueRound){ setLeagueRound(leagueRound.dataset.leagueRound); return; }
   const groupRound=e.target.closest("[data-group-round]"); if(groupRound){ const t=data.activeTournament; const stages=[...new Set((t?.groups||[]).flatMap(g=>g.matches.map(m=>(m.stage.match(/Rodada \d+/)||["Rodada 1"])[0])))]; setGroupRound(stages[Number(groupRound.dataset.groupRound)]||stages[0]); return; }
   const exp=e.target.closest("[data-export-table]"); if(exp){ exportCurrentTable(exp.dataset.exportTable); return; }
+  const expBracket=e.target.closest("[data-export-bracket]"); if(expBracket){ exportCurrentBracket(); return; }
   const nav = e.target.closest("[data-go]"); if(nav){ go(nav.dataset.go); return; }
   const comp = e.target.closest("[data-comp]"); if(comp){ openCompetition(comp.dataset.comp); return; }
   const quickComp = e.target.closest("#quickCreateCompetition"); if(quickComp){ $("#competitionForm").hidden=false; return; }
@@ -237,6 +239,13 @@ document.addEventListener("click", e=>{
   const delPack = e.target.closest("[data-delete-pack]"); if(delPack){ data.customPacks=(data.customPacks||[]).filter(p=>p.id!==delPack.dataset.deletePack); selectedPacks.delete(delPack.dataset.deletePack); save(); renderAll(); return; }
   const toggleTeam = e.target.closest("[data-toggle-team]"); if(toggleTeam){ const id=toggleTeam.dataset.toggleTeam; const t=pool().find(x=>x.id===id); if(!t) return; isSelected(id)?removeTeam(id):addTeam(t); renderSelected(); return; }
   const removeBtn = e.target.closest("[data-remove-team]"); if(removeBtn){ removeTeam(removeBtn.dataset.removeTeam); renderSelected(); return; }
+  const card=e.target.closest("[data-toggle-match-details]");
+  if(card && !e.target.closest("button")){
+    const id=card.dataset.toggleMatchDetails;
+    expandedMatches.has(id) ? expandedMatches.delete(id) : expandedMatches.add(id);
+    renderTournament();
+    return;
+  }
 });
 
 function renderAll(){ renderCompetitions(); renderCompetitionSelect(); updateSaveModeUI(); renderPacks(); renderSelected(); renderCustomTeams(); renderCustomPacks(); renderManualGroups(); toggleRuleVisibility(); renderTournament(); }
@@ -711,14 +720,49 @@ function finishTournament(t, finalMatch){
 }
 function playGroupOrLeague(a,b,c){ const r=playSingle(a,b,c,true); return {...r,winner:r.homeGoals===r.awayGoals?null:(r.homeGoals>r.awayGoals?a:b),loser:r.homeGoals===r.awayGoals?null:(r.homeGoals>r.awayGoals?b:a),meta:""}; }
 function twoLegMeta(a,b,l1,l2Home,l2Away,notes=[]){
-  const noteHtml = notes.length ? `<span class="two-leg-note">${notes.join(" • ")}</span>` : "";
-  const aShort=teamShort(a), bShort=teamShort(b);
-  return `<span class="two-leg-detail two-leg-short">
-    <span><b>Ida</b><em>${aShort} ${l1.homeGoals}-${l1.awayGoals} ${bShort}</em></span>
-    <span><b>Volta</b><em>${bShort} ${l2Home}-${l2Away} ${aShort}</em></span>
-    ${noteHtml}
-  </span>`;
+  return notes.join(" • ");
 }
+function legDetail(home,away,hg,ag){
+  return {home, away, homeGoals:hg, awayGoals:ag};
+}
+function legShortLine(leg){
+  return `${teamShort(leg.home)} ${leg.homeGoals}-${leg.awayGoals} ${teamShort(leg.away)}`;
+}
+function penaltiesLine(m){
+  if(!m.pens) return "";
+  return `${teamShort(m.home)} ${m.pens.a}-${m.pens.b} ${teamShort(m.away)}`;
+}
+function matchDetailsMarkup(m){
+  if(!m.played) return `<div class="match-detail-row"><b>Status</b><em>Aguardando simulação</em></div>`;
+  const rows=[];
+  if(m.legs?.length===2){
+    rows.push(`<div class="match-detail-row"><b>Ida</b><em>${legShortLine(m.legs[0])}</em></div>`);
+    rows.push(`<div class="match-detail-row"><b>Volta</b><em>${legShortLine(m.legs[1])}</em></div>`);
+  }else{
+    rows.push(`<div class="match-detail-row"><b>Jogo</b><em>${teamShort(m.home)} ${m.homeGoals}-${m.awayGoals} ${teamShort(m.away)}</em></div>`);
+  }
+  if(m.pens) rows.push(`<div class="match-detail-row"><b>Pênaltis</b><em>${penaltiesLine(m)}</em></div>`);
+  return rows.join("");
+}
+function bracketMatchMarkup(m,stageName,finalWinner,opts={}){
+  const isFinal=stageName==="Final";
+  const expanded=!opts.export && expandedMatches.has(m.id);
+  const played=m.played;
+  const homeWin=played && m.winner?.id===m.home.id;
+  const awayWin=played && m.winner?.id===m.away.id;
+  const homeChamp=isFinal && finalWinner===m.home.name;
+  const awayChamp=isFinal && finalWinner===m.away.name;
+  const details=played ? `<div class="match-details ${expanded?"open":""}">${matchDetailsMarkup(m)}</div>` : "";
+  const actions=opts.export ? "" : `<div class="match-actions compact-actions">${played?`<button data-edit-match="${m.id}">Editar</button>`:`<button data-sim="${m.id}">Simular</button><button data-edit-match="${m.id}">Manual</button>`}</div>`;
+  const hint=!opts.export && played ? `<span class="expand-hint">${expanded?"Ocultar detalhes":"Ver detalhes"}</span>` : "";
+  return `<div class="match compact-match ${isFinal?"final-match":""} ${expanded?"expanded":""}" data-toggle-match-details="${m.id}">
+    <div class="match-line ${homeWin?"winner":""} ${homeChamp?"gold-champion":""}"><span>${homeChamp?"🏆 ":""}${m.home.name}</span><strong>${scoreCell(m,"home")}</strong></div>
+    <div class="match-line ${awayWin?"winner":""} ${awayChamp?"gold-champion":""}"><span>${awayChamp?"🏆 ":""}${m.away.name}</span><strong>${scoreCell(m,"away")}</strong></div>
+    ${details}
+    <div class="match-footer">${hint}${actions}</div>
+  </div>`;
+}
+
 
 function playKnockout(a,b,c,isFinal){
   const two = c.legs==="two" && !(isFinal && c.finalRule==="single");
@@ -756,8 +800,9 @@ function playKnockout(a,b,c,isFinal){
     const awayA=l2Away, awayB=l1.awayGoals;
     if(awayA!==awayB){
       const meta = twoLegMeta(a,b,l1,l2Home,l2Away,["gol fora"]);
+      const legs=[legDetail(a,b,l1.homeGoals,l1.awayGoals),legDetail(b,a,l2Home,l2Away)];
       const win=awayA>awayB;
-      return {homeGoals:ga,awayGoals:gb,winner:win?a:b,loser:win?b:a,meta};
+      return {homeGoals:ga,awayGoals:gb,winner:win?a:b,loser:win?b:a,meta,legs};
     }
   }
 
@@ -771,6 +816,7 @@ function playKnockout(a,b,c,isFinal){
   }
 
   let meta = twoLegMeta(a,b,l1,l2Home,l2Away,usedET ? ["A.P."] : []);
+  let legs=[legDetail(a,b,l1.homeGoals,l1.awayGoals),legDetail(b,a,l2Home,l2Away)];
 
   if(ga===gb && c.penalties){
     const p=pens(a,b);
@@ -778,16 +824,19 @@ function playKnockout(a,b,c,isFinal){
       ...(usedET ? ["A.P."] : []),
       "pênaltis"
     ]);
+    legs=[legDetail(a,b,l1.homeGoals,l1.awayGoals),legDetail(b,a,l2Home,l2Away)];
     const win=p.winA;
-    return {homeGoals:ga,awayGoals:gb,winner:win?a:b,loser:win?b:a,meta,pens:p};
+    return {homeGoals:ga,awayGoals:gb,winner:win?a:b,loser:win?b:a,meta,pens:p,legs};
   }
   if(ga===gb){
     const win=Math.random()+(((a.power||70)-(b.power||70))/180)>.5;
-    if(win) ga++; else gb++;
+    if(win){ ga++; l2Away++; } else { gb++; l2Home++; }
     meta = twoLegMeta(a,b,l1,l2Home,l2Away,[...(usedET ? ["A.P."] : []),"desempate"]);
+    legs=[legDetail(a,b,l1.homeGoals,l1.awayGoals),legDetail(b,a,l2Home,l2Away)];
   }
+  legs=[legDetail(a,b,l1.homeGoals,l1.awayGoals),legDetail(b,a,l2Home,l2Away)];
   const win=ga>gb;
-  return {homeGoals:ga,awayGoals:gb,winner:win?a:b,loser:win?b:a,meta};
+  return {homeGoals:ga,awayGoals:gb,winner:win?a:b,loser:win?b:a,meta,legs};
 }
 function playSingle(a,b,c,allowDraw){
   const diff=(a.power||70)-(b.power||70);
@@ -972,6 +1021,33 @@ function exportCurrentTable(type="png"){
     a.href=url; a.download=`${fileBase}.png`; a.click();
   }).catch(()=>alert("Não consegui gerar a imagem desta tabela.")).finally(()=>holder.remove());
 }
+function buildExportBracket(t){
+  if(!t.knockout?.length) return null;
+  const wrap=document.createElement("div");
+  wrap.className="export-bracket-sheet";
+  const title=[t.cfg.championshipName||t.cfg.name, t.cfg.divisionName, t.cfg.seasonName||t.cfg.customEditionName].filter(Boolean).join(" — ");
+  const sub=[formatLabel(t.cfg.format), `${t.teams?.length||0} times`].filter(Boolean).join(" • ");
+  const finalWinner=t.status==="finished"?t.champion:null;
+  wrap.innerHTML=`<div class="export-bracket-head"><strong>${title||"Brocket"}</strong><small>${sub}</small></div><div class="export-bracket-board">${t.knockout.map(r=>`<div class="round compact-round ${r.name==="Final"?"final-round":""}"><h3>${r.name}</h3>${r.matches.map(m=>bracketMatchMarkup(m,r.name,finalWinner,{export:true})).join("")}</div>`).join("")}</div>`;
+  return wrap;
+}
+function exportCurrentBracket(){
+  const t=data.activeTournament;
+  if(!t?.knockout?.length){ alert("Não há mata-mata para exportar."); return; }
+  if(typeof html2canvas!=="function") { alert("Exportação indisponível no momento. Tente novamente com internet ativa."); return; }
+  const sheet=buildExportBracket(t);
+  const holder=document.createElement("div");
+  holder.className="export-holder export-holder-bracket";
+  holder.appendChild(sheet);
+  document.body.appendChild(holder);
+  const fileBase=slug([t.cfg.championshipName||t.cfg.name, t.cfg.divisionName, "mata-mata"].filter(Boolean).join("-")) || "brocket-mata-mata";
+  html2canvas(sheet,{backgroundColor:null,scale:2,useCORS:true,logging:false}).then(canvas=>{
+    const url=canvas.toDataURL("image/png");
+    const a=document.createElement("a");
+    a.href=url; a.download=`${fileBase}.png`; a.click();
+  }).catch(()=>alert("Não consegui gerar a imagem do mata-mata.")).finally(()=>holder.remove());
+}
+
 function renderTournament(){
   const t=data.activeTournament;
   if(!t){
@@ -987,9 +1063,11 @@ function renderTournament(){
   }
   $("#tournamentName").textContent=t.cfg.name; $("#tournamentFormat").textContent=[formatLabel(t.cfg.format), t.cfg.divisionName].filter(Boolean).join(" • ");
   const next=nextPlayable(t);
+  const hasBracket=!!t.knockout?.length;
+  const exportBtns=`<button class="play-btn export" data-export-table="png">Baixar tabela PNG</button>${hasBracket?`<button class="play-btn export" data-export-bracket="png">Baixar mata-mata PNG</button>`:""}`;
   $("#tournamentActions").innerHTML = t.status==="finished"
-    ? `<button class="play-btn dark">🏆 Torneio finalizado e salvo</button><button class="play-btn export" data-export-table="png">Baixar PNG</button>`
-    : `<button class="play-btn" id="simulateNext">Simular próxima partida</button><button class="play-btn" id="simulateRound">Simular rodada</button><button class="play-btn subtle" id="simulateAll">Simular tudo</button><button class="play-btn export" data-export-table="png">Baixar PNG</button><button class="play-btn danger-lite" id="deleteActiveTournament">Apagar torneio</button><button class="play-btn dark" data-go="create">Criar outro</button>`;
+    ? `<button class="play-btn dark">🏆 Torneio finalizado e salvo</button>${exportBtns}`
+    : `<button class="play-btn" id="simulateNext">Simular próxima partida</button><button class="play-btn" id="simulateRound">Simular rodada</button><button class="play-btn subtle" id="simulateAll">Simular tudo</button>${exportBtns}<button class="play-btn danger-lite" id="deleteActiveTournament">Apagar torneio</button><button class="play-btn dark" data-go="create">Criar outro</button>`;
   $("#summaryBar").innerHTML = t.status==="finished"
     ? `<div class="next-card"><small>Campeão</small><strong>🏆 ${t.champion}</strong></div>`
     : `<div class="next-card"><small>Próxima partida</small><strong>${next?`${next.home.name} x ${next.away.name}`:"aguardando"}</strong></div>`;
@@ -1079,8 +1157,9 @@ function renderBracket(t){
   if(!t.knockout?.length){ $("#bracketArea").innerHTML=""; $("#knockoutTitle").style.display=t.league?"none":"flex"; return; }
   $("#knockoutTitle").style.display="flex";
   const finalWinner=t.status==="finished"?t.champion:null;
-  $("#bracketArea").innerHTML = t.knockout.map(r=>`<div class="round compact-round ${r.name==="Final"?"final-round":""}"><h3>${r.name}</h3>${r.byes?.length?`<details class="bye-box compact-byes"><summary>Entram direto (${r.byes.length})</summary><div class="bye-chip-grid">${r.byes.map(b=>`<small>${b.name}</small>`).join("")}</div></details>`:""}${r.matches.map(m=>`<div class="match compact-match ${r.name==="Final"?"final-match":""}"><div class="match-line ${m.played&&m.winner?.id===m.home.id?"winner":""} ${finalWinner===m.home.name&&r.name==="Final"?"gold-champion":""}"><span>${finalWinner===m.home.name&&r.name==="Final"?"🏆 ":""}${m.home.name}</span><strong>${scoreCell(m,"home")}</strong></div><div class="match-line ${m.played&&m.winner?.id===m.away.id?"winner":""} ${finalWinner===m.away.name&&r.name==="Final"?"gold-champion":""}"><span>${finalWinner===m.away.name&&r.name==="Final"?"🏆 ":""}${m.away.name}</span><strong>${scoreCell(m,"away")}</strong></div><div class="match-footer"><span class="match-status">${m.played && m.meta ? m.meta : decisionLabel(m)}</span><div class="match-actions compact-actions">${m.played?`<button data-edit-match="${m.id}">Editar</button>`:`<button data-sim="${m.id}">Simular</button><button data-edit-match="${m.id}">Manual</button>`}</div></div></div>`).join("")}</div>`).join("");
+  $("#bracketArea").innerHTML = t.knockout.map(r=>`<div class="round compact-round ${r.name==="Final"?"final-round":""}"><h3>${r.name}</h3>${r.byes?.length?`<details class="bye-box compact-byes"><summary>Entram direto (${r.byes.length})</summary><div class="bye-chip-grid">${r.byes.map(b=>`<small>${b.name}</small>`).join("")}</div></details>`:""}${r.matches.map(m=>bracketMatchMarkup(m,r.name,finalWinner)).join("")}</div>`).join("");
 }
+
 function openManualResult(id){
   const t=data.activeTournament; if(!t) return;
   const m=allTournamentMatches(t).find(x=>x.id===id); if(!m) return;
