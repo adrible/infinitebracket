@@ -2350,7 +2350,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* ===== Brocket 0.7.9.7f — marcador de detalhes ===== */
+/* ===== Brocket 0.7.9.7g — marcador de detalhes ===== */
 .match-footer{
   display:flex !important;
   justify-content:center !important;
@@ -2471,7 +2471,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   .match-line{grid-template-columns:minmax(0,1fr) 40px!important;min-height:32px;}
 }
 
-/* ===== Brocket 0.7.9.7f — bracket tree correction ===== */
+/* ===== Brocket 0.7.9.7g — bracket tree correction ===== */
 .bracket-scroll{overflow-x:auto!important;overflow-y:hidden!important;padding:18px 18px 34px!important;}
 .visual-bracket,.export-bracket-board{--round-gap:74px;--card-w:232px;--connector:74px;display:flex!important;align-items:flex-start!important;gap:var(--round-gap)!important;min-width:max-content!important;position:relative!important;}
 .round.compact-round{min-width:var(--card-w)!important;width:var(--card-w)!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;position:relative!important;gap:0!important;}
