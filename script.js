@@ -206,9 +206,17 @@ function decisionLabel(m){
   const meta=(m.meta||"").toLowerCase();
   const ap=meta.includes("prorrog") || (m.meta||"").includes("A.P.");
   const pen=!!m.pens || meta.includes("pênaltis");
-  if(ap && pen) return "PR + PEN";
-  if(pen) return "PEN";
-  if(ap) return "PR";
+  if(ap && pen) return "A.P. + Pênaltis";
+  if(pen) return "Pênaltis";
+  if(ap) return "A.P.";
+  return "";
+}
+function compactDecisionLabel(m){
+  if(!m?.played) return "";
+  const meta=(m.meta||"").toLowerCase();
+  const ap=meta.includes("prorrog") || (m.meta||"").includes("A.P.");
+  const pen=!!m.pens || meta.includes("pênaltis");
+  if(ap && !pen) return "A.P.";
   return "";
 }
 
@@ -780,10 +788,10 @@ function bracketMatchMarkup(m,stageName,finalWinner,opts={}){
   const awayWin=played && m.winner?.id===m.away.id;
   const homeChamp=isFinal && finalWinner===m.home.name;
   const awayChamp=isFinal && finalWinner===m.away.name;
-  const decision=played ? decisionLabel(m) : "";
+  const decision="";
   const status=decision ? `<div class="match-status">(${decision})</div>` : ``;
   const details=played ? `<div class="match-details ${expanded?"open":""}">${matchDetailsMarkup(m)}</div>` : "";
-  const actions=opts.export ? "" : `<div class="match-actions compact-actions">${played?`<button data-edit-match="${m.id}">Editar</button>`:`<button data-sim="${m.id}">Simular</button><button data-edit-match="${m.id}">Manual</button>`}</div>`;
+  const actions=opts.export ? "" : (played ? `<div class="match-expand-marker">${expanded?"−":"+"}</div>` : `<div class="match-actions compact-actions"><button data-sim="${m.id}">Simular</button><button data-edit-match="${m.id}">Manual</button></div>`);
   return `<div class="match compact-match ${isFinal?"final-match":""} ${expanded?"expanded":""}" data-toggle-match-details="${m.id}">
     <div class="match-line ${homeWin?"winner":""} ${homeChamp?"gold-champion":""}"><span>${homeChamp?"🏆 ":""}${m.home.name}</span><strong>${scoreCell(m,"home")}</strong></div>
     <div class="match-line ${awayWin?"winner":""} ${awayChamp?"gold-champion":""}"><span>${awayChamp?"🏆 ":""}${m.away.name}</span><strong>${scoreCell(m,"away")}</strong></div>
