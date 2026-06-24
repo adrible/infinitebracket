@@ -2912,3 +2912,101 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
     font-size:12px!important;
   }
 }
+
+
+/* ===== Brocket 0.7.9.8a — ajustes finos do bracket ===== */
+
+/* 1) Ao expandir, o detalhe abre acima dos outros cards, sem ser engolido pelo card seguinte. */
+.bracket-card-slot{
+  z-index:3;
+}
+.bracket-card-slot:has(.match.compact-match.expanded){
+  z-index:30!important;
+}
+.match.compact-match.bracket-node{
+  overflow:visible!important;
+}
+.match.compact-match.bracket-node.expanded{
+  z-index:40!important;
+  box-shadow:0 22px 52px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+.match.compact-match.bracket-node .match-details.open{
+  display:grid!important;
+  position:relative;
+  z-index:45!important;
+  background:linear-gradient(180deg,rgba(22,58,37,.98),rgba(11,39,25,.98))!important;
+  border:1px solid rgba(255,255,255,.18)!important;
+  box-shadow:0 16px 34px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.07)!important;
+}
+
+/* 2) Remove a linha/underline que estava atravessando Oitavas, Quartas etc. */
+.bracket-round-label::before{
+  left:50%!important;
+  right:auto!important;
+  width:132px!important;
+  transform:translateX(-50%)!important;
+  inset-block:6px!important;
+}
+.bracket-round-label::after{
+  content:none!important;
+  display:none!important;
+}
+.round.compact-round h3::before,
+.round.compact-round h3::after,
+.bracket-round-label > *::before,
+.bracket-round-label > *::after{
+  content:none!important;
+  display:none!important;
+}
+
+/* Evita que linhas SVG pareçam passar por cima do título. */
+.bracket-headers{
+  overflow:visible!important;
+  z-index:4!important;
+}
+.bracket-body{
+  z-index:1!important;
+}
+.bracket-svg{
+  z-index:1!important;
+}
+
+/* Melhor respiro inferior para o último card não brigar com a hotbar no mobile. */
+@media(max-width:720px){
+  .bracket-scroll{
+    padding-bottom:128px!important;
+  }
+}
+
+/* ===== Brocket 0.7.9.8b — estrutura de grupos e rodadas ===== */
+.group-stage-card{display:grid;gap:12px;}
+.group-stage-head{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.group-stage-title{display:flex;align-items:center;gap:9px;min-width:0;}
+.group-stage-title h3{margin:0!important;}
+.group-letter{display:grid;place-items:center;width:32px;height:32px;border-radius:12px;font-weight:950;flex:0 0 auto;}
+.group-status{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;}
+.group-sim-btn{white-space:nowrap;border-radius:12px;padding:8px 10px;font-size:12px;font-weight:900;}
+.group-standings th,.group-standings td{text-align:center;}
+.group-standings th:nth-child(2),.group-standings td:nth-child(2){text-align:left;}
+.group-pos{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:10px;font-weight:950;}
+.group-team-name{display:inline-flex;align-items:center;gap:5px;max-width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.group-team-name.qualified{font-weight:950;}
+.group-trophy{flex:0 0 auto;}
+.group-matches-list{display:grid;gap:7px;margin-top:2px;}
+.group-match-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto;align-items:center;gap:8px;border-radius:14px;padding:8px 9px;}
+.group-match-team{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.group-match-team.home{text-align:right;}
+.group-match-team.away{text-align:left;}
+.group-match-team.winner{font-weight:950;}
+.group-match-score{min-width:58px;border-radius:999px;padding:5px 8px;text-align:center;font-weight:950;}
+.group-match-row .mini-actions{display:flex;align-items:center;justify-content:flex-end;gap:5px;}
+.group-match-row .mini-actions button,.group-match-row .mini-actions em{font-size:10px;}
+@media(max-width:720px){
+  .group-stage-head{gap:8px;}
+  .group-stage-title{gap:7px;}
+  .group-letter{width:28px;height:28px;border-radius:10px;}
+  .group-status{display:none;}
+  .group-sim-btn{padding:7px 9px;font-size:11px;}
+  .group-match-row{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);}
+  .group-match-row .mini-actions{grid-column:1 / -1;justify-content:center;margin-top:2px;}
+}
