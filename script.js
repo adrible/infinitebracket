@@ -234,6 +234,7 @@ function go(screen){
 document.addEventListener("click", e=>{
   const leagueRound=e.target.closest("[data-league-round]"); if(leagueRound){ setLeagueRound(leagueRound.dataset.leagueRound); return; }
   const groupRound=e.target.closest("[data-group-round]"); if(groupRound){ const t=data.activeTournament; const stages=[...new Set((t?.groups||[]).flatMap(g=>g.matches.map(m=>(m.stage.match(/Rodada \d+/)||["Rodada 1"])[0])))]; setGroupRound(stages[Number(groupRound.dataset.groupRound)]||stages[0]); return; }
+  const simGroup=e.target.closest("[data-sim-group]"); if(simGroup){ simulateGroup(simGroup.dataset.simGroup); return; }
   const exp=e.target.closest("[data-export-table]"); if(exp){ exportCurrentTable(exp.dataset.exportTable); return; }
   const expBracket=e.target.closest("[data-export-bracket]"); if(expBracket){ exportCurrentBracket(); return; }
   const nav = e.target.closest("[data-go]"); if(nav){ go(nav.dataset.go); return; }
@@ -710,6 +711,16 @@ function simulateMatch(id, opts={}){
   if(t.currentStage==="league") updateLeagueTable(t,m);
   if(t.currentStage==="groups") updateGroupTable(t,m);
   if(!opts.deferAdvance) advanceIfNeeded(t); save(); if(!opts.deferAdvance) renderTournament();
+}
+function simulateGroup(groupName){
+  const t=data.activeTournament;
+  if(!t || t.status==="finished" || t.currentStage!=="groups") return;
+  const group=(t.groups||[]).find(g=>g.name===groupName);
+  if(!group) return;
+  (group.matches||[]).filter(m=>!m.played).forEach(m=>simulateMatch(m.id,{deferAdvance:true}));
+  advanceIfNeeded(t);
+  save();
+  renderTournament();
 }
 function rankedQualifiedFromGroups(t){
   t.groups.forEach(g=>sortGroup(g,t.cfg));
@@ -1232,18 +1243,82 @@ function renderGroups(t){
   if(!t.groups?.length){ $("#groupsArea").innerHTML=""; return; }
   const adj=t.autoAdjustment?.target ? `<div class="auto-adjust-note"><strong>Ajuste automático:</strong> ${t.autoAdjustment.classified} classificados geram Rodada preliminar. ${t.autoAdjustment.byes} entram direto e ${t.autoAdjustment.prelimTeams} jogam a preliminar.</div>` : "";
   const info=groupClassificationInfo(t);
-  const allStages=[...new Set(t.groups.flatMap(g=>[...(g.matches||[]).map(m=>(m.stage.match(/Rodada \d+/)||["Rodada 1"])[0]), ...(g.byes||[]).map(b=>(b.stage.match(/Rodada \d+/)||["Rodada 1"])[0])]))];
-  if(selectedGroupRound===null || !allStages.includes(selectedGroupRound)) selectedGroupRound=currentGroupRoundName(t);
-  const roundName=selectedGroupRound || allStages[0] || "Rodada 1";
-  const roundIdx=Math.max(0,allStages.indexOf(roundName));
-  const roundMatches=t.groups.map(g=>({group:g.name,matches:g.matches.filter(m=>m.stage.includes(roundName)), byes:(g.byes||[]).filter(b=>b.stage.includes(roundName))})).filter(x=>x.matches.length||x.byes.length);
-  $("#groupsArea").innerHTML = `<div class="section-title on-field"><h2>Fase de grupos</h2></div>${adj}${renderQualifiedSummary(t)}<div class="groups-grid">${t.groups.map(g=>`<div class="group-card group-card--clean"><h3>Grupo ${g.name}</h3><div class="table-scroll"><table class="table group-table standings-table"><thead><tr><th>Pos</th><th>Time</th><th>Pts</th><th>J</th><th>V</th><th>SG</th><th>GP</th><th></th></tr></thead><tbody>${(g.table.length?g.table:g.teams).map((x,i)=>`<tr class="${(info.directIds?.has(x.id)||info.extraIds?.has(x.id))?"status-qualified":info.relegatedIds?.has(x.id)?"status-relegated":""}"><td>${i+1}</td><td>${teamCellWithDelta(x,false)}</td><td>${x.pts}</td><td>${x.w+x.d+x.l}</td><td>${x.w}</td><td>${x.gd}</td><td>${x.gf}</td><td>${groupRowTag(t,x,i,info)}</td></tr>`).join("")}</tbody></table></div></div>`).join("")}</div><div class="section-title on-field"><h2>Rodadas</h2></div>${roundNav("group",roundIdx,allStages.length)}<div class="groups-grid one-round">${roundMatches.map(g=>`<div class="group-card"><h3>Grupo ${g.group} • ${roundName}</h3><div class="match-list">${g.matches.map(matchMini).join("")}${g.byes.map(byeMini).join("")}</div></div>`).join("")}</div>`;
+  $("#groupsArea").innerHTML = `<div class="section-title on-field"><h2>Fase de grupos</h2></div>${adj}${renderQualifiedSummary(t)}<div class="groups-grid group-stage-grid">${t.groups.map(g=>groupStageCard(t,g,info)).join("")}</div>`;
 }
-function byeMini(b){ return `<div class="mini-match bye-match"><span>Descansa</span><strong>—</strong><span>${b.team.name}</span><em>folga</em><div></div></div>`; }
+function groupStageCard(t,g,info){
+  sortGroup(g,t.cfg);
+  const rows=g.table.length?g.table:g.teams;
+  const matches=g.matches||[];
+  const byes=g.byes||[];
+  const allPlayed=matches.length>0 && matches.every(m=>m.played);
+  return `<div class="group-card group-card--clean group-stage-card">
+    <div class="group-stage-head">
+      <div class="group-stage-title">
+        <span class="group-letter">${g.name}</span>
+        <h3>Grupo ${g.name}</h3>
+        ${allPlayed?`<span class="group-status">✓ Encerrado</span>`:""}
+      </div>
+      <button class="group-sim-btn" data-sim-group="${g.name}">⚡ Simular</button>
+    </div>
+    <div class="table-scroll group-table-wrap">
+      <table class="table group-table standings-table group-standings">
+        <thead><tr><th>#</th><th>Time</th><th>P</th><th>V</th><th>E</th><th>D</th><th>SG</th><th>PTS</th><th></th></tr></thead>
+        <tbody>${rows.map((x,i)=>groupStandingRow(t,x,i,info)).join("")}</tbody>
+      </table>
+    </div>
+    <div class="group-matches-list">${matches.map(matchMini).join("")}${byes.map(byeMini).join("")}</div>
+  </div>`;
+}
+function groupStandingRow(t,x,i,info){
+  const qualified=info.directIds?.has(x.id)||info.extraIds?.has(x.id);
+  const relegated=info.relegatedIds?.has(x.id);
+  const cls=qualified?"status-qualified":relegated?"status-relegated":"";
+  const played=(x.w||0)+(x.d||0)+(x.l||0);
+  const gd=(x.gd||0)>0?`+${x.gd}`:(x.gd||0);
+  const trophy=qualified && i===0 ? `<span class="group-trophy">🏆</span>` : "";
+  return `<tr class="${cls}">
+    <td><span class="group-pos ${qualified?"qualified":""}">${i+1}</span></td>
+    <td><span class="group-team-name ${qualified?"qualified":""}">${x.name}${trophy}</span></td>
+    <td>${played}</td><td>${x.w||0}</td><td>${x.d||0}</td><td>${x.l||0}</td><td>${gd}</td><td><strong>${x.pts||0}</strong></td><td>${groupRowTag(t,x,i,info)}</td>
+  </tr>`;
+}
+function byeMini(b){
+  return `<div class="group-match-row bye-match"><span class="group-match-team home">Descansa</span><strong class="group-match-score">—</strong><span class="group-match-team away">${b.team.name}</span><div class="mini-actions"><em>folga</em></div></div>`;
+}
 function matchMini(m){
-  const score=m.played?`${scoreCell(m,"home")} x ${scoreCell(m,"away")}`:"x";
-  const decision=m.played?`<em>${decisionLabel(m)}</em>`:"";
-  return `<div class="mini-match ${m.played?"played":""}"><span>${m.home.name}</span><strong>${score}</strong><span>${m.away.name}</span>${decision}<div class="mini-actions">${m.played?`<button data-edit-match="${m.id}">editar</button>`:`<button data-sim="${m.id}">simular</button><button data-edit-match="${m.id}">manual</button>`}</div></div>`;
+  const played=m.played;
+  const homeWon=played && m.homeGoals>m.awayGoals;
+  const awayWon=played && m.awayGoals>m.homeGoals;
+  const score=played?`${scoreCell(m,"home")} – ${scoreCell(m,"away")}`:"—";
+  return `<div class="group-match-row ${played?"played":""}">
+    <span class="group-match-team home ${homeWon?"winner":""}">${m.home.name}</span>
+    <button class="group-match-score" data-edit-match="${m.id}">${score}</button>
+    <span class="group-match-team away ${awayWon?"winner":""}">${m.away.name}</span>
+    <div class="mini-actions">${played?`<button data-edit-match="${m.id}">editar</button>`:`<button data-sim="${m.id}">simular</button><button data-edit-match="${m.id}">manual</button>`}</div>
+  </div>`;
+}
+
+function renderBracketSvg(layout){
+  return `<svg class="bracket-svg" width="${layout.width}" height="${layout.height}" viewBox="0 0 ${layout.width} ${layout.height}" aria-hidden="true">
+    ${layout.connectors.map(c=>`<path d="${c.d}" class="bracket-path ${c.active?"active":""}" />`).join("")}
+  </svg>`;
+}
+function renderBracketBoard(t, opts={}){
+  const rounds=t.knockout||[];
+  const finalWinner=t.status==="finished"?t.champion:null;
+  const layout=buildBracketLayout(t,opts);
+  const headers=rounds.map((r,i)=>`<div class="bracket-round-label ${r.name==="Final"?"final-label":""}" style="left:${i*(layout.cardW+layout.roundGap)}px;width:${layout.cardW}px">${bracketRoundLabel(r.name)}</div>`).join("");
+  const cards=rounds.flatMap((r,rIdx)=>(r.matches||[]).map((m,sIdx)=>{
+    const pos=layout.positions[m.id]; if(!pos) return "";
+    return `<div class="bracket-card-slot ${r.name==="Final"?"final-round":""}" style="left:${pos.x}px;top:${pos.y-layout.cardH/2}px;width:${layout.cardW}px">${bracketMatchMarkup(m,r.name,finalWinner,opts)}</div>`;
+  })).join("");
+  return `<div class="bracket-canvas ${opts.export?"export-canvas":""}" style="width:${layout.width}px">
+    <div class="bracket-headers" style="width:${layout.width}px;height:46px">${headers}</div>
+    <div class="bracket-body" style="width:${layout.width}px;height:${layout.height}px">
+      ${renderBracketSvg(layout)}
+      ${cards}
+    </div>
+  </div>`;
 }
 
 function renderBracket(t){
