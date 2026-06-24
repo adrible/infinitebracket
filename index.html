@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brocket 0.8.1</title>
+  <title>Brocket 0.8.3</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -19,7 +19,7 @@
         </div>
       </div>
       <div class="hero">
-        <small id="pageSubtitle">0.8.1</small>
+        <small id="pageSubtitle">0.8.3</small>
         <h1 id="pageTitle">Início</h1>
       </div>
     </header>
@@ -33,7 +33,7 @@
           <button class="quick-card" data-go="tournament"><span>🎮</span><strong>Torneio atual</strong><small>simular partida por partida</small></button>
         </div>
         <div class="panel green-panel">
-          <strong>Brocket 0.8.1</strong>
+          <strong>Brocket 0.8.3</strong>
           <p>Campeonatos, temporadas, divisões, grupos avançados e tabelas exportáveis.</p>
         </div>
         <div class="section-title"><h2>Campeonatos</h2><button class="link" data-go="competitions">ver todos</button></div>
@@ -46,6 +46,16 @@
 
         <div class="panel create-step">
           <div class="step-label">1. Modelo</div>
+          <div class="save-mode save-mode-first">
+            <label><input type="radio" name="saveMode" value="single" checked /> <span><strong>Torneio único</strong><small>Simula só este torneio, sem entrar no histórico.</small></span></label>
+            <label><input type="radio" name="saveMode" value="history" /> <span><strong>Edição de campeonato</strong><small>Salva como edição e soma nas estatísticas.</small></span></label>
+          </div>
+
+          <div id="competitionChoice" class="competition-choice" hidden>
+            <label>Campeonato<select id="competitionSelect"></select></label>
+            <small class="muted">Crie um campeonato na aba Campeonatos se a lista estiver vazia.</small>
+          </div>
+
           <div class="form-grid">
             <label id="singleNameField"><span id="singleNameLabel">Nome do torneio</span><input id="championshipName" value="Liga Mundial" placeholder="Ex: Liga Mundial" /></label>
             <label>Temporada<input id="editionName" placeholder="Ex: 2026 ou Temporada 1" /></label>
@@ -64,15 +74,6 @@
             <small class="muted">Na divisão máxima não aparece “Class.” por padrão; nas divisões inferiores aparecem promovidos e rebaixados.</small>
           </div>
 
-          <div class="save-mode">
-            <label><input type="radio" name="saveMode" value="single" checked /> <span><strong>Torneio único</strong><small>Simule sem salvar em um campeonato.</small></span></label>
-            <label><input type="radio" name="saveMode" value="history" /> <span><strong>Salvar como edição</strong><small>Usa o campeonato selecionado e entra nas estatísticas.</small></span></label>
-          </div>
-
-          <div id="competitionChoice" class="competition-choice" hidden>
-            <label>Campeonato<select id="competitionSelect"></select></label>
-            <small class="muted">Crie um campeonato na aba Campeonatos se a lista estiver vazia.</small>
-          </div>
         </div>
 
         <div class="panel create-step">
