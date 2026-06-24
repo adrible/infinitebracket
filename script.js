@@ -172,7 +172,7 @@ function formatLabel(f){ return {playoffs:"Mata-mata direto",groups:"Grupos + ma
 
 function getInputNumber(id,fallback=0){ const el=$("#"+id); return el ? (Number(el.value)||fallback) : fallback; }
 function desiredTeamCount(){
-  // 0.8.1 final: a quantidade escolhida pelo usuário manda.
+  // 0.8.3 final: a quantidade escolhida pelo usuário manda.
   // O número de grupos se adapta para caber essa quantidade, mas nunca aumenta
   // a quantidade de times por causa de grupoCount x groupSize.
   return getInputNumber("teamCount",16);
@@ -303,7 +303,7 @@ function compactDecisionLabel(m){
 function go(screen){
   $$(".screen").forEach(s=>s.classList.toggle("active",s.id===screen));
   $$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.go===screen));
-  const titles = {home:["0.8.1","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
+  const titles = {home:["0.8.3","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
   $("#pageSubtitle").textContent = titles[screen]?.[0] || "Brocket";
   $("#pageTitle").textContent = titles[screen]?.[1] || "Brocket";
   window.scrollTo(0,0);
@@ -541,7 +541,7 @@ function cfg(){
   if(format==="league" && teamCount>24) teamCount=24;
   const selectedGroupSize=getInputNumber("groupSize",4)||4;
   const selectedGroupCount=getInputNumber("groupCount",Math.ceil(teamCount/selectedGroupSize));
-  // 0.8.1 final: em grupos, calcula grupos suficientes para comportar a quantidade exata escolhida.
+  // 0.8.3 final: em grupos, calcula grupos suficientes para comportar a quantidade exata escolhida.
   // Ex.: 31 times + 4 por grupo = 8 grupos, com folgas quando necessário.
   const groupCount = format==="groups" ? Math.max(selectedGroupCount,Math.ceil(teamCount/selectedGroupSize)) : 0;
   const copa48 = format==="groups" && teamCount===48 && groupCount===12 && selectedGroupSize===4;
@@ -561,7 +561,7 @@ function generateTournament(){
   if(c.format==="league" && c.teamCount>24){ alert("Pontos corridos permite até 24 times."); refreshTeamCountOptions(); return; }
   if(c.saveMode==="history" && !c.competitionId){ alert("Crie ou selecione um campeonato para salvar no histórico."); return; }
   if(selectedTeams.length<c.teamCount){ alert(`Selecione ${c.teamCount} times.`); return; }
-  // 0.7.9: montagem manual parcial é permitida; o Brocket completa as vagas restantes automaticamente.
+  // 0.8.3: montagem manual parcial é permitida; o Brocket completa as vagas restantes automaticamente.
   let teams = getPreviewOrder(c).slice(0,c.teamCount).map(t=>({...t}));
   const t = { id:uid(), cfg:c, teams, status:"running", saved:false, champion:null, runnerUp:null, groups:[], knockout:[], league:null, currentStage:"", createdAt:new Date().toISOString() };
   if(c.format==="league") setupLeague(t);
@@ -1027,7 +1027,7 @@ function playKnockout(a,b,c,isFinal){
 function playSingle(a,b,c,allowDraw){
   const diff=(a.power||70)-(b.power||70);
 
-  // 0.7.9.2: motor universal de placares.
+  // 0.8.3.2: motor universal de placares.
   // A mesma lógica vale para liga, grupos, mata-mata e ida/volta.
   // A diferença de força altera a chance antes do placar sair; o placar final não é reduzido depois.
   const realism=c.realism||"realistic";

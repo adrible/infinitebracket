@@ -1,8 +1,8 @@
-# Brocket 0.8.1
+# Brocket 0.8.3
 
 Versão organizada com correções de lógica, navegação e visual, sem duplicar funcionalidades já existentes.
 
-## 0.8.1
+## 0.8.3
 
 - Reformulação visual do mata-mata, com cards mais limpos e legíveis.
 - Final refeita em visual dark premium, sem o bloco branco anterior.
@@ -18,7 +18,7 @@ Versão organizada com correções de lógica, navegação e visual, sem duplica
 ## Principais ajustes
 
 - Mantida chave estável de armazenamento (`brocket-0-7`) para preservar dados entre versões.
-- Migração aceita dados da 0.8.1 sem apagar campeonatos, times ou pacotes.
+- Migração aceita dados da 0.8.3 sem apagar campeonatos, times ou pacotes.
 - Liga/Pontos corridos continua limitada a 24 times.
 - Grupos e mata-mata continuam permitindo até 48 times.
 - Formato Copa 48 mantido automaticamente:
@@ -55,7 +55,7 @@ Suba somente estes arquivos na raiz do GitHub:
 - README.md
 
 
-## Brocket 0.8.1
+## Brocket 0.8.3
 
 - Visual do chaveamento mais polido.
 - Campeão com destaque dourado mais uniforme.
@@ -71,7 +71,7 @@ Suba somente estes arquivos na raiz do GitHub:
 - Montagem manual de grupos com contador por grupo e bloqueio de grupo incompleto.
 
 
-## Brocket 0.8.1
+## Brocket 0.8.3
 
 Correção pontual da tabela mobile:
 
@@ -81,7 +81,7 @@ Correção pontual da tabela mobile:
 - Simular tudo mantém a variação da última rodada simulada.
 
 
-## Brocket 0.8.1
+## Brocket 0.8.3
 
 Patch de lógica e tabela:
 
@@ -92,7 +92,7 @@ Patch de lógica e tabela:
 - Mantém Pts como principal destaque da tabela.
 
 
-## Brocket 0.8.1
+## Brocket 0.8.3
 
 Patch de ranking e zebra:
 
@@ -105,9 +105,9 @@ Patch de ranking e zebra:
   - azarão golear favorito fica mais raro;
   - favorito golear azarão continua possível.
 
-## Brocket 0.8.1
+## Brocket 0.8.3
 
-Refinamento pós 0.7.9.1:
+Refinamento pós 0.8.3.1:
 
 - Novo motor universal de placares, usado por liga, grupos, mata-mata e ida/volta.
 - Placares comuns ficam mais frequentes e placares caóticos ficam mais raros.
@@ -122,7 +122,7 @@ Refinamento pós 0.7.9.1:
 - Mantém STORAGE estável em `brocket-0-7`.
 
 
-## 0.8.1
+## 0.8.3
 - Remoção de campeonato pela lista e pela configuração.
 - Campeonato salvo passa a ser a fonte do nome quando a edição é salva no histórico.
 - Nome principal segue Campeonato — Divisão — Temporada.
@@ -130,24 +130,24 @@ Refinamento pós 0.7.9.1:
 - Status de campeão/promovido/rebaixado vira marcador lateral no mobile.
 
 
-## 0.8.1
+## 0.8.3
 
 - Corrige a redundância entre Torneio único e Salvar como edição.
 - Em edição, usa apenas o campeonato selecionado; o campo de nome do torneio fica oculto.
 - Remove exportação JPEG, mantendo apenas PNG.
 - Compacta a tabela mobile para caber melhor o nome dos times.
 - Melhora layout do mata-mata/final e aplica polimento visual geral.
-- Mantém o motor universal de placares da 0.7.9.2.
+- Mantém o motor universal de placares da 0.8.3.2.
 
 
-## 0.8.1
+## 0.8.3
 - Troca marcadores laterais duros por brilho suave nas linhas.
 - Classificados/promovidos ficam em negrito e brilho verde, sem selo “Class.”.
 - Campeão ganha brilho dourado suave.
 - Rebaixados ficam com brilho vermelho suave, sem texto ocupando coluna.
 
 
-## Brocket 0.8.1
+## Brocket 0.8.3
 - Mata-mata com apenas o classificado em negrito.
 - Final mais compacta e alinhada ao estilo dos demais cards.
 - Ida/volta em formato curto com short names.
@@ -155,7 +155,7 @@ Refinamento pós 0.7.9.1:
 - Pacotes personalizados aceitam: Nome, força, short.
 
 
-## 0.8.1
+## 0.8.3
 - Exportação PNG alinhada ao visual novo da tabela.
 - Destaques dourado, verde e vermelho aplicados no PNG.
 - Exportação sem “Class.” ou “Rebaix.” textual.
@@ -163,21 +163,21 @@ Refinamento pós 0.7.9.1:
 - Motor de placares mantido.
 
 
-## 0.8.1 final
+## 0.8.3 final
 - Quantidade escolhida pelo usuário é respeitada para grupos e mata-mata.
 - Grupos ajustam automaticamente a quantidade de grupos para caber os times escolhidos.
 - Opções de tamanho em grupos/mata-mata vão de 2 a 64 sem pular tamanhos.
 - Correção reforçada do espaçamento Pos/Time.
 
 
-## 0.8.1
+## 0.8.3
 - Negrito fica reservado aos classificados/promovidos/campeão.
 - Rebaixados e times normais ficam sem negrito pesado.
 - Sorteio padrão de grupos agora é por potes, divididos pelo power dos times.
 - O sorteio por potes distribui os mais fortes em potes e embaralha dentro dos grupos.
 - Mantido STORAGE brocket-0-7 e motor de placares.
 
-## Ajuste bracket 0.8.1
+## Ajuste bracket 0.8.3
 
 - Refeito o desenho do mata-mata para seguir estrutura clássica de bracket.
 - Linhas horizontais e verticais reforçadas para conectar as fases.
