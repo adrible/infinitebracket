@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Brocket 0.8.3</title>
+  <title>Brocket 0.8.4</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -19,7 +19,7 @@
         </div>
       </div>
       <div class="hero">
-        <small id="pageSubtitle">0.8.3</small>
+        <small id="pageSubtitle">0.8.4</small>
         <h1 id="pageTitle">Início</h1>
       </div>
     </header>
@@ -33,7 +33,7 @@
           <button class="quick-card" data-go="tournament"><span>🎮</span><strong>Torneio atual</strong><small>simular partida por partida</small></button>
         </div>
         <div class="panel green-panel">
-          <strong>Brocket 0.8.3</strong>
+          <strong>Brocket 0.8.4</strong>
           <p>Campeonatos, temporadas, divisões, grupos avançados e tabelas exportáveis.</p>
         </div>
         <div class="section-title"><h2>Campeonatos</h2><button class="link" data-go="competitions">ver todos</button></div>
@@ -61,6 +61,14 @@
             <label>Temporada<input id="editionName" placeholder="Ex: 2026 ou Temporada 1" /></label>
             <label>Formato<select id="formatSelect"><option value="playoffs">Mata-mata direto</option><option value="groups">Grupos + mata-mata</option><option value="league">Pontos corridos</option></select></label>
             <label>Quantidade de times<select id="teamCount"><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option><option selected>16</option><option>20</option><option>24</option><option>32</option><option>36</option><option>40</option><option>48</option></select></label>
+          </div>
+
+          <div id="templateSuggestion" class="template-suggestion" hidden>
+            <div>
+              <strong id="templateSuggestionTitle">Template encontrado</strong>
+              <small id="templateSuggestionText">O Brocket reconheceu este campeonato.</small>
+            </div>
+            <button class="secondary" id="applyTemplateSuggestion" type="button">Aplicar template</button>
           </div>
 
           <div class="rule-group division-rule" data-rule-for="league groups">
@@ -290,6 +298,21 @@
           </div>
           <textarea id="backupBox" class="backup-box" placeholder="O backup aparece aqui. Para importar, cole o JSON aqui."></textarea>
         </div>
+        <div class="panel football-data-panel">
+          <h3>Football-data.org</h3>
+          <p class="muted">Opcional: cole seu token para buscar times e escudos oficiais por competição. Sem token, o Brocket continua usando packs e escudos locais.</p>
+          <div class="form-grid">
+            <label>Token/API key<input id="footballDataToken" type="password" placeholder="X-Auth-Token" autocomplete="off" /></label>
+            <label>Código da competição<input id="footballDataCompetitionCode" placeholder="Ex: CL, PL, PD, SA, BL1, FL1, WC" /></label>
+          </div>
+          <div class="action-row">
+            <button class="secondary" id="saveFootballDataToken" type="button">Salvar token</button>
+            <button class="secondary" id="clearFootballDataToken" type="button">Remover token</button>
+            <button class="primary" id="fetchFootballDataTeams" type="button">Buscar times/escudos</button>
+          </div>
+          <small id="footballDataStatus" class="muted">Token não configurado.</small>
+        </div>
+
         <div class="panel import-championship-panel">
           <h3>Importar campeonatos</h3>
           <p class="muted">Cole JSON com campeonatos, pacotes, times e escudos. Aceita campos como competitions, packs, teams e crests.</p>

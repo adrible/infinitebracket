@@ -1190,7 +1190,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.8.3 — divisões, exportação e legibilidade */
+/* 0.8.4 — divisões, exportação e legibilidade */
 .division-rule{ margin-top:14px; }
 .class-tag.promoted{ background:#e8f6ff; color:#0b6796; }
 .class-tag.relegated{ background:#fff1f1; color:#b32626; }
@@ -1225,7 +1225,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.8.3.1 — ida e volta em linhas separadas */
+/* 0.8.4.1 — ida e volta em linhas separadas */
 .two-leg-detail{
   display:grid;
   gap:5px;
@@ -1247,7 +1247,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   font-weight:950;
 }
 
-/* 0.8.3.2 — refinamento visual, exportação e status compacto */
+/* 0.8.4.2 — refinamento visual, exportação e status compacto */
 .status-dot{
   width:9px;
   height:26px;
@@ -1332,7 +1332,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 .export-marker.promoted,.export-marker.direct{background:#19a84f;}
 .export-marker.relegated{background:#e53935;}
 
-/* 0.8.3.4 — campeonatos, tabela compacta e status lateral no mobile */
+/* 0.8.4.4 — campeonatos, tabela compacta e status lateral no mobile */
 .competition-card{
   display:grid;
   grid-template-columns:1fr auto;
@@ -1391,7 +1391,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.8.3.4 — nomes sem redundância, tabela mais compacta e polimento visual */
+/* 0.8.4.4 — nomes sem redundância, tabela mais compacta e polimento visual */
 #singleNameField[hidden],
 #competitionChoice[hidden]{display:none!important;}
 
@@ -1503,7 +1503,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   .standings-table:not(.group-table) tbody tr td:first-child{border-left-width:3px!important;}
 }
 
-/* 0.8.3.6 — status por glow suave, sem selo ocupando coluna */
+/* 0.8.4.6 — status por glow suave, sem selo ocupando coluna */
 .standings-table th:last-child,
 .standings-table td:last-child{
   display:none!important;
@@ -1571,7 +1571,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.8.3.6 — mata-mata, final e short names */
+/* 0.8.4.6 — mata-mata, final e short names */
 .match-line span{font-weight:760;}
 .match-line.winner span,
 .match-line.winner strong{font-weight:950;}
@@ -1634,7 +1634,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   .final-round .match-line{padding:8px 7px;}
 }
 
-/* 0.8.3 — PNG exportado com visual novo da tabela */
+/* 0.8.4 — PNG exportado com visual novo da tabela */
 .export-holder{
   position:fixed;
   left:-99999px;
@@ -1766,7 +1766,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 .export-marker{display:none!important;}
 
-/* 0.8.3 — correção de espaçamento Pos/Time nas tabelas compactas */
+/* 0.8.4 — correção de espaçamento Pos/Time nas tabelas compactas */
 .group-table th:first-child,
 .group-table td:first-child,
 .standings-table th:first-child,
@@ -1806,7 +1806,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.8.3 hotfix — Pos e Time separados de verdade */
+/* 0.8.4 hotfix — Pos e Time separados de verdade */
 .standings-table{
   table-layout:fixed!important;
 }
@@ -1854,7 +1854,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.8.3 final — Pos e Time separados e sem POSTIME */
+/* 0.8.4 final — Pos e Time separados e sem POSTIME */
 .standings-table th:first-child,
 .group-table th:first-child{
   width:56px!important;
@@ -1902,7 +1902,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   }
 }
 
-/* 0.8.3 — bracket compacto expansível, background premium e export PNG do mata-mata */
+/* 0.8.4 — bracket compacto expansível, background premium e export PNG do mata-mata */
 .tournament-screen{
   background:
     radial-gradient(circle at 50% 8%, rgba(97,255,158,.22), transparent 34%),
@@ -2064,7 +2064,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.8.3 — negrito apenas para classificados/promovidos/campeão */
+/* 0.8.4 — negrito apenas para classificados/promovidos/campeão */
 .standings-table .team-cell-fake strong{
   font-weight:700!important;
 }
@@ -2083,7 +2083,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 .export-status-promoted .export-team strong,
 .export-status-champion .export-team strong{font-weight:950!important;}
 
-/* ===== Brocket 0.8.3 — bracket refresh ===== */
+/* ===== Brocket 0.8.4 — bracket refresh ===== */
 .tournament-screen{
   position:relative;
   overflow:hidden;
@@ -2350,7 +2350,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* ===== Brocket 0.8.3 — marcador de detalhes ===== */
+/* ===== Brocket 0.8.4 — marcador de detalhes ===== */
 .match-footer{
   display:flex !important;
   justify-content:center !important;
@@ -2383,7 +2383,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 .export-bracket-board .match-expand-marker{display:none!important;}
 
 
-/* ===== Brocket 0.8.3 — bracket tree + table fit ===== */
+/* ===== Brocket 0.8.4 — bracket tree + table fit ===== */
 .standings-table{table-layout:fixed;width:100%;}
 .standings-table th:nth-child(1),.standings-table td:nth-child(1){width:42px;}
 .standings-table th:nth-child(2),.standings-table td:nth-child(2){width:auto;min-width:0;}
@@ -2471,7 +2471,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   .match-line{grid-template-columns:minmax(0,1fr) 40px!important;min-height:32px;}
 }
 
-/* ===== Brocket 0.8.3 — bracket tree correction ===== */
+/* ===== Brocket 0.8.4 — bracket tree correction ===== */
 .bracket-scroll{overflow-x:auto!important;overflow-y:hidden!important;padding:18px 18px 34px!important;}
 .visual-bracket,.export-bracket-board{--round-gap:74px;--card-w:232px;--connector:74px;display:flex!important;align-items:flex-start!important;gap:var(--round-gap)!important;min-width:max-content!important;position:relative!important;}
 .round.compact-round{min-width:var(--card-w)!important;width:var(--card-w)!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;position:relative!important;gap:0!important;}
@@ -2541,9 +2541,9 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* ===== Brocket 0.8.3 — bracket tree rebuild =====
+/* ===== Brocket 0.8.4 — bracket tree rebuild =====
    Estrutura inspirada no Challonge: colunas por fase, cards com altura fixa
-   e conectores por pares. Mantém visual/final da 0.8.3. */
+   e conectores por pares. Mantém visual/final da 0.8.4. */
 
 .bracket-scroll{
   overflow-x:auto!important;
@@ -2759,7 +2759,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* ===== Brocket 0.8.3 — bracket calculado com SVG ===== */
+/* ===== Brocket 0.8.4 — bracket calculado com SVG ===== */
 .visual-bracket{
   display:block!important;
   min-width:0!important;
@@ -2914,7 +2914,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* ===== Brocket 0.8.3 — ajustes finos do bracket ===== */
+/* ===== Brocket 0.8.4 — ajustes finos do bracket ===== */
 
 /* 1) Ao expandir, o detalhe abre acima dos outros cards, sem ser engolido pelo card seguinte. */
 .bracket-card-slot{
@@ -2978,7 +2978,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   }
 }
 
-/* ===== Brocket 0.8.3 — estrutura de grupos e rodadas ===== */
+/* ===== Brocket 0.8.4 — estrutura de grupos e rodadas ===== */
 .group-stage-card{display:grid;gap:12px;}
 .group-stage-head{display:flex;align-items:center;justify-content:space-between;gap:10px;}
 .group-stage-title{display:flex;align-items:center;gap:9px;min-width:0;}
@@ -3012,7 +3012,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* ===== Brocket 0.8.3 — escudos, grupos e importação ===== */
+/* ===== Brocket 0.8.4 — escudos, grupos e importação ===== */
 
 /* Escudos: usa imagem importada quando houver, ou escudo gerado por nome. */
 .team-name-with-crest{
@@ -3155,7 +3155,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   .group-match-score{min-width:62px!important;padding:6px 8px!important;}
 }
 
-/* ===== Brocket 0.8.3 — packs com escudos nativos ===== */
+/* ===== Brocket 0.8.4 — packs com escudos nativos ===== */
 .pack .pack-crest-sample{
   display:flex;
   align-items:center;
@@ -3167,7 +3167,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* ===== Brocket 0.8.3 — escolha Único/Edição antes de configurar ===== */
+/* ===== Brocket 0.8.4 — escolha Único/Edição antes de configurar ===== */
 .save-mode-first{
   margin:10px 0 14px;
   display:grid;
@@ -3205,7 +3205,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* Brocket 0.8.3 — correções de layout e acabamento visual */
+/* Brocket 0.8.4 — correções de layout e acabamento visual */
 
 /* Base visual mais consistente */
 :root{
@@ -3638,5 +3638,219 @@ input,select,textarea{
   .nav-btn{
     padding-left:4px;
     padding-right:4px;
+  }
+}
+
+
+/* 0.8.4 — templates, football-data.org e grupo mobile sem rolagem */
+.template-suggestion{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:12px 0 4px;
+  padding:12px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.08);
+  box-shadow:0 10px 24px rgba(0,0,0,.12);
+}
+.template-suggestion[hidden]{ display:none!important; }
+.template-suggestion div{ min-width:0; }
+.template-suggestion strong,
+.template-suggestion small{ display:block; }
+.template-suggestion small{ margin-top:3px; opacity:.78; }
+.template-suggestion button{ flex:0 0 auto; }
+
+.football-data-panel .form-grid{ align-items:end; }
+.football-data-panel #footballDataStatus{
+  display:block;
+  margin-top:10px;
+}
+
+.group-table-wrap{
+  overflow-x:hidden!important;
+}
+
+.group-standings{
+  width:100%!important;
+  min-width:0!important;
+  table-layout:fixed!important;
+}
+
+.group-standings th,
+.group-standings td{
+  white-space:nowrap!important;
+  vertical-align:middle;
+}
+
+.group-standings th:nth-child(1),
+.group-standings td:nth-child(1){
+  width:38px!important;
+}
+
+.group-standings th:nth-child(2),
+.group-standings td:nth-child(2){
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
+}
+
+.group-standings th:nth-child(n+3),
+.group-standings td:nth-child(n+3){
+  width:34px!important;
+  text-align:center!important;
+  padding-left:2px!important;
+  padding-right:2px!important;
+}
+
+.group-standings th:last-child,
+.group-standings td:last-child{
+  width:40px!important;
+}
+
+.group-rank{
+  display:inline-flex;
+  align-items:center;
+  gap:2px;
+}
+
+.rank-delta{
+  display:inline-flex;
+  transform:scale(.78);
+  transform-origin:left center;
+}
+
+.group-team-name{
+  display:flex!important;
+  align-items:center!important;
+  gap:6px!important;
+  min-width:0!important;
+  white-space:nowrap!important;
+}
+
+.group-team-name .team-crest{
+  flex:0 0 auto;
+}
+
+.group-team-text{
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+
+.group-team-short,
+.team-name-with-crest .team-short{
+  display:none;
+}
+
+.group-team-full,
+.team-name-with-crest .team-full{
+  display:inline;
+}
+
+.group-match-team .team-name-with-crest{
+  min-width:0;
+  max-width:100%;
+}
+
+.group-match-team .team-name-with-crest .team-full{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+@media(max-width:720px){
+  .template-suggestion{
+    align-items:stretch;
+    flex-direction:column;
+  }
+  .template-suggestion button{ width:100%; }
+
+  .group-table-wrap{
+    overflow-x:hidden!important;
+  }
+
+  .group-standings{
+    min-width:0!important;
+    width:100%!important;
+    font-size:13px;
+  }
+
+  .group-standings th,
+  .group-standings td{
+    padding-left:3px!important;
+    padding-right:3px!important;
+  }
+
+  .group-standings th:nth-child(1),
+  .group-standings td:nth-child(1){
+    width:34px!important;
+  }
+
+  .group-standings th:nth-child(2),
+  .group-standings td:nth-child(2){
+    width:auto!important;
+    min-width:0!important;
+  }
+
+  .group-standings th:nth-child(n+3),
+  .group-standings td:nth-child(n+3){
+    width:29px!important;
+  }
+
+  .group-standings th:last-child,
+  .group-standings td:last-child{
+    width:36px!important;
+  }
+
+  .group-team-full,
+  .team-name-compact .team-full{
+    display:none!important;
+  }
+
+  .group-team-short,
+  .team-name-compact .team-short{
+    display:inline!important;
+  }
+
+  .group-team-name .team-crest{
+    --crest-size:16px!important;
+  }
+
+  .group-match-team .team-full{
+    display:none!important;
+  }
+
+  .group-match-team .team-short{
+    display:inline!important;
+  }
+
+  .group-match-team{
+    font-size:13px!important;
+  }
+}
+
+@media(max-width:390px){
+  .group-standings{ font-size:12px; }
+
+  .group-standings th:nth-child(1),
+  .group-standings td:nth-child(1){
+    width:31px!important;
+  }
+
+  .group-standings th:nth-child(n+3),
+  .group-standings td:nth-child(n+3){
+    width:27px!important;
+  }
+
+  .group-standings th:last-child,
+  .group-standings td:last-child{
+    width:33px!important;
+  }
+
+  .group-match-team{
+    font-size:12px!important;
   }
 }
