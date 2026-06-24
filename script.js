@@ -44,7 +44,75 @@ function cleanShort(v){ return `${v||""}`.trim().toUpperCase().replace(/[^A-Z0-9
 function fallbackShort(name){ const letters=`${name||""}`.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^A-Za-z0-9]/g,"").toUpperCase(); return (letters||"---").slice(0,3); }
 function teamShort(t){ return cleanShort(t?.short) || cleanShort(KNOWN_SHORTS[t?.name]) || fallbackShort(t?.name); }
 
-const starter = { competitions:[], customTeams:[], customPacks:[], activeTournament:null };
+function crestHash(str){
+  let h=2166136261;
+  for(let i=0;i<`${str||""}`.length;i++){ h^=`${str||""}`.charCodeAt(i); h=Math.imul(h,16777619)>>>0; }
+  return h>>>0;
+}
+const CREST_PALETTE=[
+  ["#e11d48","#7f1d1d"],["#f59e0b","#78350f"],["#10b981","#064e3b"],["#3b82f6","#1e3a8a"],
+  ["#8b5cf6","#4c1d95"],["#ec4899","#831843"],["#14b8a6","#134e4a"],["#f97316","#7c2d12"],
+  ["#0ea5e9","#0c4a6e"],["#a3a3a3","#3f3f46"],["#eab308","#713f12"],["#22c55e","#14532d"]
+];
+function crestInitials(name){
+  const clean=`${name||""}`.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^\p{L}\p{N}\s-]/gu,"").trim();
+  const parts=clean.split(/\s+/).filter(Boolean);
+  if(!parts.length) return "?";
+  if(parts.length===1) return (parts[0][0]+(parts[0][1]||"")).toUpperCase();
+  return (parts[0][0]+parts.at(-1)[0]).toUpperCase();
+}
+function builtinPackCrest(name,source=""){
+  const h=crestHash(`${source}:${name}`);
+  const [a,b]=CREST_PALETTE[h%CREST_PALETTE.length];
+  const initials=crestInitials(name).replace(/[^A-Z0-9]/g,"").slice(0,3) || "?";
+  const shape=["shield","round","diamond"][h%3];
+  const band=(h>>3)%4;
+  const stripe = band===0
+    ? `<path d="M0 36h96v24H0z" fill="rgba(255,255,255,.22)"/>`
+    : band===1
+      ? `<path d="M22 0h18v96H22zM56 0h18v96H56z" fill="rgba(255,255,255,.18)"/>`
+      : band===2
+        ? `<path d="M-8 75L74-7l16 16L8 91z" fill="rgba(255,255,255,.18)"/>`
+        : `<circle cx="48" cy="48" r="22" fill="rgba(255,255,255,.13)"/>`;
+  const mask = shape==="round"
+    ? `<circle cx="48" cy="48" r="44"/>`
+    : shape==="diamond"
+      ? `<path d="M48 4 92 48 48 92 4 48z"/>`
+      : `<path d="M48 4 86 14 82 58 48 92 14 58 10 14z"/>`;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient><clipPath id="c">${mask}</clipPath></defs><g clip-path="url(#c)"><rect width="96" height="96" fill="url(#g)"/>${stripe}<path d="M8 8h80v80H8z" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="4"/></g><text x="48" y="57" text-anchor="middle" font-family="Arial, sans-serif" font-size="${initials.length>2?24:30}" font-weight="900" fill="white" style="paint-order:stroke;stroke:rgba(0,0,0,.35);stroke-width:3">${initials}</text></svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+function ensureTeamCrest(name,source=""){
+  const n=`${name||""}`.trim();
+  if(!n) return "";
+  data.crests ||= {};
+  if(!data.crests[n]) data.crests[n]=builtinPackCrest(n,source);
+  return data.crests[n];
+}
+
+function teamCrestUrl(t){
+  const name=typeof t==="string"?t:t?.name;
+  return (typeof t==="object" && t?.crest) || data.crests?.[name] || data.crests?.[`${name||""}`.trim()] || "";
+}
+function teamCrest(t,size=22){
+  const name=typeof t==="string"?t:t?.name;
+  const url=teamCrestUrl(t);
+  const label=escapeHtml(crestInitials(name));
+  if(url) return `<span class="team-crest crest-img" style="--crest-size:${size}px"><img src="${escapeAttr(url)}" alt="" loading="lazy" /></span>`;
+  const h=crestHash(name);
+  const [a,b]=CREST_PALETTE[h%CREST_PALETTE.length];
+  const shape=["shield","round","diamond"][(h>>4)%3];
+  return `<span class="team-crest crest-${shape}" style="--crest-size:${size}px;--crest-a:${a};--crest-b:${b}"><em>${label}</em></span>`;
+}
+function teamNameWithCrest(t,opts={}){
+  const name=typeof t==="string"?t:t?.name;
+  return `<span class="team-name-with-crest ${opts.dim?"dim":""}">${teamCrest(t,opts.size||22)}<span>${escapeHtml(name||"")}</span></span>`;
+}
+function escapeHtml(v){ return `${v??""}`.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
+function escapeAttr(v){ return escapeHtml(v).replace(/`/g,"&#96;"); }
+
+
+const starter = { competitions:[], customTeams:[], customPacks:[], crests:{}, activeTournament:null };
 
 let data = load();
 function sanitizeLoadedData(d){
@@ -52,6 +120,7 @@ function sanitizeLoadedData(d){
   d.competitions = Array.isArray(d.competitions) ? d.competitions : [];
   d.customTeams = Array.isArray(d.customTeams) ? d.customTeams : [];
   d.customPacks = Array.isArray(d.customPacks) ? d.customPacks : [];
+  d.crests = d.crests && typeof d.crests==="object" ? d.crests : {};
   if(d?.activeTournament?.cfg?.format==="league" && Number(d.activeTournament.cfg.teamCount)>24){
     d.activeTournament=null;
   }
@@ -74,6 +143,10 @@ let editingMatchId = null;
 let selectedLeagueRound = null;
 let selectedGroupRound = null;
 let expandedMatches = new Set();
+if(!data.crests || !Object.keys(data.crests).length){
+  Object.values(packs).forEach(p=>p.teams.forEach(([name])=>{ data.crests[name]=builtinPackCrest(name,p.name); }));
+  save();
+}
 
 function uid(){ return crypto?.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)+Date.now(); }
 function mSaved(home,away,hg,ag,winner,loser,stage,meta,pens=null){ return {home,away,homeGoals:hg,awayGoals:ag,winner,loser,stage,meta,pens,played:true}; }
@@ -88,9 +161,9 @@ function load(){
 }
 function save(){ localStorage.setItem(STORAGE, JSON.stringify(data)); }
 function slug(s){ return `${s}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
-function team(name,power,source="",short=""){
+function team(name,power,source="",short="",crest=""){
   const manualShort=cleanShort(short);
-  return { id:slug(name), name, power, source, short: manualShort || cleanShort(KNOWN_SHORTS[name]) || "" };
+  return { id:slug(name), name, power, source, short: manualShort || cleanShort(KNOWN_SHORTS[name]) || "", crest: `${crest||""}`.trim() };
 }
 function shuffle(a){ return a.map(x=>[Math.random(),x]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]); }
 function clamp(n,a,b){ return Math.max(a,Math.min(b,n)); }
@@ -99,7 +172,7 @@ function formatLabel(f){ return {playoffs:"Mata-mata direto",groups:"Grupos + ma
 
 function getInputNumber(id,fallback=0){ const el=$("#"+id); return el ? (Number(el.value)||fallback) : fallback; }
 function desiredTeamCount(){
-  // 0.7.9.7a final: a quantidade escolhida pelo usuário manda.
+  // 0.8.1 final: a quantidade escolhida pelo usuário manda.
   // O número de grupos se adapta para caber essa quantidade, mas nunca aumenta
   // a quantidade de times por causa de grupoCount x groupSize.
   return getInputNumber("teamCount",16);
@@ -118,14 +191,20 @@ function pool(){
   const map = new Map();
   selectedPacks.forEach(k => {
     const p = allPacks()[k];
-    if(p) p.teams.forEach(([name,power,short]) => map.set(slug(name), team(name,power,p.name,short)));
+    if(p) p.teams.forEach(([name,power,short,crest]) => {
+      const url = crest || ensureTeamCrest(name,p.name);
+      map.set(slug(name), team(name,power,p.name,short,url));
+    });
   });
-  data.customTeams.forEach(t => map.set(t.id, t));
+  data.customTeams.forEach(t => {
+    if(t.name && !teamCrestUrl(t)) t.crest = ensureTeamCrest(t.name,t.source||"Meu time");
+    map.set(t.id, t);
+  });
   return Array.from(map.values());
 }
 function allPacks(){
   const custom = {};
-  (data.customPacks||[]).forEach(p=>custom[p.id]={name:p.name, icon:"🧩", teams:p.teams.map(t=>[t.name,t.power,t.short||""])});
+  (data.customPacks||[]).forEach(p=>custom[p.id]={name:p.name, icon:"🧩", teams:p.teams.map(t=>[t.name,t.power,t.short||"",t.crest||data.crests?.[t.name]||""])});
   return {...packs, ...custom};
 }
 function rankEntries(obj,asc=false){ return Object.entries(obj).sort((a,b)=>asc ? (a[1]-b[1] || a[0].localeCompare(b[0])) : (b[1]-a[1] || a[0].localeCompare(b[0]))); }
@@ -224,7 +303,7 @@ function compactDecisionLabel(m){
 function go(screen){
   $$(".screen").forEach(s=>s.classList.toggle("active",s.id===screen));
   $$(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.go===screen));
-  const titles = {home:["0.7.9.7d","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
+  const titles = {home:["0.8.1","Início"],create:["Novo","Criar torneio"],teamPicker:["Times","Selecionar times"],groupBuilder:["Grupos","Montar grupos"],tournament:["Simulação","Torneio atual"],competitions:["Histórico","Campeonatos"],competitionDetail:["Central","Estatísticas"],teams:["Participantes","Times"],settings:["Ajustes","Configurações"]};
   $("#pageSubtitle").textContent = titles[screen]?.[0] || "Brocket";
   $("#pageTitle").textContent = titles[screen]?.[1] || "Brocket";
   window.scrollTo(0,0);
@@ -293,7 +372,7 @@ function renderCompetitions(){
 function openCompetition(id){ currentCompetitionId=id; const c=data.competitions.find(x=>x.id===id); if(!c) return; $("#competitionTitle").textContent=c.name; $("#editCompetitionName").value=c.name; renderCompetitionDetail(c); go("competitionDetail"); }
 
 function renderPacks(){
-  $("#packList").innerHTML = Object.entries(allPacks()).map(([key,p])=>`<label class="pack"><input type="checkbox" data-pack="${key}" ${selectedPacks.has(key)?"checked":""}/><span>${p.icon}</span><div><strong>${p.name}</strong><small>${p.teams.length} times</small></div></label>`).join("");
+  $("#packList").innerHTML = Object.entries(allPacks()).map(([key,p])=>{ const sample=p.teams.slice(0,3).map(([name,,short,crest])=>teamCrest({name,short,crest:crest||data.crests?.[name]||ensureTeamCrest(name,p.name)},20)).join(""); return `<label class="pack"><input type="checkbox" data-pack="${key}" ${selectedPacks.has(key)?"checked":""}/><span>${p.icon}</span><div><strong>${p.name}</strong><small>${p.teams.length} times</small><div class="pack-crest-sample">${sample}</div></div></label>`; }).join("");
   const pc=$("#poolCount"); if(pc) pc.textContent = `${pool().length} disponíveis`;
   renderQuotas();
   renderAvailableTeams();
@@ -330,7 +409,7 @@ function renderAvailableTeams(){
     const checked=isSelected(t.id);
     return `<button class="team-pick ${checked?"chosen":""}" data-toggle-team="${t.id}">
       <span class="pick-dot">${checked?"✓":"+"}</span>
-      <div><strong>${t.name}</strong><small>${t.source || "Meu time"} • força ${t.power}</small></div>
+      <div><strong>${teamNameWithCrest(t,{size:22})}</strong><small>${t.source || "Meu time"} • força ${t.power}</small></div>
     </button>`;
   }).join("") || `<div class="team-row"><small>Nenhum time encontrado.</small></div>`;
 }
@@ -340,10 +419,10 @@ function renderSelected(){
   const sc=$("#selectedCount"); if(sc) sc.textContent = countText;
   const mc=$("#manualSelectedCount"); if(mc) mc.textContent = countText;
   const summary = selectedTeams.slice(0,6).map(t=>`<div class="team-row selected-row">
-    <div><strong>${t.name}</strong><small>${t.source || "personalizado"} • força ${t.power}</small></div>
+    <div><strong>${teamNameWithCrest(t,{size:22})}</strong><small>${t.source || "personalizado"} • força ${t.power}</small></div>
   </div>`).join("") + (selectedTeams.length>6 ? `<div class="team-row"><small>+ ${selectedTeams.length-6} times selecionados</small></div>` : "");
   const full = selectedTeams.map(t=>`<div class="team-row selected-row">
-    <div><strong>${t.name}</strong><small>${t.source || "personalizado"}</small></div>
+    <div><strong>${teamNameWithCrest(t,{size:22})}</strong><small>${t.source || "personalizado"}</small></div>
     <div class="selected-actions">
       <label class="power-edit">Força <input type="number" min="1" max="100" value="${t.power}" data-power-team="${t.id}" /></label>
       <button class="mini-danger" data-remove-team="${t.id}">remover</button>
@@ -355,7 +434,7 @@ function renderSelected(){
   renderDrawPreview();
 }
 function renderCustomTeams(){
-  $("#customTeamList").innerHTML = data.customTeams.map(t=>`<div class="team-row"><div><strong>${t.name}</strong><small>Time criado • força ${t.power}${cleanShort(t.short)?` • short ${cleanShort(t.short)}`:""}</small></div><button class="danger mini-danger" data-delete-custom="${t.id}">apagar</button></div>`).join("") || `<div class="team-row"><small>Nenhum time criado.</small></div>`;
+  $("#customTeamList").innerHTML = data.customTeams.map(t=>`<div class="team-row"><div><strong>${teamNameWithCrest(t,{size:22})}</strong><small>Time criado • força ${t.power}${cleanShort(t.short)?` • short ${cleanShort(t.short)}`:""}${teamCrestUrl(t)?" • escudo importado":""}</small></div><button class="danger mini-danger" data-delete-custom="${t.id}">apagar</button></div>`).join("") || `<div class="team-row"><small>Nenhum time criado.</small></div>`;
 }
 
 function renderCustomPacks(){
@@ -367,8 +446,10 @@ function addCustomPack(){
   const raw=$("#customPackTeams")?.value.trim();
   if(!name || !raw){ alert("Informe o nome do pacote e os times."); return; }
   const teams=raw.split(/\n+/).map(line=>{
-    const [n,p,short]=line.split(",").map(x=>x?.trim());
-    return n ? {name:n, power:clamp(Number(p)||70,1,100), short:cleanShort(short)} : null;
+    const [n,p,short,crest]=line.split(",").map(x=>x?.trim());
+    if(n && crest) data.crests[n]=crest;
+    const generated = n ? (crest || ensureTeamCrest(n,name)) : "";
+    return n ? {name:n, power:clamp(Number(p)||70,1,100), short:cleanShort(short), crest:generated} : null;
   }).filter(Boolean);
   if(!teams.length){ alert("Adicione pelo menos um time."); return; }
   data.customPacks ||= [];
@@ -460,7 +541,7 @@ function cfg(){
   if(format==="league" && teamCount>24) teamCount=24;
   const selectedGroupSize=getInputNumber("groupSize",4)||4;
   const selectedGroupCount=getInputNumber("groupCount",Math.ceil(teamCount/selectedGroupSize));
-  // 0.7.9.7a final: em grupos, calcula grupos suficientes para comportar a quantidade exata escolhida.
+  // 0.8.1 final: em grupos, calcula grupos suficientes para comportar a quantidade exata escolhida.
   // Ex.: 31 times + 4 por grupo = 8 grupos, com folgas quando necessário.
   const groupCount = format==="groups" ? Math.max(selectedGroupCount,Math.ceil(teamCount/selectedGroupSize)) : 0;
   const copa48 = format==="groups" && teamCount===48 && groupCount===12 && selectedGroupSize===4;
@@ -802,8 +883,8 @@ function bracketMatchMarkup(m,stageName,finalWinner,opts={}){
   const details=played ? `<div class="match-details ${expanded?"open":""}">${matchDetailsMarkup(m)}</div>` : "";
   const actions=opts.export ? "" : (played ? `<div class="match-expand-marker">${expanded?"−":"+"}</div>` : `<div class="match-actions compact-actions"><button data-sim="${m.id}">Simular</button><button data-edit-match="${m.id}">Manual</button></div>`);
   return `<div class="match compact-match bracket-node ${isFinal?"final-match":""} ${expanded?"expanded":""}" data-toggle-match-details="${m.id}">
-    <div class="match-line ${homeWin?"winner":""} ${homeChamp?"gold-champion":""}"><span>${homeChamp?"🏆 ":""}${m.home.name}</span><strong>${scoreCell(m,"home")}</strong></div>
-    <div class="match-line ${awayWin?"winner":""} ${awayChamp?"gold-champion":""}"><span>${awayChamp?"🏆 ":""}${m.away.name}</span><strong>${scoreCell(m,"away")}</strong></div>
+    <div class="match-line ${homeWin?"winner":""} ${homeChamp?"gold-champion":""}"><span>${homeChamp?"🏆 ":""}${teamNameWithCrest(m.home,{size:18})}</span><strong>${scoreCell(m,"home")}</strong></div>
+    <div class="match-line ${awayWin?"winner":""} ${awayChamp?"gold-champion":""}"><span>${awayChamp?"🏆 ":""}${teamNameWithCrest(m.away,{size:18})}</span><strong>${scoreCell(m,"away")}</strong></div>
     ${details}
     <div class="match-footer">${actions}</div>
   </div>`;
@@ -1045,6 +1126,122 @@ function autoFillManualGroups(){ const c=cfg(); const teams=getPreviewOrder(c).s
 function clearManualGroups(){ manualGroups=null; renderManualGroups(); }
 
 
+
+function applyImportedCrests(input){
+  if(!input || typeof input!=="object") return 0;
+  data.crests ||= {};
+  let count=0;
+  const add=(name,url)=>{
+    if(!name || !url) return;
+    data.crests[String(name).trim()] = String(url).trim();
+    count++;
+  };
+  Object.entries(input.crests||input.crestMap||input.logos||{}).forEach(([name,url])=>add(name,url));
+  const scanTeams=(teams=[])=>teams.forEach(t=>{
+    if(typeof t==="string") return;
+    const name=t.name||t.team||t.title;
+    const url=t.crest||t.crestUrl||t.logo||t.logoUrl||t.badge||t.badgeUrl;
+    add(name,url);
+  });
+  scanTeams(input.teams||[]);
+  (input.customTeams||[]).forEach(t=>scanTeams([t]));
+  (input.packs||input.customPacks||[]).forEach(p=>scanTeams(p.teams||[]));
+  (input.competitions||[]).forEach(c=>{
+    scanTeams(c.teams||[]);
+    (c.editions||[]).forEach(e=>scanTeams((e.teams||[]).map(x=>typeof x==="string"?{name:x}:x)));
+  });
+  return count;
+}
+function normalizeImportedTeam(t,source="Importado"){
+  if(typeof t==="string") return team(t,70,source);
+  const name=t.name||t.team||t.title;
+  if(!name) return null;
+  const power=clamp(Number(t.power||t.rating||t.strength)||70,1,100);
+  const short=cleanShort(t.short||t.shortName||t.abbr||t.code);
+  const crest=t.crest||t.crestUrl||t.logo||t.logoUrl||t.badge||t.badgeUrl||"";
+  if(crest) data.crests[name]=crest;
+  return team(name,power,source,short,crest);
+}
+function importChampionshipPayload(raw){
+  let input;
+  try{ input=JSON.parse(raw); }catch(e){ alert("JSON inválido."); return; }
+  if(Array.isArray(input)) input={competitions:input};
+  if(!input || typeof input!=="object"){ alert("Importação inválida."); return; }
+  data.competitions ||= []; data.customPacks ||= []; data.customTeams ||= []; data.crests ||= {};
+  const crestCount=applyImportedCrests(input);
+  let compCount=0, packCount=0, teamCount=0;
+
+  if(Array.isArray(input.customTeams)){
+    input.customTeams.map(t=>normalizeImportedTeam(t,"Importado")).filter(Boolean).forEach(t=>{
+      if(!data.customTeams.some(x=>x.id===t.id)) { data.customTeams.push(t); teamCount++; }
+    });
+  }
+  const packs=[...(input.packs||[]), ...(input.customPacks||[])];
+  packs.forEach(p=>{
+    const name=p.name||p.title||"Pacote importado";
+    const teams=(p.teams||[]).map(t=>normalizeImportedTeam(t,name)).filter(Boolean);
+    if(teams.length){
+      data.customPacks.push({id:"pack_"+slug(name)+"_"+Date.now()+"_"+packCount, name, teams});
+      packCount++;
+    }
+  });
+  (input.competitions||[]).forEach(c=>{
+    const name=c.name||c.championshipName||c.title||"Campeonato importado";
+    const comp={id:uid(), name, editions:Array.isArray(c.editions)?c.editions:[]};
+    data.competitions.push(comp);
+    compCount++;
+    const teams=(c.teams||[]).map(t=>normalizeImportedTeam(t,name)).filter(Boolean);
+    if(teams.length){
+      data.customPacks.push({id:"pack_"+slug(name)+"_"+Date.now()+"_"+packCount, name:`${name} — importado`, teams});
+      packCount++;
+    }
+  });
+  if(input.name && input.teams && !input.competitions){
+    const name=input.name||"Campeonato importado";
+    const teams=(input.teams||[]).map(t=>normalizeImportedTeam(t,name)).filter(Boolean);
+    data.competitions.push({id:uid(), name, editions:[]});
+    compCount++;
+    if(teams.length){
+      data.customPacks.push({id:"pack_"+slug(name)+"_"+Date.now(), name:`${name} — importado`, teams});
+      packCount++;
+    }
+  }
+  currentCompetitionId=data.competitions[0]?.id||null;
+  save(); renderAll();
+  alert(`Importado: ${compCount} campeonato(s), ${packCount} pacote(s), ${teamCount} time(s), ${crestCount} escudo(s).`);
+}
+function exampleChampionshipImport(){
+  return JSON.stringify({
+    competitions:[{name:"Champions Brocket", editions:[]}],
+    packs:[{name:"Champions Brocket", teams:[
+      {name:"Liverpool",power:88,short:"LIV"},
+      {name:"PSG",power:88,short:"PSG"},
+      {name:"Bayern München",power:89,short:"BAY"},
+      {name:"Barcelona",power:87,short:"BAR"}
+    ]}],
+    crests:{
+      "Liverpool":"",
+      "PSG":"",
+      "Bayern München":"",
+      "Barcelona":""
+    }
+  },null,2);
+}
+
+
+function refreshBuiltinPackCrests(){
+  data.crests ||= {};
+  let count=0;
+  Object.values(packs).forEach(p=>p.teams.forEach(([name])=>{
+    if(name && !data.crests[name]){ data.crests[name]=builtinPackCrest(name,p.name); count++; }
+  }));
+  (data.customPacks||[]).forEach(p=>(p.teams||[]).forEach(t=>{
+    if(t?.name && !t.crest && !data.crests[t.name]){ const u=builtinPackCrest(t.name,p.name); data.crests[t.name]=u; t.crest=u; count++; }
+  }));
+  save(); renderAll();
+  return count;
+}
+
 function deleteActiveTournament(){
   if(!data.activeTournament){
     toast("Não há torneio atual para apagar.");
@@ -1254,11 +1451,10 @@ function groupStageCard(t,g,info){
   return `<div class="group-card group-card--clean group-stage-card">
     <div class="group-stage-head">
       <div class="group-stage-title">
-        <span class="group-letter">${g.name}</span>
         <h3>Grupo ${g.name}</h3>
         ${allPlayed?`<span class="group-status">✓ Encerrado</span>`:""}
       </div>
-      <button class="group-sim-btn" data-sim-group="${g.name}">⚡ Simular</button>
+      <button class="group-sim-btn" data-sim-group="${g.name}">Simular</button>
     </div>
     <div class="table-scroll group-table-wrap">
       <table class="table group-table standings-table group-standings">
@@ -1266,7 +1462,7 @@ function groupStageCard(t,g,info){
         <tbody>${rows.map((x,i)=>groupStandingRow(t,x,i,info)).join("")}</tbody>
       </table>
     </div>
-    <div class="group-matches-list">${matches.map(matchMini).join("")}${byes.map(byeMini).join("")}</div>
+    <div class="group-matches-list">${groupMatchSections(matches,byes)}</div>
   </div>`;
 }
 function groupStandingRow(t,x,i,info){
@@ -1275,15 +1471,32 @@ function groupStandingRow(t,x,i,info){
   const cls=qualified?"status-qualified":relegated?"status-relegated":"";
   const played=(x.w||0)+(x.d||0)+(x.l||0);
   const gd=(x.gd||0)>0?`+${x.gd}`:(x.gd||0);
-  const trophy=qualified && i===0 ? `<span class="group-trophy">🏆</span>` : "";
+  const delta=deltaBadge(x.posDelta);
   return `<tr class="${cls}">
     <td><span class="group-pos ${qualified?"qualified":""}">${i+1}</span></td>
-    <td><span class="group-team-name ${qualified?"qualified":""}">${x.name}${trophy}</span></td>
+    <td><span class="group-team-name ${qualified?"qualified":""}">${teamCrest(x,22)}<span class="group-team-text">${escapeHtml(x.name)}</span><span class="fake-delta">${delta}</span></span></td>
     <td>${played}</td><td>${x.w||0}</td><td>${x.d||0}</td><td>${x.l||0}</td><td>${gd}</td><td><strong>${x.pts||0}</strong></td><td>${groupRowTag(t,x,i,info)}</td>
   </tr>`;
 }
+function normalizeRoundLabel(stage){
+  return (stage?.match(/Rodada \d+/)||[stage||"Rodada"])[0];
+}
+function groupMatchSections(matches=[],byes=[]){
+  const map=new Map();
+  matches.forEach(m=>{
+    const key=normalizeRoundLabel(m.stage);
+    if(!map.has(key)) map.set(key,{matches:[],byes:[]});
+    map.get(key).matches.push(m);
+  });
+  byes.forEach(b=>{
+    const key=normalizeRoundLabel(b.stage);
+    if(!map.has(key)) map.set(key,{matches:[],byes:[]});
+    map.get(key).byes.push(b);
+  });
+  return [...map.entries()].map(([round,items])=>`<div class="group-round-block"><small>${round}</small>${items.matches.map(matchMini).join("")}${items.byes.map(byeMini).join("")}</div>`).join("");
+}
 function byeMini(b){
-  return `<div class="group-match-row bye-match"><span class="group-match-team home">Descansa</span><strong class="group-match-score">—</strong><span class="group-match-team away">${b.team.name}</span><div class="mini-actions"><em>folga</em></div></div>`;
+  return `<div class="group-match-row bye-match"><span class="group-match-team home">Descansa</span><strong class="group-match-score">—</strong><span class="group-match-team away">${teamNameWithCrest(b.team,{size:22})}</span><div class="mini-actions"><em>folga</em></div></div>`;
 }
 function matchMini(m){
   const played=m.played;
@@ -1291,33 +1504,10 @@ function matchMini(m){
   const awayWon=played && m.awayGoals>m.homeGoals;
   const score=played?`${scoreCell(m,"home")} – ${scoreCell(m,"away")}`:"—";
   return `<div class="group-match-row ${played?"played":""}">
-    <span class="group-match-team home ${homeWon?"winner":""}">${m.home.name}</span>
+    <span class="group-match-team home ${homeWon?"winner":""}">${teamNameWithCrest(m.home,{size:22})}</span>
     <button class="group-match-score" data-edit-match="${m.id}">${score}</button>
-    <span class="group-match-team away ${awayWon?"winner":""}">${m.away.name}</span>
+    <span class="group-match-team away ${awayWon?"winner":""}">${teamNameWithCrest(m.away,{size:22})}</span>
     <div class="mini-actions">${played?`<button data-edit-match="${m.id}">editar</button>`:`<button data-sim="${m.id}">simular</button><button data-edit-match="${m.id}">manual</button>`}</div>
-  </div>`;
-}
-
-function renderBracketSvg(layout){
-  return `<svg class="bracket-svg" width="${layout.width}" height="${layout.height}" viewBox="0 0 ${layout.width} ${layout.height}" aria-hidden="true">
-    ${layout.connectors.map(c=>`<path d="${c.d}" class="bracket-path ${c.active?"active":""}" />`).join("")}
-  </svg>`;
-}
-function renderBracketBoard(t, opts={}){
-  const rounds=t.knockout||[];
-  const finalWinner=t.status==="finished"?t.champion:null;
-  const layout=buildBracketLayout(t,opts);
-  const headers=rounds.map((r,i)=>`<div class="bracket-round-label ${r.name==="Final"?"final-label":""}" style="left:${i*(layout.cardW+layout.roundGap)}px;width:${layout.cardW}px">${bracketRoundLabel(r.name)}</div>`).join("");
-  const cards=rounds.flatMap((r,rIdx)=>(r.matches||[]).map((m,sIdx)=>{
-    const pos=layout.positions[m.id]; if(!pos) return "";
-    return `<div class="bracket-card-slot ${r.name==="Final"?"final-round":""}" style="left:${pos.x}px;top:${pos.y-layout.cardH/2}px;width:${layout.cardW}px">${bracketMatchMarkup(m,r.name,finalWinner,opts)}</div>`;
-  })).join("");
-  return `<div class="bracket-canvas ${opts.export?"export-canvas":""}" style="width:${layout.width}px">
-    <div class="bracket-headers" style="width:${layout.width}px;height:46px">${headers}</div>
-    <div class="bracket-body" style="width:${layout.width}px;height:${layout.height}px">
-      ${renderBracketSvg(layout)}
-      ${cards}
-    </div>
   </div>`;
 }
 
@@ -1447,7 +1637,10 @@ bind("#closeManualResult","onclick",closeManualResult);
 bind("#saveManualResult","onclick",saveManualResult);
 bind("#clearLocalData","onclick",()=>{ if(confirm("Tem certeza que deseja apagar todos os dados locais? Essa ação não pode ser desfeita.")){ localStorage.removeItem(STORAGE); data=structuredClone(starter); currentCompetitionId=null; selectedTeams=[]; manualGroups=null; save(); renderAll(); go("home"); } });
 bind("#exportBackup","onclick",()=>{ const box=$("#backupBox"); if(box) box.value=JSON.stringify(data,null,2); });
-bind("#importBackup","onclick",()=>{ const box=$("#backupBox"); if(!box?.value.trim()) return; try{ const imported=JSON.parse(box.value); data={...structuredClone(starter),...imported}; currentCompetitionId=data.competitions?.[0]?.id || null; save(); renderAll(); alert("Backup importado."); }catch(e){ alert("Backup inválido."); } });
+bind("#importBackup","onclick",()=>{ const box=$("#backupBox"); if(!box?.value.trim()) return; try{ const imported=JSON.parse(box.value); data={...structuredClone(starter),...imported}; data=sanitizeLoadedData(data); currentCompetitionId=data.competitions?.[0]?.id || null; save(); renderAll(); alert("Backup importado."); }catch(e){ alert("Backup inválido."); } });
+bind("#showChampionshipImportExample","onclick",()=>{ const box=$("#championshipImportBox"); if(box) box.value=exampleChampionshipImport(); });
+bind("#importChampionships","onclick",()=>{ const box=$("#championshipImportBox"); if(!box?.value.trim()){ alert("Cole o JSON de campeonato/pacote primeiro."); return; } importChampionshipPayload(box.value); });
+bind("#refreshBuiltinCrests","onclick",()=>{ const n=refreshBuiltinPackCrests(); alert(n ? `${n} escudo(s) atualizados.` : "Os escudos dos packs já estavam atualizados."); });
 renderAll();
 
 document.addEventListener("change",(ev)=>{

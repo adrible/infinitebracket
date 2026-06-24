@@ -1634,7 +1634,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   .final-round .match-line{padding:8px 7px;}
 }
 
-/* 0.7.9.7 — PNG exportado com visual novo da tabela */
+/* 0.8.1 — PNG exportado com visual novo da tabela */
 .export-holder{
   position:fixed;
   left:-99999px;
@@ -1766,7 +1766,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 .export-marker{display:none!important;}
 
-/* 0.7.9.7a — correção de espaçamento Pos/Time nas tabelas compactas */
+/* 0.8.1 — correção de espaçamento Pos/Time nas tabelas compactas */
 .group-table th:first-child,
 .group-table td:first-child,
 .standings-table th:first-child,
@@ -1806,7 +1806,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.9.7a hotfix — Pos e Time separados de verdade */
+/* 0.8.1 hotfix — Pos e Time separados de verdade */
 .standings-table{
   table-layout:fixed!important;
 }
@@ -1854,7 +1854,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.9.7a final — Pos e Time separados e sem POSTIME */
+/* 0.8.1 final — Pos e Time separados e sem POSTIME */
 .standings-table th:first-child,
 .group-table th:first-child{
   width:56px!important;
@@ -1902,7 +1902,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   }
 }
 
-/* 0.7.9.7d — bracket compacto expansível, background premium e export PNG do mata-mata */
+/* 0.8.1 — bracket compacto expansível, background premium e export PNG do mata-mata */
 .tournament-screen{
   background:
     radial-gradient(circle at 50% 8%, rgba(97,255,158,.22), transparent 34%),
@@ -2064,7 +2064,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* 0.7.9.7d — negrito apenas para classificados/promovidos/campeão */
+/* 0.8.1 — negrito apenas para classificados/promovidos/campeão */
 .standings-table .team-cell-fake strong{
   font-weight:700!important;
 }
@@ -2083,7 +2083,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 .export-status-promoted .export-team strong,
 .export-status-champion .export-team strong{font-weight:950!important;}
 
-/* ===== Brocket 0.7.9.7e — bracket refresh ===== */
+/* ===== Brocket 0.8.1 — bracket refresh ===== */
 .tournament-screen{
   position:relative;
   overflow:hidden;
@@ -2350,7 +2350,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* ===== Brocket 0.7.9.7f — marcador de detalhes ===== */
+/* ===== Brocket 0.8.1 — marcador de detalhes ===== */
 .match-footer{
   display:flex !important;
   justify-content:center !important;
@@ -2383,7 +2383,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 .export-bracket-board .match-expand-marker{display:none!important;}
 
 
-/* ===== Brocket 0.7.9.7g — bracket tree + table fit ===== */
+/* ===== Brocket 0.8.1 — bracket tree + table fit ===== */
 .standings-table{table-layout:fixed;width:100%;}
 .standings-table th:nth-child(1),.standings-table td:nth-child(1){width:42px;}
 .standings-table th:nth-child(2),.standings-table td:nth-child(2){width:auto;min-width:0;}
@@ -2471,7 +2471,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   .match-line{grid-template-columns:minmax(0,1fr) 40px!important;min-height:32px;}
 }
 
-/* ===== Brocket 0.7.9.7f — bracket tree correction ===== */
+/* ===== Brocket 0.8.1 — bracket tree correction ===== */
 .bracket-scroll{overflow-x:auto!important;overflow-y:hidden!important;padding:18px 18px 34px!important;}
 .visual-bracket,.export-bracket-board{--round-gap:74px;--card-w:232px;--connector:74px;display:flex!important;align-items:flex-start!important;gap:var(--round-gap)!important;min-width:max-content!important;position:relative!important;}
 .round.compact-round{min-width:var(--card-w)!important;width:var(--card-w)!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;position:relative!important;gap:0!important;}
@@ -2541,9 +2541,9 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* ===== Brocket 0.7.9.7h — bracket tree rebuild =====
+/* ===== Brocket 0.8.1 — bracket tree rebuild =====
    Estrutura inspirada no Challonge: colunas por fase, cards com altura fixa
-   e conectores por pares. Mantém visual/final da 0.7.9.7g. */
+   e conectores por pares. Mantém visual/final da 0.8.1. */
 
 .bracket-scroll{
   overflow-x:auto!important;
@@ -2759,7 +2759,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* ===== Brocket 0.7.9.8 — bracket calculado com SVG ===== */
+/* ===== Brocket 0.8.1 — bracket calculado com SVG ===== */
 .visual-bracket{
   display:block!important;
   min-width:0!important;
@@ -2914,7 +2914,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
 }
 
 
-/* ===== Brocket 0.7.9.8a — ajustes finos do bracket ===== */
+/* ===== Brocket 0.8.1 — ajustes finos do bracket ===== */
 
 /* 1) Ao expandir, o detalhe abre acima dos outros cards, sem ser engolido pelo card seguinte. */
 .bracket-card-slot{
@@ -2978,7 +2978,7 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   }
 }
 
-/* ===== Brocket 0.7.9.8b — estrutura de grupos e rodadas ===== */
+/* ===== Brocket 0.8.1 — estrutura de grupos e rodadas ===== */
 .group-stage-card{display:grid;gap:12px;}
 .group-stage-head{display:flex;align-items:center;justify-content:space-between;gap:10px;}
 .group-stage-title{display:flex;align-items:center;gap:9px;min-width:0;}
@@ -3009,4 +3009,159 @@ button,input,select{font:inherit} button{border:0;cursor:pointer} .app{max-width
   .group-sim-btn{padding:7px 9px;font-size:11px;}
   .group-match-row{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);}
   .group-match-row .mini-actions{grid-column:1 / -1;justify-content:center;margin-top:2px;}
+}
+
+
+/* ===== Brocket 0.8.1 — escudos, grupos e importação ===== */
+
+/* Escudos: usa imagem importada quando houver, ou escudo gerado por nome. */
+.team-name-with-crest{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+  max-width:100%;
+}
+.team-name-with-crest > span:last-child{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.team-name-with-crest.dim{
+  opacity:.72;
+}
+.team-crest{
+  --crest-size:22px;
+  width:var(--crest-size);
+  height:var(--crest-size);
+  flex:0 0 var(--crest-size);
+  display:inline-grid;
+  place-items:center;
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(135deg,var(--crest-a),var(--crest-b));
+  box-shadow:0 2px 7px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.18);
+  vertical-align:middle;
+}
+.team-crest em{
+  color:#fff;
+  font-style:normal;
+  font-size:calc(var(--crest-size) * .36);
+  font-weight:950;
+  line-height:1;
+  text-shadow:0 1px 2px rgba(0,0,0,.45);
+}
+.crest-round{border-radius:999px;}
+.crest-diamond{border-radius:8px;transform:rotate(45deg);}
+.crest-diamond em{transform:rotate(-45deg);}
+.crest-shield{
+  clip-path:polygon(50% 0,92% 14%,90% 56%,50% 100%,10% 56%,8% 14%);
+  border-radius:6px;
+}
+.crest-img{
+  border-radius:999px;
+  background:rgba(255,255,255,.12);
+}
+.crest-img img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+
+/* Grupos no estilo estrutural limpo, mas preservando Brocket. */
+.group-stage-card{display:grid;gap:14px;}
+.group-stage-head{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.group-stage-title{display:flex;align-items:center;gap:10px;min-width:0;}
+.group-stage-title h3{margin:0!important;font-size:clamp(24px,5.5vw,34px);line-height:1.05;white-space:nowrap;}
+.group-letter,.group-trophy{display:none!important;}
+.group-status{border-radius:999px;padding:5px 9px;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;}
+.group-sim-btn{border-radius:999px;padding:8px 14px;font-size:13px;font-weight:900;white-space:nowrap;}
+
+.group-table-wrap,.group-stage-card .table-scroll{overflow-x:auto!important;-webkit-overflow-scrolling:touch;}
+.group-standings{table-layout:auto!important;min-width:660px;width:100%;}
+.group-standings th,.group-standings td{white-space:nowrap;vertical-align:middle;}
+.group-standings th:nth-child(1),.group-standings td:nth-child(1){width:42px!important;}
+.group-standings th:nth-child(2),.group-standings td:nth-child(2){width:auto!important;min-width:270px!important;max-width:none!important;}
+.group-standings th:nth-child(3),.group-standings td:nth-child(3),
+.group-standings th:nth-child(4),.group-standings td:nth-child(4),
+.group-standings th:nth-child(5),.group-standings td:nth-child(5),
+.group-standings th:nth-child(6),.group-standings td:nth-child(6),
+.group-standings th:nth-child(7),.group-standings td:nth-child(7){width:42px!important;}
+.group-standings th:nth-child(8),.group-standings td:nth-child(8){width:56px!important;}
+
+.group-team-name{
+  display:flex!important;
+  align-items:center!important;
+  gap:8px!important;
+  min-width:0!important;
+  max-width:none!important;
+  overflow:visible!important;
+  white-space:nowrap!important;
+  font-weight:600!important;
+}
+.group-team-name.qualified{font-weight:950!important;}
+.group-team-name:not(.qualified){font-weight:600!important;}
+.group-team-text{min-width:0;overflow:visible;text-overflow:clip;white-space:nowrap;}
+.group-team-name .fake-delta{margin-left:auto;flex:0 0 auto;}
+.group-pos{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:10px;font-weight:950;}
+.group-standings td strong{font-weight:950;}
+
+.group-matches-list{display:grid;gap:12px;margin-top:2px;}
+.group-round-block{display:grid;gap:7px;}
+.group-round-block>small{display:block;margin:2px 0 3px;font-size:11px;font-weight:950;letter-spacing:.16em;text-transform:uppercase;}
+.group-match-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  align-items:center;
+  column-gap:10px;
+  row-gap:7px;
+  padding:10px 12px!important;
+  border-radius:18px!important;
+  overflow:hidden;
+}
+.group-match-team{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;font-weight:520!important;}
+.group-match-team.home{text-align:right;}
+.group-match-team.away{text-align:left;}
+.group-match-team.winner{font-weight:950!important;}
+.group-match-score{min-width:68px!important;border-radius:999px!important;padding:6px 10px!important;text-align:center!important;font-weight:950!important;white-space:nowrap!important;}
+.group-match-row .mini-actions{grid-column:1 / -1;display:flex!important;justify-content:center!important;align-items:center!important;gap:8px!important;margin-top:0;}
+.group-match-row .mini-actions button,.group-match-row .mini-actions em{border-radius:999px!important;padding:6px 10px!important;font-size:11px!important;font-weight:900!important;white-space:nowrap!important;}
+
+/* Escudos dentro de bracket e listas não devem quebrar layout. */
+.match-line .team-name-with-crest{
+  max-width:100%;
+}
+.match-line .team-name-with-crest .team-crest{
+  --crest-size:18px;
+}
+.team-pick strong,
+.team-row strong{
+  min-width:0;
+}
+.import-championship-panel textarea{
+  min-height:170px;
+}
+
+@media(max-width:720px){
+  .group-stage-head{gap:8px;}
+  .group-stage-title h3{font-size:28px;}
+  .group-status{display:none;}
+  .group-sim-btn{padding:7px 12px;font-size:12px;}
+  .group-standings{min-width:650px;}
+  .group-standings th:nth-child(2),.group-standings td:nth-child(2){min-width:285px!important;}
+  .group-match-row{padding:10px!important;column-gap:8px!important;}
+  .group-match-score{min-width:62px!important;padding:6px 8px!important;}
+}
+
+/* ===== Brocket 0.8.1 — packs com escudos nativos ===== */
+.pack .pack-crest-sample{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  margin-top:5px;
+}
+.pack .pack-crest-sample .team-crest{
+  --crest-size:20px;
 }
