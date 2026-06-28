@@ -578,7 +578,7 @@ function renderCompetitionTemplateSuggestion(){
   box.hidden=false;
   const title=$("#templateSuggestionTitle"), text=$("#templateSuggestionText");
   if(title) title.textContent=`Template: ${template.title}`;
-  if(text) text.textContent=`${template.hint} Código football-data.org: ${template.footballDataCode || "sem código oficial"}.`;
+  if(text) text.textContent=`${template.hint} Código football-data.org: ${template.footballDataCode || "sem código oficial"}. Escudos oficiais exigem token salvo e busca pela API.`;
   const code=$("#footballDataCompetitionCode");
   if(code && template.footballDataCode && !code.value.trim()) code.value=template.footballDataCode;
 }
@@ -652,7 +652,7 @@ function renderFootballDataSettings(){
   const status=$("#footballDataStatus");
   const code=$("#footballDataCompetitionCode");
   if(token && document.activeElement!==token) token.value=data.footballDataToken||"";
-  if(status) status.textContent=data.footballDataToken ? "Token configurado. Você pode buscar times/escudos oficiais." : "Token não configurado. O Brocket usará packs e escudos locais.";
+  if(status) status.textContent=data.footballDataToken ? "Token configurado. Use Buscar times/escudos para trocar os escudos automáticos por oficiais." : "Token não configurado. O Brocket usará escudos automáticos até você salvar um token.";
   const template=resolveCompetitionTemplate(templateSourceName());
   if(code && template?.footballDataCode && !code.value.trim()) code.value=template.footballDataCode;
   renderCompetitionTemplateSuggestion();
@@ -674,7 +674,7 @@ function clearFootballDataToken(){
 }
 async function footballDataRequest(path){
   const token=(data.footballDataToken || localStorage.getItem("brocket-football-data-token") || "").trim();
-  if(!token) throw new Error("Configure o token do football-data.org em Configurações.");
+  if(!token) throw new Error("Cole e salve o token do football-data.org em Configurações antes de buscar escudos oficiais.");
   const res=await fetch(`${footballOrgConfig.baseUrl}${path}`,{headers:{"X-Auth-Token":token}});
   if(!res.ok){
     let msg=`Erro ${res.status}`;
@@ -1824,6 +1824,7 @@ bind("#applyTemplateSuggestion","onclick",()=>applyTemplateFromName(false));
 bind("#saveFootballDataToken","onclick",saveFootballDataToken);
 bind("#clearFootballDataToken","onclick",clearFootballDataToken);
 bind("#fetchFootballDataTeams","onclick",fetchFootballDataForCurrentTemplate);
+bind("#fetchTemplateOfficialCrests","onclick",fetchFootballDataForCurrentTemplate);
 bind("#formatSelect","onchange",()=>{ clearManualGroupsIfAny(); previewOrder=null; toggleRuleVisibility(); renderDrawPreview(); }); bind("#teamCount","onchange",()=>{ clearManualGroupsIfAny(); selectedTeams=selectedTeams.slice(0,desiredTeamCount()); previewOrder=null; renderSelected(); });
 bind("#competitionSelect","onchange",e=>{ currentCompetitionId=e.target.value; renderCompetitionTemplateSuggestion(); autoApplyCompetitionTemplate(); });
 document.addEventListener("change",e=>{
