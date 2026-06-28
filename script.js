@@ -26,7 +26,44 @@ const packs = {
   selecoesAsia:{ name:"Seleções Ásia", icon:"🌏", teams:[["Japão",80],["Coreia do Sul",79],["Irã",78],["Austrália",77],["Arábia Saudita",76],["Qatar",75],["Iraque",74],["Uzbequistão",74],["Emirados Árabes",73],["China",70]]},
   selecoesConcacaf:{ name:"Seleções CONCACAF", icon:"🌎", teams:[["México",79],["Estados Unidos",79],["Canadá",77],["Costa Rica",74],["Panamá",73],["Jamaica",73],["Honduras",71],["El Salvador",69],["Haiti",69],["Trinidad e Tobago",68]]},
   classicos:{ name:"Times clássicos", icon:"📜", teams:[["Santos 1962",94],["Brasil 1970",98],["Milan 1989",95],["Barcelona 2011",97],["Real Madrid 2017",95],["Manchester United 1999",93],["Ajax 1995",92],["Boca Juniors 2003",90],["São Paulo 2005",89],["Flamengo 1981",91],["Palmeiras 1999",88],["Inter 2010",90]]},
-  selecoesBLUELOCK:{ name: "Blue Lock", icon:"🔒", teams:[["Japão",86],["França",96],["Espanha",94],["Brasil",91],["Argentina",88],["Itália",87],["Suíça",84],["Holanda",92],["Austrália",85],["Portugal",86],["Canadá",82],["Arábia Saudita",82],["Marrocos",85],["Uruguai",84],["Turquia",82],["Noruega",84],["Estados Unidos",83],["Polônia",84],["México",80],["Alemanha",91],["Sérvia",82],["Camarões",81],["China",85],["Colômbia",83],["Argélia",80],["Senegal",83],["Tunísia",83],["Suécia",83],["Áustria",82],["Peru",81],["Croácia",81],["Venezuela",80]]}
+    bluelock: {
+    name: "Blue Lock",
+    icon: "🔒",
+    teams: [
+      ["Japão",86],
+      ["França",96],
+      ["Espanha",94],
+      ["Brasil",91],
+      ["Argentina",88],
+      ["Itália",87],
+      ["Suíça",84],
+      ["Holanda",92],
+      ["Austrália",85],
+      ["Portugal",86],
+      ["Canadá",82],
+      ["Arábia Saudita",82],
+      ["Marrocos",85],
+      ["Uruguai",84],
+      ["Turquia",82],
+      ["Noruega",84],
+      ["Estados Unidos",83],
+      ["Polônia",84],
+      ["México",80],
+      ["Alemanha",91],
+      ["Sérvia",82],
+      ["Camarões",81],
+      ["China",85],
+      ["Colômbia",83],
+      ["Argélia",80],
+      ["Senegal",83],
+      ["Tunísia",83],
+      ["Suécia",83],
+      ["Áustria",82],
+      ["Peru",81],
+      ["Croácia",81],
+      ["Venezuela",80]
+    ]
+  }
 };
 
 const KNOWN_SHORTS = {
