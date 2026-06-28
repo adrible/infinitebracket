@@ -213,3 +213,12 @@ Atualização oficial 0.8.4:
 - Ajustado o container do chaveamento para não criar rolagem vertical interna feia.
 - Mata-mata ficou mais compacto em notebooks e desktops médios.
 - Mantida a versão 0.8.4.
+
+## Correção desktop sem scroll da 0.8.4
+
+- O layout do mata-mata agora recalcula a largura dos cards conforme a largura do desktop.
+- Remove scroll interno no computador.
+- Aumenta altura base dos cards para evitar sobreposição vertical.
+- Em notebook/desktop médio, o mata-mata usa short name para caber sem rolagem.
+- Detalhes expandidos passam a abrir como sobreposição controlada, sem empurrar/sobrepor a chave inteira.
+- Mantida a versão 0.8.4.

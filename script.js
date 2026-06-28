@@ -1081,11 +1081,13 @@ function bracketMatchMarkup(m,stageName,finalWinner,opts={}){
   const awayWin=played && m.winner?.id===m.away.id;
   const homeChamp=isFinal && finalWinner===m.home.name;
   const awayChamp=isFinal && finalWinner===m.away.name;
+  const compactNames=!opts.export && typeof window!=="undefined" && window.innerWidth<1280;
+  const crestSize=compactNames?16:18;
   const details=played ? `<div class="match-details ${expanded?"open":""}">${matchDetailsMarkup(m)}</div>` : "";
   const actions=opts.export ? "" : (played ? `<div class="match-expand-marker">${expanded?"−":"+"}</div>` : `<div class="match-actions compact-actions"><button data-sim="${m.id}">Simular</button><button data-edit-match="${m.id}">Manual</button></div>`);
   return `<div class="match compact-match bracket-node ${isFinal?"final-match":""} ${expanded?"expanded":""}" data-toggle-match-details="${m.id}">
-    <div class="match-line ${homeWin?"winner":""} ${homeChamp?"gold-champion":""}"><span>${homeChamp?"🏆 ":""}${teamNameWithCrest(m.home,{size:18})}</span><strong>${scoreCell(m,"home")}</strong></div>
-    <div class="match-line ${awayWin?"winner":""} ${awayChamp?"gold-champion":""}"><span>${awayChamp?"🏆 ":""}${teamNameWithCrest(m.away,{size:18})}</span><strong>${scoreCell(m,"away")}</strong></div>
+    <div class="match-line ${homeWin?"winner":""} ${homeChamp?"gold-champion":""}"><span>${homeChamp?"🏆 ":""}${teamNameWithCrest(m.home,{size:crestSize,compact:compactNames})}</span><strong>${scoreCell(m,"home")}</strong></div>
+    <div class="match-line ${awayWin?"winner":""} ${awayChamp?"gold-champion":""}"><span>${awayChamp?"🏆 ":""}${teamNameWithCrest(m.away,{size:crestSize,compact:compactNames})}</span><strong>${scoreCell(m,"away")}</strong></div>
     ${details}
     <div class="match-footer">${actions}</div>
   </div>`;
@@ -1096,7 +1098,17 @@ function bracketRoundLabel(name){
 }
 function buildBracketLayout(t, opts={}){
   const rounds=t.knockout||[];
-  const cardW=opts.cardW||220, cardH=opts.cardH||76, roundGap=opts.roundGap||58, baseGap=opts.baseGap||22;
+  let cardW=opts.cardW||220, cardH=opts.cardH||96, roundGap=opts.roundGap||58, baseGap=opts.baseGap||22;
+  if(!opts.export && typeof window!=="undefined" && window.innerWidth>=901){
+    const roundCount=Math.max(1,rounds.length||1);
+    const available=Math.max(720, window.innerWidth-150);
+    roundGap=opts.roundGap || (roundCount>=6 ? 22 : 34);
+    const rawW=Math.floor((available - Math.max(0,roundCount-1)*roundGap)/roundCount);
+    const minW=roundCount>=6 ? 104 : 130;
+    cardW=Math.max(minW,Math.min(220,rawW));
+    cardH=opts.cardH || 108;
+    baseGap=opts.baseGap || 22;
+  }
   const pitch0=cardH+baseGap;
   const maxMatches=Math.max(1,...rounds.map(r=>Math.max(r.matches?.length||0, r.byes?.length||0)));
   const bodyHeight=Math.max(cardH, maxMatches*pitch0);
