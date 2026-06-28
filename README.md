@@ -198,3 +198,18 @@ Atualização oficial 0.8.4:
 - Tabela de grupos sem rolagem horizontal no mobile.
 - Uso de short name no mobile, sem quebrar o nome em duas linhas.
 - Partidas de grupo com short name no mobile.
+
+## Correção da 0.8.4
+
+- Setinhas de variação de posição restauradas dentro da coluna #.
+- Botão de buscar escudos oficiais adicionado também no card de template.
+- Interface deixa claro que escudo oficial depende de token football-data.org salvo e busca pela API.
+- O token não é embutido no código público; deve ser salvo no localStorage pelo usuário.
+
+## Correção desktop da 0.8.4
+
+- A hotbar inferior passa a ser apenas mobile/tablet.
+- No desktop, a barra inferior não cobre mais o mata-mata.
+- Ajustado o container do chaveamento para não criar rolagem vertical interna feia.
+- Mata-mata ficou mais compacto em notebooks e desktops médios.
+- Mantida a versão 0.8.4.

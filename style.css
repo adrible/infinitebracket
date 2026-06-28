@@ -3854,3 +3854,195 @@ input,select,textarea{
     font-size:12px!important;
   }
 }
+
+
+/* Correção 0.8.4 — setinhas visíveis e fluxo oficial de escudos */
+.template-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.template-actions button{
+  flex:0 0 auto;
+}
+
+/* Setinha fica dentro da coluna #, visível quando houver variação */
+.group-rank{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:2px!important;
+  min-width:30px!important;
+}
+.rank-delta{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-width:16px!important;
+  min-height:16px!important;
+  transform:none!important;
+}
+.rank-delta:empty{
+  display:none!important;
+}
+.rank-delta .delta-badge{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-width:18px!important;
+  padding:2px 4px!important;
+  font-size:10px!important;
+  line-height:1!important;
+  border-radius:999px!important;
+  box-shadow:0 1px 3px rgba(0,0,0,.12);
+}
+
+/* No mobile, a setinha continua pequena sem sumir */
+@media(max-width:720px){
+  .template-actions{
+    width:100%;
+  }
+  .template-actions button{
+    width:100%;
+  }
+  .group-rank{
+    gap:1px!important;
+    min-width:28px!important;
+  }
+  .rank-delta .delta-badge{
+    min-width:15px!important;
+    padding:2px 3px!important;
+    font-size:9px!important;
+  }
+}
+
+
+/* Correção 0.8.4 — desktop não pode parecer mobile esticado */
+@media (min-width: 901px){
+  body{
+    overflow-x:hidden;
+  }
+
+  .app{
+    max-width:1600px;
+    margin:0 auto;
+    padding:0 22px 36px;
+  }
+
+  .screen{
+    padding-bottom:32px!important;
+  }
+
+  /* A hotbar branca é de mobile. No desktop ela cobria o mata-mata. */
+  .bottom-nav{
+    display:none!important;
+  }
+
+  /* No desktop, a navegação principal fica no topo e não flutuando no meio da tela */
+  .top-nav,
+  .desktop-nav,
+  .main-nav{
+    position:sticky;
+    top:0;
+    z-index:50;
+  }
+
+  /* Mata-mata: card mais compacto e sem rolagem interna vertical feia */
+  #bracketArea,
+  .bracket-area{
+    max-width:100%;
+    overflow-x:auto;
+    overflow-y:visible!important;
+    padding-bottom:18px;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .bracket-scroll{
+    max-width:100%;
+    overflow-x:auto!important;
+    overflow-y:visible!important;
+    padding:22px 24px 28px!important;
+  }
+
+  .bracket-scroll > *,
+  .bracket-canvas,
+  .visual-bracket,
+  .bracket-board{
+    max-height:none!important;
+    overflow-y:visible!important;
+  }
+
+  /* Evita o quadro gigante com espaço vazio demais */
+  .visual-bracket,
+  .bracket-canvas{
+    transform-origin:top left;
+  }
+
+  .bracket-card,
+  .bracket-match,
+  .match{
+    box-shadow:0 10px 22px rgba(0,0,0,.18);
+  }
+
+  .bracket-round-title,
+  .round-title{
+    letter-spacing:.12em;
+    font-size:12px;
+  }
+
+  /* O campeão fica como destaque, mas sem virar um bloco gigante */
+  .champion-card,
+  .champion-banner,
+  .winner-card{
+    margin-bottom:28px;
+  }
+}
+
+/* Desktop médio: compacta o chaveamento para caber melhor em notebooks */
+@media (min-width:901px) and (max-width:1400px){
+  .bracket-scroll{
+    padding-left:16px!important;
+    padding-right:16px!important;
+  }
+
+  .bracket-card,
+  .bracket-match,
+  .match{
+    min-width:210px;
+    max-width:250px;
+  }
+
+  .match-line,
+  .match-team{
+    font-size:13px;
+  }
+}
+
+/* Desktop pequeno/notebook: reduz mais sem mexer no mobile */
+@media (min-width:901px) and (max-width:1180px){
+  .app{
+    padding-left:14px;
+    padding-right:14px;
+  }
+
+  .bracket-card,
+  .bracket-match,
+  .match{
+    min-width:190px;
+    max-width:225px;
+  }
+
+  .bracket-round-title,
+  .round-title{
+    font-size:11px;
+  }
+}
+
+/* Mobile/tablet mantém hotbar */
+@media (max-width:900px){
+  .bottom-nav{
+    display:flex;
+  }
+}
