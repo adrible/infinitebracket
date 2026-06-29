@@ -1119,7 +1119,7 @@ function bracketMatchMarkup(m,stageName,finalWinner,opts={}){
   const awayWin=played && m.winner?.id===m.away.id;
   const homeChamp=isFinal && finalWinner===m.home.name;
   const awayChamp=isFinal && finalWinner===m.away.name;
-  const compactNames=!opts.export && typeof window!=="undefined" && window.innerWidth<1280;
+  const compactNames=!opts.export && typeof window!=="undefined" && window.innerWidth<1380;
   const crestSize=compactNames?16:18;
   const details=played ? `<div class="match-details ${expanded?"open":""}">${matchDetailsMarkup(m)}</div>` : "";
   const actions=opts.export ? "" : (played ? `<div class="match-expand-marker">${expanded?"−":"+"}</div>` : `<div class="match-actions compact-actions"><button data-sim="${m.id}">Simular</button><button data-edit-match="${m.id}">Manual</button></div>`);
@@ -1136,16 +1136,17 @@ function bracketRoundLabel(name){
 }
 function buildBracketLayout(t, opts={}){
   const rounds=t.knockout||[];
-  let cardW=opts.cardW||220, cardH=opts.cardH||96, roundGap=opts.roundGap||58, baseGap=opts.baseGap||22;
+  let cardW=opts.cardW||220, cardH=opts.cardH||112, roundGap=opts.roundGap||58, baseGap=opts.baseGap||26;
   if(!opts.export && typeof window!=="undefined" && window.innerWidth>=901){
     const roundCount=Math.max(1,rounds.length||1);
-    const available=Math.max(720, window.innerWidth-150);
-    roundGap=opts.roundGap || (roundCount>=6 ? 22 : 34);
+    const contentWidth=(document.querySelector(".content")?.clientWidth || window.innerWidth-96);
+    const available=Math.max(760, contentWidth-28);
+    roundGap=opts.roundGap || (roundCount>=6 ? 18 : 30);
     const rawW=Math.floor((available - Math.max(0,roundCount-1)*roundGap)/roundCount);
-    const minW=roundCount>=6 ? 104 : 130;
-    cardW=Math.max(minW,Math.min(220,rawW));
-    cardH=opts.cardH || 108;
-    baseGap=opts.baseGap || 22;
+    const minW=roundCount>=6 ? 110 : 138;
+    cardW=Math.max(minW,Math.min(218,rawW));
+    cardH=opts.cardH || (roundCount>=6 ? 124 : 118);
+    baseGap=opts.baseGap || 30;
   }
   const pitch0=cardH+baseGap;
   const maxMatches=Math.max(1,...rounds.map(r=>Math.max(r.matches?.length||0, r.byes?.length||0)));
