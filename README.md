@@ -222,3 +222,13 @@ Atualização oficial 0.8.4:
 - Em notebook/desktop médio, o mata-mata usa short name para caber sem rolagem.
 - Detalhes expandidos passam a abrir como sobreposição controlada, sem empurrar/sobrepor a chave inteira.
 - Mantida a versão 0.8.4.
+
+## Ajuste estético da 0.8.4
+
+- Adicionada navegação superior para desktop.
+- Hotbar inferior passa a ficar focada em mobile/tablet.
+- Menus, cards, botões, inputs, abas e painéis foram padronizados.
+- Visual geral ficou mais sóbrio, menos neon e menos “template de IA”.
+- Mata-mata recebeu camada visual mais limpa, com conectores atrás dos cards.
+- Cards do bracket ganharam espaçamento e altura mais estáveis para evitar sobreposição.
+- Mantidas as funcionalidades, estrutura de arquivos e versão 0.8.4.
